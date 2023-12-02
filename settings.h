@@ -261,6 +261,7 @@ extern EEPROM_Config_t gEeprom;
 #endif
 void SETTINGS_SaveVfoIndices(void);
 void SETTINGS_SaveSettings(void);
+void SETTINGS_SaveChannelName(uint8_t channel, const char * name);
 void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, uint8_t Mode);
 void SETTINGS_SaveBatteryCalibration(const uint16_t * batteryCalibration);
 void SETTINGS_UpdateChannel(uint8_t channel, const VFO_Info_t *pVFO, bool keep);

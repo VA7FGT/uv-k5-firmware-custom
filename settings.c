@@ -203,8 +203,7 @@ void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, 
 		if (!IS_NOAA_CHANNEL(Channel))
 	#endif
 	{
-		const uint16_t OffsetMR  = Channel * 16;
-		      uint16_t OffsetVFO = OffsetMR;
+		uint16_t OffsetVFO = Channel * 16;
 
 		if (!IS_MR_CHANNEL(Channel))
 		{	// it's a VFO, not a channel
@@ -246,19 +245,10 @@ void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, 
 
 				#ifndef ENABLE_KEEP_MEM_NAME
 					// clear/reset the channel name
-					//memset(&State, 0xFF, sizeof(State));
-					memset(&State, 0x00, sizeof(State));     // follow the QS way
-					EEPROM_WriteBuffer(0x0F50 + OffsetMR, State);
-					EEPROM_WriteBuffer(0x0F58 + OffsetMR, State);
+					SETTINGS_SaveChannelName(Channel, "");
 				#else
-					if (Mode >= 3)
-					{	// save the channel name
-						memmove(State, pVFO->Name + 0, 8);
-						EEPROM_WriteBuffer(0x0F50 + OffsetMR, State);
-						//memset(State, 0xFF, sizeof(State));
-						memset(State, 0x00, sizeof(State));  // follow the QS way
-						memmove(State, pVFO->Name + 8, 2);
-						EEPROM_WriteBuffer(0x0F58 + OffsetMR, State);
+					if (Mode >= 3) {
+						SETTINGS_SaveChannelName(Channel, pVFO->Name);
 						
 						#ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
 							//update channel names stored in memory
@@ -279,6 +269,16 @@ void SETTINGS_SaveBatteryCalibration(const uint16_t * batteryCalibration)
 	buf[0] = batteryCalibration[4];
 	buf[1] = batteryCalibration[5];
 	EEPROM_WriteBuffer(0x1F48, buf);
+}
+
+void SETTINGS_SaveChannelName(uint8_t channel, const char * name)
+{
+	uint16_t offset = channel * 16;
+	uint8_t  buf[16];
+	memset(&buf, 0x00, sizeof(buf));
+	memcpy(buf, name, MIN(strlen(name),10u));
+	EEPROM_WriteBuffer(0x0F50 + offset, buf);
+	EEPROM_WriteBuffer(0x0F58 + offset, buf + 8);
 }
 
 void SETTINGS_UpdateChannel(uint8_t channel, const VFO_Info_t *pVFO, bool keep)
@@ -313,14 +313,63 @@ void SETTINGS_UpdateChannel(uint8_t channel, const VFO_Info_t *pVFO, bool keep)
 		gMR_ChannelAttributes[channel] = att;
 
 		if (IS_MR_CHANNEL(channel)) {	// it's a memory channel
-			const uint16_t OffsetMR = channel * 16;
 			if (!keep) {
 				// clear/reset the channel name
-				memset(&state, 0x00, sizeof(state));
-				EEPROM_WriteBuffer(0x0F50 + OffsetMR, state);
-				EEPROM_WriteBuffer(0x0F58 + OffsetMR, state);
+				SETTINGS_SaveChannelName(channel, "");
 			}
 		}
+	}
+}
+
+void SETTINGS_SetVfoFrequency(uint32_t frequency) {
+	const uint8_t Vfo = gEeprom.TX_VFO;
+	// clamp the frequency entered to some valid value
+	if (frequency < RX_freq_min())
+	{
+		frequency = RX_freq_min();
+	}
+	else
+	if (frequency >= BX4819_band1.upper && frequency < BX4819_band2.lower)
+	{
+		const uint32_t center = (BX4819_band1.upper + BX4819_band2.lower) / 2;
+		frequency = (frequency < center) ? BX4819_band1.upper : BX4819_band2.lower;
+	}
+	else
+	if (frequency > frequencyBandTable[ARRAY_SIZE(frequencyBandTable) - 1].upper)
+	{
+		frequency = frequencyBandTable[ARRAY_SIZE(frequencyBandTable) - 1].upper;
+	}
+
+	{
+		const FREQUENCY_Band_t band = FREQUENCY_GetBand(frequency);
+
+		#ifdef ENABLE_VOICE
+			gAnotherVoiceID = (VOICE_ID_t)Key;
+		#endif
+
+		if (gTxVfo->Band != band)
+		{
+			gTxVfo->Band               = band;
+			gEeprom.ScreenChannel[Vfo] = band + FREQ_CHANNEL_FIRST;
+			gEeprom.FreqChannel[Vfo]   = band + FREQ_CHANNEL_FIRST;
+
+			SETTINGS_SaveVfoIndices();
+
+			RADIO_ConfigureChannel(Vfo, VFO_CONFIGURE_RELOAD);
+		}
+
+		// Autoset stepFrequency based on step setting
+		gTxVfo->StepFrequency = gStepFrequencyTable[gTxVfo->STEP_SETTING];
+
+		frequency = FREQUENCY_RoundToStep(frequency, gTxVfo->StepFrequency);
+
+		if (frequency >= BX4819_band1.upper && frequency < BX4819_band2.lower)
+		{	// clamp the frequency to the limit
+			const uint32_t center = (BX4819_band1.upper + BX4819_band2.lower) / 2;
+			frequency = (frequency < center) ? BX4819_band1.upper - gTxVfo->StepFrequency : BX4819_band2.lower;
+		}
+
+		gTxVfo->freq_config_RX.Frequency = frequency;
 	}
 }
 
