@@ -1257,14 +1257,6 @@ static void UpdateListening() {
 }
 
 static void Tick() {
-#ifdef ENABLE_AM_FIX
-  if (gNextTimeslice) {
-    gNextTimeslice = false;
-    if(settings.modulationType == MODULATION_AM && !lockAGC) {
-      AM_fix_10ms(vfo); //allow AM_Fix to apply its AGC action
-    }
-  }
-#endif
 
 #ifdef ENABLE_SCAN_RANGES
   if (gNextTimeslice_500ms) {
@@ -1314,22 +1306,20 @@ static void Tick() {
 }
 
 void APP_RunSpectrum() {
-  // TX here coz it always? set to active VFO
-  vfo = gEeprom.TX_VFO;
-  // set the current frequency in the middle of the display
-#ifdef ENABLE_SCAN_RANGES
-  if(gScanRangeStart) {
-    currentFreq = initialFreq = gScanRangeStart;
-    for(uint8_t i = 0; i < ARRAY_SIZE(scanStepValues); i++) {
-      if(scanStepValues[i] >= gTxVfo->StepFrequency) {
-        settings.scanStepIndex = i;
-        break;
+  #ifdef ENABLE_SCAN_RANGES
+    if(gScanRangeStart) {
+      currentFreq = initialFreq = gScanRangeStart;
+      for(uint8_t i = 0; i < ARRAY_SIZE(scanStepValues); i++) {
+        if(scanStepValues[i] >= gTxVfo->StepFrequency) {
+          settings.scanStepIndex = i;
+          break;
+        }
       }
+      settings.stepsCount = STEPS_128;
     }
-    settings.stepsCount = STEPS_128;
-  }
-  else
-#endif
+    else
+  #endif
+  // REMOVE IF IT CENTERS:
     currentFreq = initialFreq = gTxVfo->pRX->Frequency -
                                 ((GetStepsCount() / 2) * GetScanStep());
 
