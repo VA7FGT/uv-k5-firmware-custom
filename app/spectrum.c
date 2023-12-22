@@ -63,7 +63,7 @@ ScanInfo scanInfo;
 KeyboardState kbd = {KEY_INVALID, KEY_INVALID, 0};
 
 #ifdef ENABLE_SCAN_RANGES
-#define BLACKLIST_SIZE 30
+#define BLACKLIST_SIZE 200
 static uint16_t blacklistFreqs[BLACKLIST_SIZE];
 static uint8_t blacklistFreqsIdx;
 #endif
