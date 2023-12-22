@@ -1307,6 +1307,7 @@ static void Tick() {
 
 void APP_RunSpectrum() {
   #ifdef ENABLE_SCAN_RANGES
+    //we are in spectrum scan range
     if(gScanRangeStart) {
       currentFreq = initialFreq = gScanRangeStart;
       for(uint8_t i = 0; i < ARRAY_SIZE(scanStepValues); i++) {
@@ -1316,12 +1317,20 @@ void APP_RunSpectrum() {
         }
       }
       settings.stepsCount = STEPS_128;
-    }
-    else
-  #endif
-  // REMOVE IF IT CENTERS:
-    currentFreq = initialFreq = gTxVfo->pRX->Frequency -
+      // Center frequency for spectrum scan range functionality
+      currentFreq = initialFreq = gTxVfo->pRX->Frequency -
                                 ((GetStepsCount() / 2) * GetScanStep());
+    }
+    //we are in regular spectrum
+    else
+    {
+      // Do not center frequency in regular spectrum
+      currentFreq = initialFreq = gEeprom.VfoInfo[gEeprom.TX_VFO].pRX->Frequency;
+    }
+  #else
+    // Do not center frequency in regular spectrum
+    currentFreq = initialFreq = gEeprom.VfoInfo[gEeprom.TX_VFO].pRX->Frequency;
+  #endif
 
   BackupRegisters();
 
