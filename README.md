@@ -58,11 +58,11 @@ Anyway, have fun.
    * `ENABLE_ULTRA_LOW_POWER_TX` flag allows to transmit with ultra low power (thanks to egzumer work) for local testing of communication between radios.
 
  ## Keyboard shortcuts
-    * In `VFO mode` long press `5` to enter `scan range mode`
-    * In `VFO mode` long press `5` then press `F+5` to enter `spectrum scan range mode`
-    * Press `F+5` to enter `spectrum mode`
-    * While in `spectrum mode` press `MENU` to enter `fine tuning mode`
-    * While in `spectrum mode` or `fine tuning mode` short press `PTT` to copy current modulation, step, frequency, bw and enter `VFO mode`
+* In `VFO mode` long press `5` to enter `scan range mode`
+* In `VFO mode` long press `5` then press `F+5` to enter `spectrum scan range mode`
+* Press `F+5` to enter `spectrum mode`
+* While in `spectrum mode` press `MENU` to enter `fine tuning mode`
+* While in `spectrum mode` or `fine tuning mode` short press `PTT` to copy current modulation, step, frequency, bw and enter `VFO mode`
 
  ## Manual
 
