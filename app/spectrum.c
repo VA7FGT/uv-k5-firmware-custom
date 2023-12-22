@@ -66,6 +66,8 @@ KeyboardState kbd = {KEY_INVALID, KEY_INVALID, 0};
 #define BLACKLIST_SIZE 200
 static uint16_t blacklistFreqs[BLACKLIST_SIZE];
 static uint8_t blacklistFreqsIdx;
+static bool IsBlacklisted(uint16_t idx);
+static uint8_t ScanRangeidx();
 #endif
 
 const char *bwOptions[] = {"  25k", "12.5k", "6.25k"};
@@ -450,7 +452,7 @@ static void Measure()
   uint16_t rssi = scanInfo.rssi = GetRssi();
 #ifdef ENABLE_SCAN_RANGES  
   if(scanInfo.measurementsCount > 128) {
-    uint8_t idx = (uint32_t)ARRAY_SIZE(rssiHistory) * 1000 / scanInfo.measurementsCount * scanInfo.i / 1000;
+    uint8_t idx = ScanRangeidx();
     if(rssiHistory[idx] < rssi || isListening) 
       rssiHistory[idx] = rssi;
     rssiHistory[(idx+1)%128] = 0;
@@ -655,6 +657,7 @@ static void UpdateFreqInput(KEY_Code_t key) {
 static void Blacklist() {
 #ifdef ENABLE_SCAN_RANGES
   blacklistFreqs[blacklistFreqsIdx++ % ARRAY_SIZE(blacklistFreqs)] = peak.i;
+  rssiHistory[ScanRangeidx()] = RSSI_MAX_VALUE;
 #endif
   rssiHistory[peak.i] = RSSI_MAX_VALUE;
   ResetPeak();
@@ -663,6 +666,11 @@ static void Blacklist() {
 }
 
 #ifdef ENABLE_SCAN_RANGES
+static uint8_t ScanRangeidx()
+{
+  return (uint32_t)ARRAY_SIZE(rssiHistory) * 1000 / scanInfo.measurementsCount * scanInfo.i / 1000;
+}
+
 static bool IsBlacklisted(uint16_t idx)
 {
   for(uint8_t i = 0; i < ARRAY_SIZE(blacklistFreqs); i++)
