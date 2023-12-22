@@ -59,6 +59,7 @@ Anyway, have fun.
 
  ## Keyboard shortcuts
 * In `VFO mode` long press `5` to enter `scan range mode`
+* In `VFO mode` long press `5` then press `F+5` to enter `spectrum scan range mode`
 * Press `F+5` to enter `spectrum mode`
 * While in `spectrum mode` press `MENU` to enter `fine tuning mode`
 * While in `spectrum mode` or `fine tuning mode` short press `PTT` to copy current modulation, step, frequency, bw and enter `VFO mode`
