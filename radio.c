@@ -34,6 +34,7 @@
 #include "radio.h"
 #include "settings.h"
 #include "ui/menu.h"
+#include "board.h"
 
 VFO_Info_t    *gTxVfo;
 VFO_Info_t    *gRxVfo;
@@ -381,7 +382,7 @@ void RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure
 
 	if (IS_MR_CHANNEL(channel))
 	{	// 16 bytes allocated to the channel name but only 10 used, the rest are 0's
-		SETTINGS_FetchChannelName(pVfo->Name, channel);
+		BOARD_fetchChannelName(pVfo->Name, channel);
 	}
 
 	if (!pVfo->FrequencyReverse)

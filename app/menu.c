@@ -1309,7 +1309,7 @@ static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		UI_MENU_GetCurrentMenuId() == MENU_1_CALL || 
 		UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME)
 	{	// enter 3-digit channel number
-
+	
 		if (gInputBoxIndex < 3)
 		{
 			#ifdef ENABLE_VOICE
@@ -1427,7 +1427,14 @@ static void MENU_Key_EXIT(bool bKeyPressed, bool bKeyHeld)
 }
 
 static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
-{
+{	
+	//Exit if not allowed to edit
+	if(UI_MENU_IsAllowedToEdit(UI_MENU_GetCurrentMenuId())==false)
+	{
+		gBeepToPlay = BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL;
+		return;
+	}
+
 	if (bKeyHeld || !bKeyPressed)
 		return;
 
