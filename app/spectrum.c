@@ -14,7 +14,6 @@
  *     limitations under the License.
  */
 #include "app/spectrum.h"
-#include "audio.h"
 
 #ifdef ENABLE_SCAN_RANGES
 #include "chFrScanner.h"
