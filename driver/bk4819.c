@@ -304,7 +304,8 @@ void BK4819_InitAGC()
 	//         0 = -33dB
 	//
 
-	BK4819_WriteRegister(BK4819_REG_13, 0x03BE);  // 0x03BE / 000000 11 101 11 110 /  -7dB
+	BK4819_SetDefaultAmplifierSettings();         // 0x03BE / 000000 11 101 11 110 /  -7dB
+
 	BK4819_WriteRegister(BK4819_REG_12, 0x037B);  // 0x037B / 000000 11 011 11 011 / -24dB
 	BK4819_WriteRegister(BK4819_REG_11, 0x027B);  // 0x027B / 000000 10 011 11 011 / -43dB
 	BK4819_WriteRegister(BK4819_REG_10, 0x007A);  // 0x007A / 000000 00 011 11 010 / -58dB
@@ -771,6 +772,14 @@ void BK4819_SetupSquelch(
 
 	BK4819_RX_TurnOn();
 }
+
+// Set RF RX front end gain original QS front end register settings
+// 0x03BE   00000 011 101 11 110
+void BK4819_SetDefaultAmplifierSettings()
+{
+	BK4819_WriteRegister(BK4819_REG_13, 0x03BE);
+}
+
 
 void BK4819_SetAF(BK4819_AF_Type_t AF)
 {
