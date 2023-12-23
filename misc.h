@@ -353,5 +353,7 @@ extern volatile uint8_t      boot_counter_10ms;
 int32_t NUMBER_AddWithWraparound(int32_t Base, int32_t Add, int32_t LowerLimit, int32_t UpperLimit);
 unsigned long StrToUL(const char * str);
 
+bool IsValueInArray(int val, const int *arr, const int size);
+
 #endif
 

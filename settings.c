@@ -203,8 +203,7 @@ void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, 
 		if (!IS_NOAA_CHANNEL(Channel))
 	#endif
 	{
-		const uint16_t OffsetMR  = Channel * 16;
-		      uint16_t OffsetVFO = OffsetMR;
+		uint16_t OffsetVFO = Channel * 16;
 
 		if (!IS_MR_CHANNEL(Channel))
 		{	// it's a VFO, not a channel
@@ -246,19 +245,10 @@ void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, 
 
 				#ifndef ENABLE_KEEP_MEM_NAME
 					// clear/reset the channel name
-					//memset(&State, 0xFF, sizeof(State));
-					memset(&State, 0x00, sizeof(State));     // follow the QS way
-					EEPROM_WriteBuffer(0x0F50 + OffsetMR, State);
-					EEPROM_WriteBuffer(0x0F58 + OffsetMR, State);
+					SETTINGS_SaveChannelName(Channel, "");
 				#else
-					if (Mode >= 3)
-					{	// save the channel name
-						memmove(State, pVFO->Name + 0, 8);
-						EEPROM_WriteBuffer(0x0F50 + OffsetMR, State);
-						//memset(State, 0xFF, sizeof(State));
-						memset(State, 0x00, sizeof(State));  // follow the QS way
-						memmove(State, pVFO->Name + 8, 2);
-						EEPROM_WriteBuffer(0x0F58 + OffsetMR, State);
+					if (Mode >= 3) {
+						SETTINGS_SaveChannelName(Channel, pVFO->Name);
 						
 						#ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
 							//update channel names stored in memory
@@ -279,6 +269,45 @@ void SETTINGS_SaveBatteryCalibration(const uint16_t * batteryCalibration)
 	buf[0] = batteryCalibration[4];
 	buf[1] = batteryCalibration[5];
 	EEPROM_WriteBuffer(0x1F48, buf);
+}
+
+void SETTINGS_SaveChannelName(uint8_t channel, const char * name)
+{
+	uint16_t offset = channel * 16;
+	uint8_t  buf[16];
+	memset(&buf, 0x00, sizeof(buf));
+	memcpy(buf, name, MIN(strlen(name),10u));
+	EEPROM_WriteBuffer(0x0F50 + offset, buf);
+	EEPROM_WriteBuffer(0x0F58 + offset, buf + 8);
+}
+
+void SETTINGS_FetchChannelName(char *s, const int channel)
+{
+	int i;
+
+	if (s == NULL)
+		return;
+	
+	memset(s, 0, 11);  // 's' had better be large enough !
+	
+	if (channel < 0)
+		return;
+
+	if (!RADIO_CheckValidChannel(channel, false, 0))
+		return;
+
+
+	EEPROM_ReadBuffer(0x0F50 + (channel * 16), s + 0, 8);
+	EEPROM_ReadBuffer(0x0F58 + (channel * 16), s + 8, 2);
+
+	for (i = 0; i < 10; i++)
+		if (s[i] < 32 || s[i] > 127)
+			break;                // invalid char
+
+	s[i--] = 0;                   // null term
+
+	while (i >= 0 && s[i] == 32)  // trim trailing spaces
+		s[i--] = 0;               // null term
 }
 
 void SETTINGS_UpdateChannel(uint8_t channel, const VFO_Info_t *pVFO, bool keep)
@@ -313,12 +342,9 @@ void SETTINGS_UpdateChannel(uint8_t channel, const VFO_Info_t *pVFO, bool keep)
 		gMR_ChannelAttributes[channel] = att;
 
 		if (IS_MR_CHANNEL(channel)) {	// it's a memory channel
-			const uint16_t OffsetMR = channel * 16;
 			if (!keep) {
 				// clear/reset the channel name
-				memset(&state, 0x00, sizeof(state));
-				EEPROM_WriteBuffer(0x0F50 + OffsetMR, state);
-				EEPROM_WriteBuffer(0x0F58 + OffsetMR, state);
+				SETTINGS_SaveChannelName(channel, "");
 			}
 		}
 	}

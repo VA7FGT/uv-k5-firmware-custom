@@ -177,5 +177,6 @@ extern int               edit_index;
 void UI_DisplayMenu(void);
 int UI_MENU_GetCurrentMenuId();
 uint8_t UI_MENU_GetMenuIdx(uint8_t id);
+bool UI_MENU_IsAllowedToEdit(int menu_id);
 
 #endif

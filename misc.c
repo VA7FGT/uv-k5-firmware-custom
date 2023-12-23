@@ -284,3 +284,13 @@ unsigned long StrToUL(const char * str)
 	}
 	return ul;
 }
+
+// Checks if given val is in arr
+bool IsValueInArray(int val, const int *arr, const int size) {
+	int length = size / sizeof(int);
+    for(int i = 0; i < length; i++) {
+        if(arr[i] == val)
+            return true;
+    }
+    return false;
+}

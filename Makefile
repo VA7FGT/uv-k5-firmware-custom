@@ -378,7 +378,7 @@ ifeq ($(ENABLE_CLANG),0)
 	LDFLAGS += -mcpu=cortex-m0 -nostartfiles -Wl,-T,firmware.ld
 else
 #	Fix warning about implied executable stack
-	LDFLAGS += -z noexecstack -mcpu=cortex-m0 -nostartfiles -Wl,-T,firmware.ld
+	LDFLAGS += -z noexecstack -mcpu=cortex-m0 -nostartfiles -Wl,-T,firmware.ld, -V
 endif
 
 # Use newlib-nano instead of newlib

@@ -528,12 +528,8 @@ void MENU_AcceptSetting(void)
 					edit[i] = ' ';
 				}
 			}
-
-			// save the channel name
-			memset(gTxVfo->Name, 0, sizeof(gTxVfo->Name));
-			memmove(gTxVfo->Name, edit, 10);
-			SETTINGS_SaveChannel(gSubMenuSelection, gEeprom.TX_VFO, gTxVfo, 3);
-			gFlagReconfigureVfos = true;
+			
+			SETTINGS_SaveChannelName(gSubMenuSelection, edit);
 			return;
 
 		case MENU_SAVE:
@@ -1313,7 +1309,7 @@ static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		UI_MENU_GetCurrentMenuId() == MENU_1_CALL || 
 		UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME)
 	{	// enter 3-digit channel number
-
+	
 		if (gInputBoxIndex < 3)
 		{
 			#ifdef ENABLE_VOICE
@@ -1431,7 +1427,14 @@ static void MENU_Key_EXIT(bool bKeyPressed, bool bKeyHeld)
 }
 
 static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
-{
+{	
+	//Exit if not allowed to edit
+	if(UI_MENU_IsAllowedToEdit(UI_MENU_GetCurrentMenuId())==false)
+	{
+		gBeepToPlay = BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL;
+		return;
+	}
+
 	if (bKeyHeld || !bKeyPressed)
 		return;
 
@@ -1470,7 +1473,7 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 			if (!RADIO_CheckValidChannel(gSubMenuSelection, false, 0))
 				return;
 
-			BOARD_fetchChannelName(edit, gSubMenuSelection);
+			SETTINGS_FetchChannelName(edit, gSubMenuSelection);
 
 			// pad the channel name out with '_'
 			edit_index = strlen(edit);
