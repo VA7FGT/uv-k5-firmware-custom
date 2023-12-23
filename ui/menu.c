@@ -662,7 +662,7 @@ void UI_DisplayMenu(void)
 				UI_GenerateChannelStringEx(String, 1, gSubMenuSelection);
 				UI_PrintString(String, menu_item_x1, menu_item_x2, 0, 8);
 
-				BOARD_fetchChannelName(String, gSubMenuSelection);
+				SETTINGS_FetchChannelName(String, gSubMenuSelection);
 				if (String[0] == 0)
 					strcpy(String, "--");
 				UI_PrintString(String, menu_item_x1, menu_item_x2, 2, 8);
@@ -688,7 +688,7 @@ void UI_DisplayMenu(void)
 
 				if (!gIsInSubMenu || edit_index < 0)
 				{	// show the channel name
-					BOARD_fetchChannelName(String, gSubMenuSelection);
+					SETTINGS_FetchChannelName(String, gSubMenuSelection);
 					if (String[0] == 0)
 						strcpy(String, "--");
 					UI_PrintString(String, menu_item_x1, menu_item_x2, 2, 8);
@@ -936,7 +936,7 @@ void UI_DisplayMenu(void)
 			UI_PrintString(String, menu_item_x1, menu_item_x2, 0, 8);
 
 			// channel name
-			BOARD_fetchChannelName(String, gSubMenuSelection);
+			SETTINGS_FetchChannelName(String, gSubMenuSelection);
 			if (String[0] == 0)
 				strcpy(String, "--");
 			UI_PrintString(String, menu_item_x1, menu_item_x2, 2, 8);
@@ -947,7 +947,7 @@ void UI_DisplayMenu(void)
 			UI_PrintString(String, menu_item_x1, menu_item_x2, 0, 8);
 
 			// channel name
-			BOARD_fetchChannelName(String, gSubMenuSelection);
+			SETTINGS_FetchChannelName(String, gSubMenuSelection);
 			if (String[0] == 0)
 				strcpy(String, "--");
 			UI_PrintStringSmall(String, menu_item_x1, menu_item_x2, 2);

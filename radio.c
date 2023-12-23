@@ -382,7 +382,7 @@ void RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure
 
 	if (IS_MR_CHANNEL(channel))
 	{	// 16 bytes allocated to the channel name but only 10 used, the rest are 0's
-		BOARD_fetchChannelName(pVfo->Name, channel);
+		SETTINGS_FetchChannelName(pVfo->Name, channel);
 	}
 
 	if (!pVfo->FrequencyReverse)

@@ -281,6 +281,35 @@ void SETTINGS_SaveChannelName(uint8_t channel, const char * name)
 	EEPROM_WriteBuffer(0x0F58 + offset, buf + 8);
 }
 
+void SETTINGS_FetchChannelName(char *s, const int channel)
+{
+	int i;
+
+	if (s == NULL)
+		return;
+	
+	memset(s, 0, 11);  // 's' had better be large enough !
+	
+	if (channel < 0)
+		return;
+
+	if (!RADIO_CheckValidChannel(channel, false, 0))
+		return;
+
+
+	EEPROM_ReadBuffer(0x0F50 + (channel * 16), s + 0, 8);
+	EEPROM_ReadBuffer(0x0F58 + (channel * 16), s + 8, 2);
+
+	for (i = 0; i < 10; i++)
+		if (s[i] < 32 || s[i] > 127)
+			break;                // invalid char
+
+	s[i--] = 0;                   // null term
+
+	while (i >= 0 && s[i] == 32)  // trim trailing spaces
+		s[i--] = 0;               // null term
+}
+
 void SETTINGS_UpdateChannel(uint8_t channel, const VFO_Info_t *pVFO, bool keep)
 {
 #ifdef ENABLE_NOAA

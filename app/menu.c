@@ -1473,7 +1473,7 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 			if (!RADIO_CheckValidChannel(gSubMenuSelection, false, 0))
 				return;
 
-			BOARD_fetchChannelName(edit, gSubMenuSelection);
+			SETTINGS_FetchChannelName(edit, gSubMenuSelection);
 
 			// pad the channel name out with '_'
 			edit_index = strlen(edit);
