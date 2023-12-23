@@ -386,7 +386,7 @@ static void InitScan() {
   scanInfo.f = GetFStart();
 
   scanInfo.scanStep = GetScanStep();
-  scanInfo.measurementsCount = GetStepsCount();
+  scanInfo.measurementsCount = MR_CHANNEL_LAST +1;
 }
 
 static void ResetBlacklist() {
@@ -1193,7 +1193,7 @@ static void Scan() {
 static void NextScanStep() {
   ++peak.t;
   ++scanInfo.i;
-  scanInfo.f += scanInfo.scanStep;
+  scanInfo.f = gMR_ChannelFrequencyAttributes[scanInfo.i].Frequency;
 }
 
 static void UpdateScan() {
