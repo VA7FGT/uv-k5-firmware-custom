@@ -659,9 +659,7 @@ void UI_DisplayMenu(void)
 			case MENU_1_CALL:
 			case MENU_DEL_CH:
 			{
-				const bool valid = RADIO_CheckValidChannel(gSubMenuSelection, false, 0);
-
-				UI_GenerateChannelStringEx(String, valid, gSubMenuSelection);
+				UI_GenerateChannelStringEx(String, 1, gSubMenuSelection);
 				UI_PrintString(String, menu_item_x1, menu_item_x2, 0, 8);
 
 				BOARD_fetchChannelName(String, gSubMenuSelection);
@@ -669,7 +667,7 @@ void UI_DisplayMenu(void)
 					strcpy(String, "--");
 				UI_PrintString(String, menu_item_x1, menu_item_x2, 2, 8);
 
-				if (valid && !gAskForConfirmation)
+				if (!gAskForConfirmation)
 				{	// show the frequency so that the user knows the channels frequency
 					const uint32_t frequency = BOARD_fetchChannelFrequency(gSubMenuSelection);
 					sprintf(String, "%u.%05u", frequency / 100000, frequency % 100000);
@@ -682,37 +680,33 @@ void UI_DisplayMenu(void)
 
 			case MENU_MEM_NAME:
 			{
-				const bool valid = RADIO_CheckValidChannel(gSubMenuSelection, false, 0);
-
-				UI_GenerateChannelStringEx(String, valid, gSubMenuSelection);
+				UI_GenerateChannelStringEx(String, 1, gSubMenuSelection);
 				UI_PrintString(String, menu_item_x1, menu_item_x2, 0, 8);
 
-			if (valid)
-				{
-					const uint32_t frequency = BOARD_fetchChannelFrequency(gSubMenuSelection);
 
+				const uint32_t frequency = BOARD_fetchChannelFrequency(gSubMenuSelection);
+
+				if (!gIsInSubMenu || edit_index < 0)
+				{	// show the channel name
+					BOARD_fetchChannelName(String, gSubMenuSelection);
+					if (String[0] == 0)
+						strcpy(String, "--");
+					UI_PrintString(String, menu_item_x1, menu_item_x2, 2, 8);
+				}
+				else
+				{	// show the channel name being edited
+					UI_PrintString(edit, menu_item_x1, 0, 2, 8);
+					if (edit_index < 10)
+						UI_PrintString(     "^", menu_item_x1 + (8 * edit_index), 0, 4, 8);  // show the cursor
+				}
+
+				if (!gAskForConfirmation)
+				{	// show the frequency so that the user knows the channels frequency
+					sprintf(String, "%u.%05u", frequency / 100000, frequency % 100000);
 					if (!gIsInSubMenu || edit_index < 0)
-					{	// show the channel name
-						BOARD_fetchChannelName(String, gSubMenuSelection);
-						if (String[0] == 0)
-							strcpy(String, "--");
-						UI_PrintString(String, menu_item_x1, menu_item_x2, 2, 8);
-					}
+						UI_PrintString(String, menu_item_x1, menu_item_x2, 4, 8);
 					else
-					{	// show the channel name being edited
-						UI_PrintString(edit, menu_item_x1, 0, 2, 8);
-						if (edit_index < 10)
-							UI_PrintString(     "^", menu_item_x1 + (8 * edit_index), 0, 4, 8);  // show the cursor
-					}
-
-					if (!gAskForConfirmation)
-					{	// show the frequency so that the user knows the channels frequency
-						sprintf(String, "%u.%05u", frequency / 100000, frequency % 100000);
-						if (!gIsInSubMenu || edit_index < 0)
-							UI_PrintString(String, menu_item_x1, menu_item_x2, 4, 8);
-						else
-							UI_PrintString(String, menu_item_x1, menu_item_x2, 5, 8);
-					}
+						UI_PrintString(String, menu_item_x1, menu_item_x2, 5, 8);
 				}
 
 				already_printed = true;
