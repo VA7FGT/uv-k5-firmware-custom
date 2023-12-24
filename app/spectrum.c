@@ -334,12 +334,21 @@ uint8_t GetBWRegValueForScan() {
 }
 
 uint16_t GetRssi() {
+  uint16_t rssi;
   // SYSTICK_DelayUs(800);
   // testing autodelay based on Glitch value
   while ((BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
     SYSTICK_DelayUs(100);
   }
-  return BK4819_GetRSSI();
+  rssi = BK4819_GetRSSI();
+ 
+  // Increase perceived RSSI for UHF bands to imitate radio squelch
+  // in the future this offset could be adjustable by user?
+  // TODO: Move this logic to Measure() function and set rssi = scanInfo.rssi there
+  if(FREQUENCY_GetBand(fMeasure) > BAND4_174MHz)
+    rssi+=40;
+
+  return rssi;
 }
 
 static void ToggleAudio(bool on) {
