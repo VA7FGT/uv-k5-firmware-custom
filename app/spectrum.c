@@ -337,6 +337,11 @@ uint16_t GetRssi() {
   uint16_t rssi;
   // SYSTICK_DelayUs(800);
   // testing autodelay based on Glitch value
+
+  // Read only for valid channels (makes it even faster for ppl with less than 200 channels stored)
+  if(RADIO_CheckValidChannel(scanInfo.i, false, 0)==false)
+    return 0;
+
   while ((BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
     SYSTICK_DelayUs(100);
   }
