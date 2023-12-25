@@ -53,6 +53,7 @@ static char String[32];
   bool     isKnownChannel = false;
   int      channel;
   char     channelName[12];
+  void     LoadValidMemoryChannels();
 #endif
 
 bool isInitialized = false;
@@ -784,8 +785,6 @@ static void DrawF(uint32_t f) {
   GUI_DisplaySmallest(String, 116, 1, false, true);
   sprintf(String, "%s", bwOptions[settings.listenBw]);
   GUI_DisplaySmallest(String, 108, 7, false, true);
-    sprintf(String, "p:%ds:%d", peak.i, scanInfo.i);
-  GUI_DisplaySmallest(String, 85, 13, false, true);
 }
 #ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
   void LookupChannelInfo() {
@@ -1223,7 +1222,8 @@ static void NextScanStep() {
     // channel mode
     if (appMode==CHANNEL_MODE)
     {
-      scanInfo.f =  gMR_ChannelFrequencyAttributes[scanChannel[scanInfo.i]].Frequency;
+      int currentChannel = scanChannel[scanInfo.i];
+      scanInfo.f =  gMR_ChannelFrequencyAttributes[currentChannel].Frequency;
       ++scanInfo.i; 
     }
     else
@@ -1365,20 +1365,7 @@ void APP_RunSpectrum() {
   #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
     if (appMode==CHANNEL_MODE)
     {
-      scanChannelsCount = RADIO_ValidMemoryChannelsCount();
-      int channelIndex=0;
-      for(int i=0; i < scanChannelsCount; i++)
-      {
-        int nextChannel;
-        nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, false, 0);
-        channelIndex = nextChannel;
-        scanChannel[i]=channelIndex;
-    
-        if (nextChannel == 0xFF)
-        {	// no valid channel found
-          break;
-        }
-      }
+      LoadValidMemoryChannels();
     }
   #endif
   #ifdef ENABLE_SCAN_RANGES
@@ -1427,3 +1414,23 @@ void APP_RunSpectrum() {
     Tick();
   }
 }
+
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+  void LoadValidMemoryChannels()
+  {
+    scanChannelsCount = RADIO_ValidMemoryChannelsCount();
+    int channelIndex=0;
+    for(int i=0; i < scanChannelsCount; i++)
+    {
+      int nextChannel;
+      nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, false, 0);
+      channelIndex = nextChannel;
+      scanChannel[i]=channelIndex;
+
+      if (nextChannel == 0xFF)
+      {	// no valid channel found
+        break;
+      }
+    }
+  }
+#endif
