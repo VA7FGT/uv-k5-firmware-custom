@@ -810,8 +810,17 @@ static void DrawNums() {
   if (currentState == SPECTRUM) {
     sprintf(String, "%ux", GetStepsCount());
     GUI_DisplaySmallest(String, 0, 1, false, true);
-    sprintf(String, "%u.%02uk", GetScanStep() / 100, GetScanStep() % 100);
-    GUI_DisplaySmallest(String, 0, 7, false, true);
+    if (appMode==CHANNEL_MODE)
+    {
+      sprintf(String, "%ddB", Rssi2DBm(peak.rssi));
+      GUI_DisplaySmallest(String, 0, 7, false, true);
+    }
+    else
+    {
+      sprintf(String, "%u.%02uk", GetScanStep() / 100, GetScanStep() % 100);
+      GUI_DisplaySmallest(String, 0, 7, false, true);
+    }
+
   }
 
   if (IsCenterMode()) {
@@ -820,15 +829,27 @@ static void DrawNums() {
             settings.frequencyChangeStep % 100);
     GUI_DisplaySmallest(String, 36, 49, false, true);
   } else {
-    sprintf(String, "%u.%05u", GetFStart() / 100000, GetFStart() % 100000);
-    GUI_DisplaySmallest(String, 0, 49, false, true);
+    if (appMode==CHANNEL_MODE) 
+    {
+      sprintf(String, "M:%d", scanChannel[0]);
+      GUI_DisplaySmallest(String, 0, 49, false, true);
 
-    sprintf(String, "\x7F%u.%02uk", settings.frequencyChangeStep / 100,
-            settings.frequencyChangeStep % 100);
-    GUI_DisplaySmallest(String, 48, 49, false, true);
+      sprintf(String, "M:%d", scanChannel[scanChannelsCount-2]);
+      GUI_DisplaySmallest(String, 108, 49, false, true);
+    }
+    else
+    {
+      sprintf(String, "%u.%05u", GetFStart() / 100000, GetFStart() % 100000);
+      GUI_DisplaySmallest(String, 0, 49, false, true);
 
-    sprintf(String, "%u.%05u", GetFEnd() / 100000, GetFEnd() % 100000);
-    GUI_DisplaySmallest(String, 93, 49, false, true);
+      sprintf(String, "\x7F%u.%02uk", settings.frequencyChangeStep / 100,
+              settings.frequencyChangeStep % 100);
+      GUI_DisplaySmallest(String, 48, 49, false, true);
+
+      sprintf(String, "%u.%05u", GetFEnd() / 100000, GetFEnd() % 100000);
+      GUI_DisplaySmallest(String, 93, 49, false, true);
+    }
+
   }
 }
 
@@ -886,10 +907,16 @@ static void OnKeyDown(uint8_t key) {
     UpdateDBMax(false);
     break;
   case KEY_1:
-    UpdateScanStep(true);
+    if(appMode!=CHANNEL_MODE)
+    {
+      UpdateScanStep(true);
+    }
     break;
   case KEY_7:
-    UpdateScanStep(false);
+    if(appMode!=CHANNEL_MODE)
+    {
+      UpdateScanStep(false);
+    }
     break;
   case KEY_2:
     UpdateFreqChangeStep(true);
@@ -899,13 +926,13 @@ static void OnKeyDown(uint8_t key) {
     break;
   case KEY_UP:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart)
+    if(!gScanRangeStart && appMode!= CHANNEL_MODE)
 #endif
       UpdateCurrentFreq(true);
     break;
   case KEY_DOWN:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart)
+    if(!gScanRangeStart && appMode!= CHANNEL_MODE)
 #endif
       UpdateCurrentFreq(false);
     break;
@@ -920,7 +947,7 @@ static void OnKeyDown(uint8_t key) {
     break;
   case KEY_5:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart)
+    if(!gScanRangeStart && appMode!= CHANNEL_MODE)
 #endif  
       FreqInput();
     break;
