@@ -165,6 +165,8 @@ void     RADIO_PrepareTX(void);
 void     RADIO_EnableCxCSS(void);
 void     RADIO_PrepareCssTX(void);
 void     RADIO_SendEndOfTransmission(void);
+#endif
 
-
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+	uint8_t RADIO_MemoryChannelsCount(void);
 #endif

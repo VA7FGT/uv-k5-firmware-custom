@@ -104,7 +104,7 @@ bool RADIO_CheckValidChannel(uint16_t Channel, bool bCheckScanList, uint8_t VFO)
 uint8_t RADIO_FindNextChannel(uint8_t Channel, int8_t Direction, bool bCheckScanList, uint8_t VFO)
 {
 	unsigned int i;
-
+		
 	for (i = 0; IS_MR_CHANNEL(i); i++)
 	{
 		if (Channel == 0xFF)
@@ -118,7 +118,7 @@ uint8_t RADIO_FindNextChannel(uint8_t Channel, int8_t Direction, bool bCheckScan
 
 		Channel += Direction;
 	}
-
+	
 	return 0xFF;
 }
 
@@ -1143,3 +1143,11 @@ void RADIO_SendEndOfTransmission(void)
 
 	BK4819_ExitDTMF_TX(true);
 }
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+	uint8_t RADIO_MemoryChannelsCount(void)
+	{
+		uint8_t i=0;
+		for (i = MR_CHANNEL_FIRST; RADIO_CheckValidChannel(i, false, 0); ++i) {}
+		return i;
+	}
+#endif

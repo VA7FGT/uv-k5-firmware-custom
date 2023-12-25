@@ -34,6 +34,13 @@ struct FrequencyBandInfo {
 
 #define F_MAX frequencyBandTable[ARRAY_SIZE(frequencyBandTable) - 1].upper
 
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+  //Idea - make this user adjustable to compensate for different antennas, frontends, conditions
+  #define UHF_NOISE_FLOOR 40
+  // TODO: refactor to find index of first memory channel, someone migght have first 10 memory channels blank
+  int channelIndex = 0;
+#endif
+
 const uint16_t RSSI_MAX_VALUE = 65535;
 
 static uint16_t R30, R37, R3D, R43, R47, R48, R7E;
@@ -270,7 +277,9 @@ uint16_t GetScanStep() { return scanStepValues[settings.scanStepIndex]; }
 
 uint16_t GetStepsCount() 
 { 
-#ifdef ENABLE_SCAN_RANGES
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+  return RADIO_MemoryChannelsCount();
+#elif ENABLE_SCAN_RANGES
   if(gScanRangeStart) {
     return (gScanRangeStop - gScanRangeStart) / GetScanStep();
   }
@@ -339,8 +348,8 @@ uint16_t GetRssi() {
   // testing autodelay based on Glitch value
 
   // Read only for valid channels (makes it even faster for ppl with less than 200 channels stored)
-  if(RADIO_CheckValidChannel(scanInfo.i, false, 0)==false)
-    return 0;
+  // if(RADIO_CheckValidChannel(scanInfo.i, false, 0)==false)
+  //   return 0;
 
   while ((BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
     SYSTICK_DelayUs(100);
@@ -350,9 +359,10 @@ uint16_t GetRssi() {
   // Increase perceived RSSI for UHF bands to imitate radio squelch
   // in the future this offset could be adjustable by user?
   // TODO: Move this logic to Measure() function and set rssi = scanInfo.rssi there
-  if(FREQUENCY_GetBand(fMeasure) > BAND4_174MHz)
-    rssi+=40;
-
+  #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+    if(FREQUENCY_GetBand(fMeasure) > BAND4_174MHz)
+      rssi+=UHF_NOISE_FLOOR;
+  #endif
   return rssi;
 }
 
@@ -400,7 +410,7 @@ static void InitScan() {
   scanInfo.f = GetFStart();
 
   scanInfo.scanStep = GetScanStep();
-  scanInfo.measurementsCount = MR_CHANNEL_LAST +1;
+  scanInfo.measurementsCount = GetStepsCount();
 }
 
 static void ResetBlacklist() {
@@ -1207,7 +1217,27 @@ static void Scan() {
 static void NextScanStep() {
   ++peak.t;
   ++scanInfo.i;
-  scanInfo.f = gMR_ChannelFrequencyAttributes[scanInfo.i].Frequency;
+  #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+    int nextChannel;
+    // nextChannel = RADIO_FindNextChannel(channelIndex, RADIO_CHANNEL_UP, false, Vfo);
+    // channelIndex = nextChannel;
+    // scanInfo.f =  gMR_ChannelFrequencyAttributes[channelIndex].Frequency;
+
+    
+
+    nextChannel = RADIO_FindNextChannel((scanInfo.i % RADIO_MemoryChannelsCount()) + 1, 1, false, 0);
+		if (nextChannel == 0xFF)
+      {	// no valid channel found
+        nextChannel = MR_CHANNEL_FIRST;
+      }
+    channelIndex = nextChannel;
+    scanInfo.f =  gMR_ChannelFrequencyAttributes[channelIndex].Frequency;
+
+    // scanInfo.f = gMR_ChannelFrequencyAttributes[scanInfo.i].Frequency;
+  #elif
+    scanInfo.f += scanInfo.scanStep;
+  #endif
+
 }
 
 static void UpdateScan() {
