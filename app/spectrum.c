@@ -35,6 +35,7 @@ struct FrequencyBandInfo {
 #define F_MAX frequencyBandTable[ARRAY_SIZE(frequencyBandTable) - 1].upper
 
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+  Mode appMode;
   //Idea - make this user adjustable to compensate for different antennas, frontends, conditions
   #define UHF_NOISE_FLOOR 40
   //Current channel scan index
@@ -84,7 +85,6 @@ const uint8_t modTypeReg47Values[] = {1, 7, 5};
 SpectrumSettings settings = {stepsCount: STEPS_128,
                              scanStepIndex: S_STEP_25_0kHz,
                              frequencyChangeStep: 80000,
-                             scanDelay: 3200,
                              rssiTriggerLevel: 150,
                              backlightState: true,
                              bw: BK4819_FILTER_BW_WIDE,
@@ -278,8 +278,12 @@ uint16_t GetScanStep() { return scanStepValues[settings.scanStepIndex]; }
 uint16_t GetStepsCount() 
 { 
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-  return (RADIO_ValidMemoryChannelsCount());
-#elif ENABLE_SCAN_RANGES
+  if (appMode==CHANNEL_MODE)
+  {
+    return (RADIO_ValidMemoryChannelsCount());
+  }
+#endif
+#ifdef ENABLE_SCAN_RANGES
   if(gScanRangeStart) {
     return (gScanRangeStop - gScanRangeStart) / GetScanStep();
   }
@@ -353,9 +357,12 @@ uint16_t GetRssi() {
   rssi = BK4819_GetRSSI();
  
   #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-    // Increase perceived RSSI for UHF bands to imitate radio squelch
-    if(FREQUENCY_GetBand(fMeasure) > BAND4_174MHz)
+    if ((appMode==CHANNEL_MODE) && (FREQUENCY_GetBand(fMeasure) > BAND4_174MHz))
+    {
+      // Increase perceived RSSI for UHF bands to imitate radio squelch
       rssi+=UHF_NOISE_FLOOR;
+    }
+
   #endif
   return rssi;
 }
@@ -1211,21 +1218,33 @@ static void Scan() {
 static void NextScanStep() {
   ++peak.t;
   #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-    int nextChannel;
-    if(scanInfo.i==0)
-      channelIndex = MR_CHANNEL_FIRST; 
+    // channel mode
+    if (appMode==CHANNEL_MODE)
+    {
+      int nextChannel;
+      if(scanInfo.i==0)
+        channelIndex = MR_CHANNEL_FIRST; 
 
-    nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, false, 0);
-    channelIndex = nextChannel;
-    scanInfo.f =  gMR_ChannelFrequencyAttributes[channelIndex].Frequency;
-  
-		if (nextChannel == 0xFF)
-    {	// no valid channel found
-      channelIndex = MR_CHANNEL_FIRST;
+      nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, false, 0);
+      channelIndex = nextChannel;
+      scanInfo.f =  gMR_ChannelFrequencyAttributes[channelIndex].Frequency;
+    
+      if (nextChannel == 0xFF)
+      {	// no valid channel found
+        channelIndex = MR_CHANNEL_FIRST;
+      }
+
+      ++scanInfo.i; 
     }
-
-    ++scanInfo.i; 
+    else
+    // frequency mode
+    {
+      ++scanInfo.i; 
+      scanInfo.f += scanInfo.scanStep;
+    }
+    
   #elif
+    ++scanInfo.i;
     scanInfo.f += scanInfo.scanStep;
   #endif
 
@@ -1347,7 +1366,12 @@ static void Tick() {
   }
 }
 
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+void APP_RunSpectrum(Mode mode) {
+  appMode = mode;
+#elif
 void APP_RunSpectrum() {
+#endif
   #ifdef ENABLE_SCAN_RANGES
     if(gScanRangeStart) {
       currentFreq = initialFreq = gScanRangeStart;
