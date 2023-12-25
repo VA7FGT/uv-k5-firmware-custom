@@ -92,6 +92,13 @@ typedef enum State {
   STILL,
 } State;
 
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+typedef enum Mode {
+  FREQUENCY_MODE,
+  CHANNEL_MODE
+} Mode;
+#endif
+
 typedef enum StepsCount {
   STEPS_128,
   STEPS_64,
@@ -149,8 +156,12 @@ typedef struct PeakInfo {
   uint32_t f;
   uint16_t i;
 } PeakInfo;
-
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+void APP_RunSpectrum(Mode mode);
+#elif
 void APP_RunSpectrum(void);
+#endif
+
 
 #ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
   void LookupChannelInfo();

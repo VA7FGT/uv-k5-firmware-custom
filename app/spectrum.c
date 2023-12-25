@@ -34,6 +34,14 @@ struct FrequencyBandInfo {
 
 #define F_MAX frequencyBandTable[ARRAY_SIZE(frequencyBandTable) - 1].upper
 
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+  Mode appMode;
+  //Idea - make this user adjustable to compensate for different antennas, frontends, conditions
+  #define UHF_NOISE_FLOOR 40
+  uint8_t scanChannel[MR_CHANNEL_LAST];
+  uint8_t scanChannelsCount;
+#endif
+
 const uint16_t RSSI_MAX_VALUE = 65535;
 
 static uint16_t R30, R37, R3D, R43, R47, R48, R7E;
@@ -45,6 +53,7 @@ static char String[32];
   bool     isKnownChannel = false;
   int      channel;
   char     channelName[12];
+  void     LoadValidMemoryChannels();
 #endif
 
 bool isInitialized = false;
@@ -77,7 +86,6 @@ const uint8_t modTypeReg47Values[] = {1, 7, 5};
 SpectrumSettings settings = {stepsCount: STEPS_128,
                              scanStepIndex: S_STEP_25_0kHz,
                              frequencyChangeStep: 80000,
-                             scanDelay: 3200,
                              rssiTriggerLevel: 150,
                              backlightState: true,
                              bw: BK4819_FILTER_BW_WIDE,
@@ -270,6 +278,12 @@ uint16_t GetScanStep() { return scanStepValues[settings.scanStepIndex]; }
 
 uint16_t GetStepsCount() 
 { 
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+  if (appMode==CHANNEL_MODE)
+  {
+    return scanChannelsCount;
+  }
+#endif
 #ifdef ENABLE_SCAN_RANGES
   if(gScanRangeStart) {
     return (gScanRangeStop - gScanRangeStart) / GetScanStep();
@@ -334,12 +348,24 @@ uint8_t GetBWRegValueForScan() {
 }
 
 uint16_t GetRssi() {
+  uint16_t rssi;
   // SYSTICK_DelayUs(800);
   // testing autodelay based on Glitch value
+
   while ((BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
     SYSTICK_DelayUs(100);
   }
-  return BK4819_GetRSSI();
+  rssi = BK4819_GetRSSI();
+ 
+  #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+    if ((appMode==CHANNEL_MODE) && (FREQUENCY_GetBand(fMeasure) > BAND4_174MHz))
+    {
+      // Increase perceived RSSI for UHF bands to imitate radio squelch
+      rssi+=UHF_NOISE_FLOOR;
+    }
+
+  #endif
+  return rssi;
 }
 
 static void ToggleAudio(bool on) {
@@ -784,8 +810,17 @@ static void DrawNums() {
   if (currentState == SPECTRUM) {
     sprintf(String, "%ux", GetStepsCount());
     GUI_DisplaySmallest(String, 0, 1, false, true);
-    sprintf(String, "%u.%02uk", GetScanStep() / 100, GetScanStep() % 100);
-    GUI_DisplaySmallest(String, 0, 7, false, true);
+    if (appMode==CHANNEL_MODE)
+    {
+      sprintf(String, "%ddB", Rssi2DBm(peak.rssi));
+      GUI_DisplaySmallest(String, 0, 7, false, true);
+    }
+    else
+    {
+      sprintf(String, "%u.%02uk", GetScanStep() / 100, GetScanStep() % 100);
+      GUI_DisplaySmallest(String, 0, 7, false, true);
+    }
+
   }
 
   if (IsCenterMode()) {
@@ -794,15 +829,27 @@ static void DrawNums() {
             settings.frequencyChangeStep % 100);
     GUI_DisplaySmallest(String, 36, 49, false, true);
   } else {
-    sprintf(String, "%u.%05u", GetFStart() / 100000, GetFStart() % 100000);
-    GUI_DisplaySmallest(String, 0, 49, false, true);
+    if (appMode==CHANNEL_MODE) 
+    {
+      sprintf(String, "M:%d", scanChannel[0]);
+      GUI_DisplaySmallest(String, 0, 49, false, true);
 
-    sprintf(String, "\x7F%u.%02uk", settings.frequencyChangeStep / 100,
-            settings.frequencyChangeStep % 100);
-    GUI_DisplaySmallest(String, 48, 49, false, true);
+      sprintf(String, "M:%d", scanChannel[scanChannelsCount-2]);
+      GUI_DisplaySmallest(String, 108, 49, false, true);
+    }
+    else
+    {
+      sprintf(String, "%u.%05u", GetFStart() / 100000, GetFStart() % 100000);
+      GUI_DisplaySmallest(String, 0, 49, false, true);
 
-    sprintf(String, "%u.%05u", GetFEnd() / 100000, GetFEnd() % 100000);
-    GUI_DisplaySmallest(String, 93, 49, false, true);
+      sprintf(String, "\x7F%u.%02uk", settings.frequencyChangeStep / 100,
+              settings.frequencyChangeStep % 100);
+      GUI_DisplaySmallest(String, 48, 49, false, true);
+
+      sprintf(String, "%u.%05u", GetFEnd() / 100000, GetFEnd() % 100000);
+      GUI_DisplaySmallest(String, 93, 49, false, true);
+    }
+
   }
 }
 
@@ -860,10 +907,16 @@ static void OnKeyDown(uint8_t key) {
     UpdateDBMax(false);
     break;
   case KEY_1:
-    UpdateScanStep(true);
+    if(appMode!=CHANNEL_MODE)
+    {
+      UpdateScanStep(true);
+    }
     break;
   case KEY_7:
-    UpdateScanStep(false);
+    if(appMode!=CHANNEL_MODE)
+    {
+      UpdateScanStep(false);
+    }
     break;
   case KEY_2:
     UpdateFreqChangeStep(true);
@@ -873,13 +926,13 @@ static void OnKeyDown(uint8_t key) {
     break;
   case KEY_UP:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart)
+    if(!gScanRangeStart && appMode!= CHANNEL_MODE)
 #endif
       UpdateCurrentFreq(true);
     break;
   case KEY_DOWN:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart)
+    if(!gScanRangeStart && appMode!= CHANNEL_MODE)
 #endif
       UpdateCurrentFreq(false);
     break;
@@ -894,7 +947,7 @@ static void OnKeyDown(uint8_t key) {
     break;
   case KEY_5:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart)
+    if(!gScanRangeStart && appMode!= CHANNEL_MODE)
 #endif  
       FreqInput();
     break;
@@ -1192,8 +1245,26 @@ static void Scan() {
 
 static void NextScanStep() {
   ++peak.t;
-  ++scanInfo.i;
-  scanInfo.f += scanInfo.scanStep;
+  #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+    // channel mode
+    if (appMode==CHANNEL_MODE)
+    {
+      int currentChannel = scanChannel[scanInfo.i];
+      scanInfo.f =  gMR_ChannelFrequencyAttributes[currentChannel].Frequency;
+      ++scanInfo.i; 
+    }
+    else
+    // frequency mode
+    {
+      ++scanInfo.i; 
+      scanInfo.f += scanInfo.scanStep;
+    }
+    
+  #elif
+    ++scanInfo.i;
+    scanInfo.f += scanInfo.scanStep;
+  #endif
+
 }
 
 static void UpdateScan() {
@@ -1312,7 +1383,18 @@ static void Tick() {
   }
 }
 
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+void APP_RunSpectrum(Mode mode) {
+  appMode = mode;
+#elif
 void APP_RunSpectrum() {
+#endif
+  #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+    if (appMode==CHANNEL_MODE)
+    {
+      LoadValidMemoryChannels();
+    }
+  #endif
   #ifdef ENABLE_SCAN_RANGES
     if(gScanRangeStart) {
       currentFreq = initialFreq = gScanRangeStart;
@@ -1359,3 +1441,23 @@ void APP_RunSpectrum() {
     Tick();
   }
 }
+
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+  void LoadValidMemoryChannels()
+  {
+    scanChannelsCount = RADIO_ValidMemoryChannelsCount();
+    int channelIndex=0;
+    for(int i=0; i < scanChannelsCount; i++)
+    {
+      int nextChannel;
+      nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, false, 0);
+      channelIndex = nextChannel;
+      scanChannel[i]=channelIndex;
+
+      if (nextChannel == 0xFF)
+      {	// no valid channel found
+        break;
+      }
+    }
+  }
+#endif
