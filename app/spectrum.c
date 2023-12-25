@@ -38,8 +38,8 @@ struct FrequencyBandInfo {
   Mode appMode;
   //Idea - make this user adjustable to compensate for different antennas, frontends, conditions
   #define UHF_NOISE_FLOOR 40
-  //Current channel scan index
-  int channelIndex = 0;
+  uint8_t scanChannel[200];
+  uint8_t scanChannelsCount;
 #endif
 
 const uint16_t RSSI_MAX_VALUE = 65535;
@@ -280,7 +280,7 @@ uint16_t GetStepsCount()
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
   if (appMode==CHANNEL_MODE)
   {
-    return (RADIO_ValidMemoryChannelsCount());
+    return scanChannelsCount;
   }
 #endif
 #ifdef ENABLE_SCAN_RANGES
@@ -784,6 +784,8 @@ static void DrawF(uint32_t f) {
   GUI_DisplaySmallest(String, 116, 1, false, true);
   sprintf(String, "%s", bwOptions[settings.listenBw]);
   GUI_DisplaySmallest(String, 108, 7, false, true);
+    sprintf(String, "p:%ds:%d", peak.i, scanInfo.i);
+  GUI_DisplaySmallest(String, 85, 13, false, true);
 }
 #ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
   void LookupChannelInfo() {
@@ -1221,19 +1223,7 @@ static void NextScanStep() {
     // channel mode
     if (appMode==CHANNEL_MODE)
     {
-      int nextChannel;
-      if(scanInfo.i==0)
-        channelIndex = MR_CHANNEL_FIRST; 
-
-      nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, false, 0);
-      channelIndex = nextChannel;
-      scanInfo.f =  gMR_ChannelFrequencyAttributes[channelIndex].Frequency;
-    
-      if (nextChannel == 0xFF)
-      {	// no valid channel found
-        channelIndex = MR_CHANNEL_FIRST;
-      }
-
+      scanInfo.f =  gMR_ChannelFrequencyAttributes[scanChannel[scanInfo.i]].Frequency;
       ++scanInfo.i; 
     }
     else
@@ -1372,6 +1362,25 @@ void APP_RunSpectrum(Mode mode) {
 #elif
 void APP_RunSpectrum() {
 #endif
+  #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+    if (appMode==CHANNEL_MODE)
+    {
+      scanChannelsCount = RADIO_ValidMemoryChannelsCount();
+      int channelIndex=0;
+      for(int i=0; i < scanChannelsCount; i++)
+      {
+        int nextChannel;
+        nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, false, 0);
+        channelIndex = nextChannel;
+        scanChannel[i]=channelIndex;
+    
+        if (nextChannel == 0xFF)
+        {	// no valid channel found
+          break;
+        }
+      }
+    }
+  #endif
   #ifdef ENABLE_SCAN_RANGES
     if(gScanRangeStart) {
       currentFreq = initialFreq = gScanRangeStart;
