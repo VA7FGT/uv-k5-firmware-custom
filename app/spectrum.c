@@ -1114,7 +1114,14 @@ static void RenderStatus() {
 
 static void RenderSpectrum() {
   DrawTicks();
-  DrawArrow(128u * peak.i / GetStepsCount());
+  if(appMode==CHANNEL_MODE)
+  {
+    DrawArrow(peak.i * (settings.stepsCount + 1));
+  }
+  else
+  {
+    DrawArrow(128u * peak.i / GetStepsCount());
+  }
   DrawSpectrum();
   DrawRssiTriggerLevel();
   DrawF(peak.f);
