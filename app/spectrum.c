@@ -108,11 +108,11 @@ uint16_t listenT = 0;
 
 RegisterSpec registerSpecs[] = {
     {},
-    {"LNAs", BK4819_REG_13, 8, 0b11, 1},
-    {"LNA", BK4819_REG_13, 5, 0b111, 1},
-    {"PGA", BK4819_REG_13, 0, 0b111, 1},
-    {"IF", BK4819_REG_3D, 0, 0xFFFF, 0x2aaa},
-    // {"MIX", 0x13, 3, 0b11, 1}, // TODO: hidden
+    {"LNAs", BK4819_REG_13, 8, 0b11,  1},
+    {"LNA",  BK4819_REG_13, 5, 0b111, 1},
+    {"PGA",  BK4819_REG_13, 0, 0b111, 1},
+    {"MIX",  BK4819_REG_13, 3, 0b11,  1},
+    // {"IF", BK4819_REG_3D, 0, 0xFFFF, 0x2aaa},
 };
 
 uint16_t statuslineUpdateTimer = 0;
