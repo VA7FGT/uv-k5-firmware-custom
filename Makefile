@@ -446,7 +446,10 @@ debug:
 	/opt/openocd/bin/openocd -c "bindto 0.0.0.0" -f interface/jlink.cfg -f dp32g030.cfg
 
 flash:
-	k5prog -F -YYY -b firmware.bin
+	k5prog -F -YYY -b compiled-firmware/firmware.bin
+
+docker:
+	./compile-with-docker.sh
 
 flash-openocd:
 	/opt/openocd/bin/openocd -c "bindto 0.0.0.0" -f interface/jlink.cfg -f dp32g030.cfg -c "write_image firmware.bin 0; shutdown;"
@@ -472,4 +475,4 @@ clean:
 	$(RM) $(call FixPath, $(TARGET).bin $(TARGET).packed.bin $(TARGET) $(OBJS) $(DEPS))
 
 run:
-	make clean && make -j8 && sleep 5 && make flash
+	make docker && make flash
