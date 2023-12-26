@@ -926,15 +926,27 @@ static void OnKeyDown(uint8_t key) {
     break;
   case KEY_UP:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart && appMode!= CHANNEL_MODE)
+    if(!gScanRangeStart && appMode!=CHANNEL_MODE)
+    {
 #endif
       UpdateCurrentFreq(true);
+    }
+    else if (appMode==CHANNEL_MODE)
+    {
+      ResetBlacklist();/* code */
+    }
     break;
   case KEY_DOWN:
 #ifdef ENABLE_SCAN_RANGES
     if(!gScanRangeStart && appMode!= CHANNEL_MODE)
+    {
 #endif
       UpdateCurrentFreq(false);
+    }
+    else if (appMode==CHANNEL_MODE)
+    {
+      ResetBlacklist();/* code */
+    }
     break;
   case KEY_SIDE1:
     Blacklist();
