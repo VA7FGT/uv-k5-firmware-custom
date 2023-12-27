@@ -38,7 +38,7 @@ struct FrequencyBandInfo {
   Mode appMode;
   //Idea - make this user adjustable to compensate for different antennas, frontends, conditions
   #define UHF_NOISE_FLOOR 40
-  uint8_t scanChannel[MR_CHANNEL_LAST];
+  uint8_t scanChannel[MR_CHANNEL_LAST+1];
   uint8_t scanChannelsCount;
   void ToggleScanList();
   void AutoAdjustResolution();
