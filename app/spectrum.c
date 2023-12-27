@@ -311,24 +311,37 @@ static void TuneToPeak() {
 }
 #ifdef ENABLE_SPECTRUM_COPY_VFO
 static void ExitAndCopyToVfo() {
-  //if we are in the channel mode
-  if (IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE)){	
-    // swap to frequency mode
-    COMMON_SwitchToVFOMode();
+  if (appMode==CHANNEL_MODE)
+  // channel mode
+  {
+    gEeprom.MrChannel[gEeprom.TX_VFO]     = scanChannel[peak.i-1];
+    gEeprom.ScreenChannel[gEeprom.TX_VFO] = scanChannel[peak.i-1];
+
+    gRequestSaveVFO   = true;
+    gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
   }
+  else
+  // frequency mode
+  {
+    //if we entered spectrum from the channel mode
+    if (IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE)){	
+      // swap to frequency mode
+      COMMON_SwitchToVFOMode();
+    }
 
-  gTxVfo->STEP_SETTING = FREQUENCY_GetStepIdxFromStepFrequency(GetScanStep());
-  gTxVfo->Modulation = settings.modulationType;
-  // TODO: Add support for NARROW- bandwidth in VFO (settings etc)
-  gTxVfo->CHANNEL_BANDWIDTH = settings.listenBw;
+    gTxVfo->STEP_SETTING = FREQUENCY_GetStepIdxFromStepFrequency(GetScanStep());
+    gTxVfo->Modulation = settings.modulationType;
+    // TODO: Add support for NARROW- bandwidth in VFO (settings etc)
+    gTxVfo->CHANNEL_BANDWIDTH = settings.listenBw;
 
-  SETTINGS_SetVfoFrequency(peak.f);
-
+    SETTINGS_SetVfoFrequency(peak.f);
+  
+    gRequestSaveChannel = 1;
+  }
+ 
   // Additional delay to debounce keys
   SYSTEM_DelayMs(200);
 
-  gRequestSaveChannel = 1;
-  
   isInitialized = false;
 }
 
