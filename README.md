@@ -66,6 +66,7 @@ Anyway, have fun.
 * Press `F+5` to enter `spectrum mode`
 * While in `spectrum mode` press `MENU` to enter `fine tuning mode`
 * While in `spectrum mode` or `fine tuning mode` short press `PTT` to copy current modulation, step, frequency, bw and enter `VFO mode`
+* While in `spectrum channel mode` press `4` to toggle scan lists.
 
  ## Manual
 

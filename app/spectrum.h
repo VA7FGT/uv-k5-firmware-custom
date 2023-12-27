@@ -122,6 +122,12 @@ typedef enum ScanStep {
   S_STEP_100_0kHz,
 } ScanStep;
 
+typedef enum ScanList {
+  S_SCAN_LIST_1,
+  S_SCAN_LIST_2,
+  S_SCAN_LIST_ALL
+} ScanList;
+
 typedef struct SpectrumSettings {
   uint32_t frequencyChangeStep;  
   StepsCount stepsCount;
@@ -134,6 +140,7 @@ typedef struct SpectrumSettings {
   int dbMax;  
   ModulationMode_t modulationType;
   bool backlightState;
+  int scanList;
 } SpectrumSettings;
 
 typedef struct KeyboardState {

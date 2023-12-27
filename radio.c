@@ -1144,11 +1144,11 @@ void RADIO_SendEndOfTransmission(void)
 	BK4819_ExitDTMF_TX(true);
 }
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-	uint8_t RADIO_ValidMemoryChannelsCount(void)
+uint8_t RADIO_ValidMemoryChannelsCount(bool bCheckScanList, uint8_t VFO)
 	{
 		uint8_t count=0;
 		for (int i = MR_CHANNEL_FIRST; i<=MR_CHANNEL_LAST; ++i) {
-			if(RADIO_CheckValidChannel(i, false, 0))
+			if(RADIO_CheckValidChannel(i, bCheckScanList, VFO))
 				count++;
 		}
 		return count;

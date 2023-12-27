@@ -40,6 +40,8 @@ struct FrequencyBandInfo {
   #define UHF_NOISE_FLOOR 40
   uint8_t scanChannel[MR_CHANNEL_LAST];
   uint8_t scanChannelsCount;
+  void ToggleScanList();
+  void AutoAdjustResolution();
 #endif
 
 const uint16_t RSSI_MAX_VALUE = 65535;
@@ -80,6 +82,7 @@ static uint8_t ScanRangeidx();
 #endif
 
 const char *bwOptions[] = {"  25k", "12.5k", "6.25k"};
+const char *scanListOptions[] = {"SL I", "SL II", "ALL"};
 const uint8_t modulationTypeTuneSteps[] = {100, 50, 10};
 const uint8_t modTypeReg47Values[] = {1, 7, 5};
 
@@ -92,7 +95,8 @@ SpectrumSettings settings = {stepsCount: STEPS_128,
                              listenBw: BK4819_FILTER_BW_WIDE,
                              modulationType: false,
                              dbMin: -130,
-                             dbMax: -50};
+                             dbMax: -50,
+                             scanList: S_SCAN_LIST_ALL};
 
 uint32_t fMeasure = 0;
 uint32_t currentFreq, tempFreq;
@@ -812,7 +816,7 @@ static void DrawNums() {
     GUI_DisplaySmallest(String, 0, 1, false, true);
     if (appMode==CHANNEL_MODE)
     {
-      sprintf(String, "%ddB", Rssi2DBm(peak.rssi));
+      sprintf(String, "%s", scanListOptions[settings.scanList]);
       GUI_DisplaySmallest(String, 0, 7, false, true);
     }
     else
@@ -970,10 +974,14 @@ static void OnKeyDown(uint8_t key) {
     ToggleListeningBW();
     break;
   case KEY_4:
-#ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart)
-#endif
+    if(appMode==CHANNEL_MODE)
+    {
+      ToggleScanList();
+    }
+    else if (!gScanRangeStart)
+    {
       ToggleStepsCount();
+    }
     break;
   case KEY_SIDE2:
     ToggleBacklight();
@@ -1412,14 +1420,7 @@ void APP_RunSpectrum() {
     if (appMode==CHANNEL_MODE)
     {
       LoadValidMemoryChannels();
-      if (scanChannelsCount <= 64)
-      {
-        settings.stepsCount = STEPS_64;
-      }
-      else
-      {
-        settings.stepsCount = STEPS_128;
-      }
+      AutoAdjustResolution();
     }
   #endif
   #ifdef ENABLE_SCAN_RANGES
@@ -1472,12 +1473,13 @@ void APP_RunSpectrum() {
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
   void LoadValidMemoryChannels()
   {
-    scanChannelsCount = RADIO_ValidMemoryChannelsCount();
+    memset(scanChannel,0,sizeof(scanChannel));
+    scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
     signed int channelIndex=-1;
     for(int i=0; i < scanChannelsCount; i++)
     {
       int nextChannel;
-      nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, false, 0);
+      nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, true, settings.scanList);
       channelIndex = nextChannel;
       scanChannel[i]=channelIndex;
       
@@ -1485,6 +1487,36 @@ void APP_RunSpectrum() {
       {	// no valid channel found
         break;
       }
+    }
+  }
+
+  void ToggleScanList()
+  {
+    if (settings.scanList==S_SCAN_LIST_ALL)
+    {
+      settings.scanList=S_SCAN_LIST_1;
+    }
+    else
+    {
+      settings.scanList++;
+    }
+
+    scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
+    LoadValidMemoryChannels();
+    RelaunchScan();
+    ResetBlacklist();
+    AutoAdjustResolution();
+  }
+
+  void AutoAdjustResolution()
+  {
+    if (scanChannelsCount <= 64)
+    {
+      settings.stepsCount = STEPS_64;
+    }
+    else
+    {
+      settings.stepsCount = STEPS_128;
     }
   }
 #endif

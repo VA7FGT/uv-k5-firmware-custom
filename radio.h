@@ -168,5 +168,5 @@ void     RADIO_SendEndOfTransmission(void);
 #endif
 
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-	uint8_t RADIO_ValidMemoryChannelsCount(void);
+	uint8_t RADIO_ValidMemoryChannelsCount(bool bCheckScanList, uint8_t VFO);
 #endif
