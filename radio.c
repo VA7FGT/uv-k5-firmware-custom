@@ -58,8 +58,6 @@ bool RADIO_CheckValidChannel(uint16_t Channel, bool bCheckScanList, uint8_t VFO)
 {	// return true if the channel appears valid
 
 	ChannelAttributes_t att;
-	uint8_t PriorityCh1;
-	uint8_t PriorityCh2;
 
 	if (!IS_MR_CHANNEL(Channel))
 		return false;
@@ -74,28 +72,16 @@ bool RADIO_CheckValidChannel(uint16_t Channel, bool bCheckScanList, uint8_t VFO)
 			case 0:
 				if (!att.scanlist1)
 					return false;
-
-				PriorityCh1 = gEeprom.SCANLIST_PRIORITY_CH1[0];
-				PriorityCh2 = gEeprom.SCANLIST_PRIORITY_CH2[0];
 				break;
 
 			case 1:
 				if (!att.scanlist2)
 					return false;
-
-				PriorityCh1 = gEeprom.SCANLIST_PRIORITY_CH1[1];
-				PriorityCh2 = gEeprom.SCANLIST_PRIORITY_CH2[1];
 				break;
 
 			default:
 				return true;
 		}
-
-		if (PriorityCh1 == Channel)
-			return false;
-
-		if (PriorityCh2 == Channel)
-			return false;
 	}
 
 	return true;
@@ -1144,11 +1130,11 @@ void RADIO_SendEndOfTransmission(void)
 	BK4819_ExitDTMF_TX(true);
 }
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-	uint8_t RADIO_ValidMemoryChannelsCount(void)
+uint8_t RADIO_ValidMemoryChannelsCount(bool bCheckScanList, uint8_t VFO)
 	{
 		uint8_t count=0;
 		for (int i = MR_CHANNEL_FIRST; i<=MR_CHANNEL_LAST; ++i) {
-			if(RADIO_CheckValidChannel(i, false, 0))
+			if(RADIO_CheckValidChannel(i, bCheckScanList, VFO))
 				count++;
 		}
 		return count;

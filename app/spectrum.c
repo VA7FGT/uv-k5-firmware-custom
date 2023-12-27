@@ -40,6 +40,8 @@ struct FrequencyBandInfo {
   #define UHF_NOISE_FLOOR 40
   uint8_t scanChannel[MR_CHANNEL_LAST];
   uint8_t scanChannelsCount;
+  void ToggleScanList();
+  void AutoAdjustResolution();
 #endif
 
 const uint16_t RSSI_MAX_VALUE = 65535;
@@ -80,6 +82,7 @@ static uint8_t ScanRangeidx();
 #endif
 
 const char *bwOptions[] = {"  25k", "12.5k", "6.25k"};
+const char *scanListOptions[] = {"SL I", "SL II", "ALL"};
 const uint8_t modulationTypeTuneSteps[] = {100, 50, 10};
 const uint8_t modTypeReg47Values[] = {1, 7, 5};
 
@@ -92,7 +95,8 @@ SpectrumSettings settings = {stepsCount: STEPS_128,
                              listenBw: BK4819_FILTER_BW_WIDE,
                              modulationType: false,
                              dbMin: -130,
-                             dbMax: -50};
+                             dbMax: -50,
+                             scanList: S_SCAN_LIST_ALL};
 
 uint32_t fMeasure = 0;
 uint32_t currentFreq, tempFreq;
@@ -108,11 +112,11 @@ uint16_t listenT = 0;
 
 RegisterSpec registerSpecs[] = {
     {},
-    {"LNAs", BK4819_REG_13, 8, 0b11, 1},
-    {"LNA", BK4819_REG_13, 5, 0b111, 1},
-    {"PGA", BK4819_REG_13, 0, 0b111, 1},
-    {"IF", BK4819_REG_3D, 0, 0xFFFF, 0x2aaa},
-    // {"MIX", 0x13, 3, 0b11, 1}, // TODO: hidden
+    {"LNAs", BK4819_REG_13, 8, 0b11,  1},
+    {"LNA",  BK4819_REG_13, 5, 0b111, 1},
+    {"PGA",  BK4819_REG_13, 0, 0b111, 1},
+    {"MIX",  BK4819_REG_13, 3, 0b11,  1},
+    // {"IF", BK4819_REG_3D, 0, 0xFFFF, 0x2aaa},
 };
 
 uint16_t statuslineUpdateTimer = 0;
@@ -307,24 +311,37 @@ static void TuneToPeak() {
 }
 #ifdef ENABLE_SPECTRUM_COPY_VFO
 static void ExitAndCopyToVfo() {
-  //if we are in the channel mode
-  if (IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE)){	
-    // swap to frequency mode
-    COMMON_SwitchToVFOMode();
+  if (appMode==CHANNEL_MODE)
+  // channel mode
+  {
+    gEeprom.MrChannel[gEeprom.TX_VFO]     = scanChannel[peak.i-1];
+    gEeprom.ScreenChannel[gEeprom.TX_VFO] = scanChannel[peak.i-1];
+
+    gRequestSaveVFO   = true;
+    gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
   }
+  else
+  // frequency mode
+  {
+    //if we entered spectrum from the channel mode
+    if (IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE)){	
+      // swap to frequency mode
+      COMMON_SwitchToVFOMode();
+    }
 
-  gTxVfo->STEP_SETTING = FREQUENCY_GetStepIdxFromStepFrequency(GetScanStep());
-  gTxVfo->Modulation = settings.modulationType;
-  // TODO: Add support for NARROW- bandwidth in VFO (settings etc)
-  gTxVfo->CHANNEL_BANDWIDTH = settings.listenBw;
+    gTxVfo->STEP_SETTING = FREQUENCY_GetStepIdxFromStepFrequency(GetScanStep());
+    gTxVfo->Modulation = settings.modulationType;
+    // TODO: Add support for NARROW- bandwidth in VFO (settings etc)
+    gTxVfo->CHANNEL_BANDWIDTH = settings.listenBw;
 
-  SETTINGS_SetVfoFrequency(peak.f);
-
+    SETTINGS_SetVfoFrequency(peak.f);
+  
+    gRequestSaveChannel = 1;
+  }
+ 
   // Additional delay to debounce keys
   SYSTEM_DelayMs(200);
 
-  gRequestSaveChannel = 1;
-  
   isInitialized = false;
 }
 
@@ -812,7 +829,7 @@ static void DrawNums() {
     GUI_DisplaySmallest(String, 0, 1, false, true);
     if (appMode==CHANNEL_MODE)
     {
-      sprintf(String, "%ddB", Rssi2DBm(peak.rssi));
+      sprintf(String, "%s", scanListOptions[settings.scanList]);
       GUI_DisplaySmallest(String, 0, 7, false, true);
     }
     else
@@ -831,10 +848,10 @@ static void DrawNums() {
   } else {
     if (appMode==CHANNEL_MODE) 
     {
-      sprintf(String, "M:%d", scanChannel[0]);
+      sprintf(String, "M:%d", scanChannel[0]+1);
       GUI_DisplaySmallest(String, 0, 49, false, true);
 
-      sprintf(String, "M:%d", scanChannel[scanChannelsCount-2]);
+      sprintf(String, "M:%d", scanChannel[scanChannelsCount-1]+1);
       GUI_DisplaySmallest(String, 108, 49, false, true);
     }
     else
@@ -926,15 +943,27 @@ static void OnKeyDown(uint8_t key) {
     break;
   case KEY_UP:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart && appMode!= CHANNEL_MODE)
+    if(!gScanRangeStart && appMode!=CHANNEL_MODE)
+    {
 #endif
       UpdateCurrentFreq(true);
+    }
+    else if (appMode==CHANNEL_MODE)
+    {
+      ResetBlacklist();
+    }
     break;
   case KEY_DOWN:
 #ifdef ENABLE_SCAN_RANGES
     if(!gScanRangeStart && appMode!= CHANNEL_MODE)
+    {
 #endif
       UpdateCurrentFreq(false);
+    }
+    else if (appMode==CHANNEL_MODE)
+    {
+      ResetBlacklist();
+    }
     break;
   case KEY_SIDE1:
     Blacklist();
@@ -958,10 +987,14 @@ static void OnKeyDown(uint8_t key) {
     ToggleListeningBW();
     break;
   case KEY_4:
-#ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart)
-#endif
+    if(appMode==CHANNEL_MODE)
+    {
+      ToggleScanList();
+    }
+    else if (!gScanRangeStart)
+    {
       ToggleStepsCount();
+    }
     break;
   case KEY_SIDE2:
     ToggleBacklight();
@@ -1114,7 +1147,14 @@ static void RenderStatus() {
 
 static void RenderSpectrum() {
   DrawTicks();
-  DrawArrow(128u * peak.i / GetStepsCount());
+  if((appMode==CHANNEL_MODE)&&(GetStepsCount()<128u))
+  {
+    DrawArrow(peak.i * (settings.stepsCount + 1));
+  }
+  else
+  {
+    DrawArrow(128u * peak.i / GetStepsCount());
+  }
   DrawSpectrum();
   DrawRssiTriggerLevel();
   DrawF(peak.f);
@@ -1393,6 +1433,7 @@ void APP_RunSpectrum() {
     if (appMode==CHANNEL_MODE)
     {
       LoadValidMemoryChannels();
+      AutoAdjustResolution();
     }
   #endif
   #ifdef ENABLE_SCAN_RANGES
@@ -1445,19 +1486,50 @@ void APP_RunSpectrum() {
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
   void LoadValidMemoryChannels()
   {
-    scanChannelsCount = RADIO_ValidMemoryChannelsCount();
-    int channelIndex=0;
+    memset(scanChannel,0,sizeof(scanChannel));
+    scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
+    signed int channelIndex=-1;
     for(int i=0; i < scanChannelsCount; i++)
     {
       int nextChannel;
-      nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, false, 0);
+      nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, true, settings.scanList);
       channelIndex = nextChannel;
       scanChannel[i]=channelIndex;
-
+      
       if (nextChannel == 0xFF)
       {	// no valid channel found
         break;
       }
+    }
+  }
+
+  void ToggleScanList()
+  {
+    if (settings.scanList==S_SCAN_LIST_ALL)
+    {
+      settings.scanList=S_SCAN_LIST_1;
+    }
+    else
+    {
+      settings.scanList++;
+    }
+
+    scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
+    LoadValidMemoryChannels();
+    RelaunchScan();
+    ResetBlacklist();
+    AutoAdjustResolution();
+  }
+
+  void AutoAdjustResolution()
+  {
+    if (scanChannelsCount <= 64)
+    {
+      settings.stepsCount = STEPS_64;
+    }
+    else
+    {
+      settings.stepsCount = STEPS_128;
     }
   }
 #endif

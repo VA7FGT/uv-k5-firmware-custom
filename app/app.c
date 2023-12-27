@@ -69,9 +69,6 @@ static void FlashlightTimeSlice();
 
 static void UpdateRSSI(const int vfo)
 {
-	while ((BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
-		SYSTICK_DelayUs(100);
-  	}
 	int16_t rssi = BK4819_GetRSSI();
 
 	// #ifdef ENABLE_AM_FIX
