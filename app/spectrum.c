@@ -831,10 +831,10 @@ static void DrawNums() {
   } else {
     if (appMode==CHANNEL_MODE) 
     {
-      sprintf(String, "M:%d", scanChannel[0]);
+      sprintf(String, "M:%d", scanChannel[0]+1);
       GUI_DisplaySmallest(String, 0, 49, false, true);
 
-      sprintf(String, "M:%d", scanChannel[scanChannelsCount-2]);
+      sprintf(String, "M:%d", scanChannel[scanChannelsCount-1]+1);
       GUI_DisplaySmallest(String, 108, 49, false, true);
     }
     else
@@ -933,7 +933,7 @@ static void OnKeyDown(uint8_t key) {
     }
     else if (appMode==CHANNEL_MODE)
     {
-      ResetBlacklist();/* code */
+      ResetBlacklist();
     }
     break;
   case KEY_DOWN:
@@ -945,7 +945,7 @@ static void OnKeyDown(uint8_t key) {
     }
     else if (appMode==CHANNEL_MODE)
     {
-      ResetBlacklist();/* code */
+      ResetBlacklist();
     }
     break;
   case KEY_SIDE1:
@@ -1126,7 +1126,7 @@ static void RenderStatus() {
 
 static void RenderSpectrum() {
   DrawTicks();
-  if(appMode==CHANNEL_MODE)
+  if((appMode==CHANNEL_MODE)&&(GetStepsCount()<128u))
   {
     DrawArrow(peak.i * (settings.stepsCount + 1));
   }
@@ -1412,6 +1412,14 @@ void APP_RunSpectrum() {
     if (appMode==CHANNEL_MODE)
     {
       LoadValidMemoryChannels();
+      if (scanChannelsCount <= 64)
+      {
+        settings.stepsCount = STEPS_64;
+      }
+      else
+      {
+        settings.stepsCount = STEPS_128;
+      }
     }
   #endif
   #ifdef ENABLE_SCAN_RANGES
@@ -1465,14 +1473,14 @@ void APP_RunSpectrum() {
   void LoadValidMemoryChannels()
   {
     scanChannelsCount = RADIO_ValidMemoryChannelsCount();
-    int channelIndex=0;
+    signed int channelIndex=-1;
     for(int i=0; i < scanChannelsCount; i++)
     {
       int nextChannel;
       nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, false, 0);
       channelIndex = nextChannel;
       scanChannel[i]=channelIndex;
-
+      
       if (nextChannel == 0xFF)
       {	// no valid channel found
         break;
