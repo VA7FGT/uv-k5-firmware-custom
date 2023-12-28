@@ -287,7 +287,8 @@ uint16_t GetStepsCount()
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
   if (appMode==CHANNEL_MODE)
   {
-    return scanChannelsCount;
+    // hack: adds 1 step count if steps > 128 to properly average and display last channel
+    return scanChannelsCount <= 128 ? scanChannelsCount : scanChannelsCount+1;
   }
 #endif
 #ifdef ENABLE_SCAN_RANGES
@@ -1302,10 +1303,9 @@ static void NextScanStep() {
     // channel mode
     if (appMode==CHANNEL_MODE)
     {
-      if (GetStepsCount() > 128) {++scanInfo.i;} 
       int currentChannel = scanChannel[scanInfo.i];
       scanInfo.f =  gMR_ChannelFrequencyAttributes[currentChannel].Frequency;
-      if (GetStepsCount() <= 128) {++scanInfo.i;} 
+      ++scanInfo.i; 
     }
     else
     // frequency mode
