@@ -711,7 +711,15 @@ static void Blacklist() {
 #ifdef ENABLE_SCAN_RANGES
 static uint8_t ScanRangeidx()
 {
-  return (uint32_t)ARRAY_SIZE(rssiHistory) * 1000 / scanInfo.measurementsCount * scanInfo.i / 1000;
+  if(scanInfo.measurementsCount > 128) {
+    uint8_t i = (uint32_t)ARRAY_SIZE(rssiHistory) * 1000 / scanInfo.measurementsCount * scanInfo.i / 1000;
+    return i;
+  }
+  else
+  {
+    return 0;
+  }
+  
 }
 
 static bool IsBlacklisted(uint16_t idx)
