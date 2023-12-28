@@ -772,7 +772,7 @@ void BOARD_gMR_LoadChannels() {
 	uint8_t  i;
 	uint32_t freq_buf;
 	
-	for (i = MR_CHANNEL_FIRST; i < MR_CHANNEL_LAST; i++)
+	for (i = MR_CHANNEL_FIRST; i <= MR_CHANNEL_LAST; i++)
 	{
 		freq_buf = BOARD_fetchChannelFrequency(i);
 		
