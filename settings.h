@@ -158,7 +158,8 @@ typedef struct {
 	uint8_t               TX_TIMEOUT_TIMER;
 	bool                  KEY_LOCK;
 	bool                  VOX_SWITCH;
-	uint8_t               VOX_LEVEL;
+	uint8_t               VOX_LEVEL; // sensitivity
+	uint8_t				  VOX_DELAY; // vox delay
 	#ifdef ENABLE_VOICE
 		VOICE_Prompt_t    VOICE_PROMPT;
 	#endif

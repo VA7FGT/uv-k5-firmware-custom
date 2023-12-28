@@ -1024,7 +1024,7 @@ void APP_Update(void)
 
 #ifdef ENABLE_VOX
 			if (gEeprom.VOX_SWITCH)
-				BK4819_EnableVox(gEeprom.VOX1_THRESHOLD, gEeprom.VOX0_THRESHOLD);
+				BK4819_EnableVox(gEeprom.VOX1_THRESHOLD, gEeprom.VOX0_THRESHOLD, gEeprom.VOX_DELAY);
 #endif
 
 			if (gEeprom.DUAL_WATCH != DUAL_WATCH_OFF &&

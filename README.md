@@ -58,6 +58,7 @@ Anyway, have fun.
    * `ENABLE_ULTRA_LOW_POWER_TX` flag allows to transmit with ultra low power (thanks to egzumer work) for local testing of communication between radios.
    * `ENABLE_ADJUSTABLE_RX_GAIN_SETTINGS` keeps the rx gain settings set in spectrum mode after exit (otherwise these are always overwritten to default value), this makes much more sense considering that we have a radio with user adjustable gain so why not use it to adjust to current radio conditions, maximum gain allows to greatly increase reception in scan memory channels mode (in this configuration default gain settings are only set at boot and when exiting AM modulation mode to set it to sane value after am fix)
    * `ENABLE_SPECTRUM_CHANNEL_SCAN` this enables spectrum channel scan mode (enter by going into memory mode and press F+5, this allows SUPER fast channel scanning (4.5x faster than regular scanning), regular scan of 200 memory channels takes roughly 18 seconds, spectrum memory scan takes roughly 4 seconds, if you have less channels stored i.e 50 - the spectrum memory scan will take only **1 second**
+   * `ENABLE_VOX_NO_DELAY` this disables VOX delay, useful feature for packet radio enthusiasts (APRS etc.)
 
  ## Keyboard shortcuts
 * In `VFO mode` long press `5` to enter `scan range mode`
@@ -149,6 +150,7 @@ ENABLE_SPECTRUM_SHOW_CHANNEL_NAME  := 1       shows channel number and channel n
 ENABLE_ULTRA_LOW_POWER_TX          := 0       transmits with ultra low power. useful for dev/testing
 ENABLE_ADJUSTABLE_RX_GAIN_SETTINGS := 1       keeps the rx gain settings set in spectrum mode after exit (otherwise these are always overwritten to default value), this makes much more sense considering that we have a radio with user adjustable gain so why not use it to adjust to current radio conditions, maximum gain allows to greatly increase reception in scan memory channels mode (in this configuration default gain settings are only set at boot and when exiting AM modulation mode to set it to sane value after am fix)
 ENABLE_SPECTRUM_CHANNEL_SCAN       := 1       this enables spectrum channel scan mode (enter by going into memory mode and press F+5, this allows SUPER fast channel scanning (4.5x faster than regular scanning), regular scan of 200 memory channels takes roughly 18 seconds, spectrum memory scan takes roughly 4 seconds, if you have less channels stored i.e 50 - the spectrum memory scan will take only **1 second**
+ENABLE_VOX_NO_DELAY                := 1       this disables VOX delay, useful feature for packet radio enthusiasts (APRS etc.)
 ```
 
 

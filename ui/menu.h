@@ -53,6 +53,9 @@ enum
 #ifdef ENABLE_VOX
 	MENU_VOX,
 #endif
+#ifdef ENABLE_VOX_NO_DELAY
+	MENU_VOX_DELAY,
+#endif
 	MENU_ABR,
 	MENU_ABR_ON_TX_RX,
 	MENU_ABR_MIN,
