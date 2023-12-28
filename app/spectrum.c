@@ -38,7 +38,7 @@ struct FrequencyBandInfo {
   Mode appMode;
   //Idea - make this user adjustable to compensate for different antennas, frontends, conditions
   #define UHF_NOISE_FLOOR 40
-  uint8_t scanChannel[MR_CHANNEL_LAST];
+  uint8_t scanChannel[MR_CHANNEL_LAST+1];
   uint8_t scanChannelsCount;
   void ToggleScanList();
   void AutoAdjustResolution();
@@ -120,6 +120,8 @@ RegisterSpec registerSpecs[] = {
 };
 
 uint16_t statuslineUpdateTimer = 0;
+
+static void RelaunchScan();
 
 static uint8_t DBm2S(int dbm) {
   uint8_t i = 0;
@@ -285,7 +287,8 @@ uint16_t GetStepsCount()
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
   if (appMode==CHANNEL_MODE)
   {
-    return scanChannelsCount;
+    // hack: adds 1 step count if steps > 128 to properly average and display last channel
+    return scanChannelsCount <= 128 ? scanChannelsCount : scanChannelsCount+1;
   }
 #endif
 #ifdef ENABLE_SCAN_RANGES
@@ -441,6 +444,13 @@ static void ResetBlacklist() {
   memset(blacklistFreqs, 0, sizeof(blacklistFreqs));
   blacklistFreqsIdx = 0;
 #endif
+  if(appMode==CHANNEL_MODE){
+      scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
+      LoadValidMemoryChannels();
+      AutoAdjustResolution();
+  }
+
+  RelaunchScan();
 }
 
 static void RelaunchScan() {
@@ -553,7 +563,6 @@ static void UpdateScanStep(bool inc) {
     return;
   }
   settings.frequencyChangeStep = GetBW() >> 1;
-  RelaunchScan();
   ResetBlacklist();
   redrawScreen = true;
 }
@@ -566,7 +575,6 @@ static void UpdateCurrentFreq(bool inc) {
   } else {
     return;
   }
-  RelaunchScan();
   ResetBlacklist();
   redrawScreen = true;
 }
@@ -629,7 +637,6 @@ static void ToggleStepsCount() {
     settings.stepsCount--;
   }
   settings.frequencyChangeStep = GetBW() >> 1;
-  RelaunchScan();
   ResetBlacklist();
   redrawScreen = true;
 }
@@ -711,7 +718,15 @@ static void Blacklist() {
 #ifdef ENABLE_SCAN_RANGES
 static uint8_t ScanRangeidx()
 {
-  return (uint32_t)ARRAY_SIZE(rssiHistory) * 1000 / scanInfo.measurementsCount * scanInfo.i / 1000;
+  if(scanInfo.measurementsCount > 128) {
+    uint8_t i = (uint32_t)ARRAY_SIZE(rssiHistory) * 1000 / scanInfo.measurementsCount * scanInfo.i / 1000;
+    return i;
+  }
+  else
+  {
+    return 0;
+  }
+  
 }
 
 static bool IsBlacklisted(uint16_t idx)
@@ -1055,7 +1070,6 @@ static void OnKeyDownFreqInput(uint8_t key) {
     currentFreq = tempFreq;
     if (currentState == SPECTRUM) {
       ResetBlacklist();
-      RelaunchScan();
     } else {
       SetF(currentFreq);
     }
@@ -1493,12 +1507,15 @@ void APP_RunSpectrum() {
     {
       int nextChannel;
       nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, true, settings.scanList);
-      channelIndex = nextChannel;
-      scanChannel[i]=channelIndex;
       
       if (nextChannel == 0xFF)
       {	// no valid channel found
         break;
+      }
+      else
+      {
+        channelIndex = nextChannel;
+        scanChannel[i]=channelIndex;
       }
     }
   }
@@ -1516,7 +1533,6 @@ void APP_RunSpectrum() {
 
     scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
     LoadValidMemoryChannels();
-    RelaunchScan();
     ResetBlacklist();
     AutoAdjustResolution();
   }

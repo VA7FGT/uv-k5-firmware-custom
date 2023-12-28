@@ -147,9 +147,7 @@ const int CHANNEL_ONLY_SETTINGS[] = {
 	MENU_1_CALL
 };
 
-const int VFO_ONLY_SETTINGS[] = {
-	MENU_MEM_CH
-};
+const int VFO_ONLY_SETTINGS[] = {};
 
 const uint8_t FIRST_HIDDEN_MENU_ITEM = MENU_F_LOCK;
 
