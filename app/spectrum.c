@@ -1297,9 +1297,10 @@ static void NextScanStep() {
     // channel mode
     if (appMode==CHANNEL_MODE)
     {
+      if (GetStepsCount() > 128) {++scanInfo.i;} 
       int currentChannel = scanChannel[scanInfo.i];
       scanInfo.f =  gMR_ChannelFrequencyAttributes[currentChannel].Frequency;
-      ++scanInfo.i; 
+      if (GetStepsCount() <= 128) {++scanInfo.i;} 
     }
     else
     // frequency mode
@@ -1501,12 +1502,15 @@ void APP_RunSpectrum() {
     {
       int nextChannel;
       nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, true, settings.scanList);
-      channelIndex = nextChannel;
-      scanChannel[i]=channelIndex;
       
       if (nextChannel == 0xFF)
       {	// no valid channel found
         break;
+      }
+      else
+      {
+        channelIndex = nextChannel;
+        scanChannel[i]=channelIndex;
       }
     }
   }
