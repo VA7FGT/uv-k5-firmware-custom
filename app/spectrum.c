@@ -121,6 +121,8 @@ RegisterSpec registerSpecs[] = {
 
 uint16_t statuslineUpdateTimer = 0;
 
+static void RelaunchScan();
+
 static uint8_t DBm2S(int dbm) {
   uint8_t i = 0;
   dbm *= -1;
@@ -441,6 +443,13 @@ static void ResetBlacklist() {
   memset(blacklistFreqs, 0, sizeof(blacklistFreqs));
   blacklistFreqsIdx = 0;
 #endif
+  if(appMode==CHANNEL_MODE){
+      scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
+      LoadValidMemoryChannels();
+      AutoAdjustResolution();
+  }
+
+  RelaunchScan();
 }
 
 static void RelaunchScan() {
@@ -553,7 +562,6 @@ static void UpdateScanStep(bool inc) {
     return;
   }
   settings.frequencyChangeStep = GetBW() >> 1;
-  RelaunchScan();
   ResetBlacklist();
   redrawScreen = true;
 }
@@ -566,7 +574,6 @@ static void UpdateCurrentFreq(bool inc) {
   } else {
     return;
   }
-  RelaunchScan();
   ResetBlacklist();
   redrawScreen = true;
 }
@@ -629,7 +636,6 @@ static void ToggleStepsCount() {
     settings.stepsCount--;
   }
   settings.frequencyChangeStep = GetBW() >> 1;
-  RelaunchScan();
   ResetBlacklist();
   redrawScreen = true;
 }
@@ -1063,7 +1069,6 @@ static void OnKeyDownFreqInput(uint8_t key) {
     currentFreq = tempFreq;
     if (currentState == SPECTRUM) {
       ResetBlacklist();
-      RelaunchScan();
     } else {
       SetF(currentFreq);
     }
@@ -1528,7 +1533,6 @@ void APP_RunSpectrum() {
 
     scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
     LoadValidMemoryChannels();
-    RelaunchScan();
     ResetBlacklist();
     AutoAdjustResolution();
   }
