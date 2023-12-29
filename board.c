@@ -804,9 +804,9 @@ void BOARD_EEPROM_LoadCalibration(void)
 	gBatteryCalibration[5] = 2300;
 
 	#ifdef ENABLE_VOX
-		// these are not sensitive enough - experiment with it, are these read properly?
-		EEPROM_ReadBuffer(0x1F50 + (gEeprom.VOX_LEVEL * 2), &gEeprom.VOX1_THRESHOLD, 2);
-		EEPROM_ReadBuffer(0x1F68 + (gEeprom.VOX_LEVEL * 2), &gEeprom.VOX0_THRESHOLD, 2);
+		// fixed and improved VOX sensitivity, based on calibration data
+		gEeprom.VOX1_THRESHOLD = 205-(20*gEeprom.VOX_LEVEL);
+		gEeprom.VOX0_THRESHOLD = 215-(20*gEeprom.VOX_LEVEL);
 	#endif
 	
 	//EEPROM_ReadBuffer(0x1F80 + gEeprom.MIC_SENSITIVITY, &Mic, 1);
