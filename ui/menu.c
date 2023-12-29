@@ -115,7 +115,8 @@ const t_menu_item MenuList[] =
 	{"AM Fix", VOICE_ID_INVALID,                       MENU_AM_FIX        },
 #endif
 #ifdef ENABLE_VOX
-	{"VOX",    VOICE_ID_VOX,                           MENU_VOX           },
+	{"VOXSen", VOICE_ID_VOX,                           MENU_VOX           }, // VOX Sensibility or OFF
+	{"VOXDel", VOICE_ID_VOX,                           MENU_VOX_DELAY     }, // VOX delay
 #endif
 	{"BatVol", VOICE_ID_INVALID,                       MENU_VOL           }, // was "VOL"
 	{"RxMode", VOICE_ID_DUAL_STANDBY,                  MENU_TDR           },
@@ -595,6 +596,9 @@ void UI_DisplayMenu(void)
 						strcpy(String, "OFF");
 					else
 						sprintf(String, "%d", gSubMenuSelection);
+					break;
+				case MENU_VOX_DELAY:
+					sprintf(String, "%d", gSubMenuSelection);
 					break;
 			#endif
 

@@ -732,7 +732,7 @@ void RADIO_SetupRegisters(bool switchToForeground)
 			#endif
 		#endif
 		{
-			BK4819_EnableVox(gEeprom.VOX1_THRESHOLD, gEeprom.VOX0_THRESHOLD);
+			BK4819_EnableVox(gEeprom.VOX1_THRESHOLD, gEeprom.VOX0_THRESHOLD, gEeprom.VOX_DELAY);
 			InterruptMask |= BK4819_REG_3F_VOX_FOUND | BK4819_REG_3F_VOX_LOST;
 		}
 		else

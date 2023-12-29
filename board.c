@@ -605,9 +605,9 @@ void BOARD_EEPROM_Init(void)
 	memmove(&gEeprom.POWER_ON_PASSWORD, Data, 4);
 
 	// 0EA0..0EA7
-	#ifdef ENABLE_VOICE
+	#ifdef ENABLE_VOX
 		EEPROM_ReadBuffer(0x0EA0, Data, 8);
-		gEeprom.VOICE_PROMPT = (Data[0] < 3) ? Data[0] : VOICE_PROMPT_ENGLISH;
+		gEeprom.VOX_DELAY = (Data[0] < 11) ? Data[0] : 4;
 	#endif
 
 	// 0EA8..0EAF
@@ -804,8 +804,9 @@ void BOARD_EEPROM_LoadCalibration(void)
 	gBatteryCalibration[5] = 2300;
 
 	#ifdef ENABLE_VOX
-		EEPROM_ReadBuffer(0x1F50 + (gEeprom.VOX_LEVEL * 2), &gEeprom.VOX1_THRESHOLD, 2);
-		EEPROM_ReadBuffer(0x1F68 + (gEeprom.VOX_LEVEL * 2), &gEeprom.VOX0_THRESHOLD, 2);
+		// fixed and improved VOX sensitivity, based on calibration data
+		gEeprom.VOX1_THRESHOLD = 205-(20*gEeprom.VOX_LEVEL);
+		gEeprom.VOX0_THRESHOLD = 215-(20*gEeprom.VOX_LEVEL);
 	#endif
 	
 	//EEPROM_ReadBuffer(0x1F80 + gEeprom.MIC_SENSITIVITY, &Mic, 1);

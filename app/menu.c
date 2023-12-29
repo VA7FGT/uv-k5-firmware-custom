@@ -270,6 +270,7 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 
 		#ifdef ENABLE_VOX
 			case MENU_VOX:
+			case MENU_VOX_DELAY:
 		#endif
 		case MENU_RP_STE:
 			*pMin = 0;
@@ -541,6 +542,13 @@ void MENU_AcceptSetting(void)
 				gEeprom.VOX_SWITCH = gSubMenuSelection != 0;
 				if (gEeprom.VOX_SWITCH)
 					gEeprom.VOX_LEVEL = gSubMenuSelection - 1;
+				BOARD_EEPROM_LoadCalibration();
+				gFlagReconfigureVfos = true;
+				gUpdateStatus        = true;
+				break;
+
+			case MENU_VOX_DELAY:
+				gEeprom.VOX_DELAY = gSubMenuSelection;
 				BOARD_EEPROM_LoadCalibration();
 				gFlagReconfigureVfos = true;
 				gUpdateStatus        = true;
@@ -956,11 +964,14 @@ void MENU_ShowCurrentSetting(void)
 			gSubMenuSelection = gEeprom.BATTERY_SAVE;
 			break;
 
-#ifdef ENABLE_VOX
+		#ifdef ENABLE_VOX
 		case MENU_VOX:
 			gSubMenuSelection = gEeprom.VOX_SWITCH ? gEeprom.VOX_LEVEL + 1 : 0;
 			break;
-#endif
+		case MENU_VOX_DELAY:
+			gSubMenuSelection = gEeprom.VOX_DELAY;
+			break;
+		#endif
 
 		case MENU_ABR:
 			gSubMenuSelection = gEeprom.BACKLIGHT_TIME;
