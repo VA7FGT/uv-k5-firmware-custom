@@ -23,7 +23,7 @@ ENABLE_DTMF_CALLING           := 0
 
 #---- DEBUG ----
 ENABLE_AM_FIX_SHOW_DATA            := 0
-ENABLE_ULTRA_LOW_POWER_TX          := 1
+ENABLE_ULTRA_LOW_POWER_TX          := 0
 
 # ---- CUSTOM MODS ----
 ENABLE_BIG_FREQ                    := 1

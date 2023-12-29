@@ -127,8 +127,8 @@ void SETTINGS_SaveSettings(void)
 	EEPROM_WriteBuffer(0x0E98, State);
 
 	memset(State, 0xFF, sizeof(State));
-#ifdef ENABLE_VOICE
-	State[0] = gEeprom.VOICE_PROMPT;
+#ifdef ENABLE_VOX
+	State[0] = gEeprom.VOX_DELAY;
 	EEPROM_WriteBuffer(0x0EA0, State);
 #endif
 
