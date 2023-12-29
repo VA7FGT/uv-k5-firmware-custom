@@ -52,8 +52,6 @@ enum
 	MENU_SAVE,
 #ifdef ENABLE_VOX
 	MENU_VOX,
-#endif
-#ifdef ENABLE_VOX_NO_DELAY
 	MENU_VOX_DELAY,
 #endif
 	MENU_ABR,
