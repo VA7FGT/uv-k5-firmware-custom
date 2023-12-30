@@ -656,38 +656,20 @@ void BK4819_SetFilterBandwidth(const BK4819_FilterBandwidth_t Bandwidth, const b
 	BK4819_WriteRegister(BK4819_REG_43, val);
 }
 
-void BK4819_SetupPowerAmplifier(const uint8_t bias, const uint32_t frequency)
-{
-	// REG_36 <15:8> 0 PA Bias output 0 ~ 3.2V
-	//               255 = 3.2V
-	//                 0 = 0V
-	//
-	// REG_36 <7>    0
-	//               1 = Enable PA-CTL output
-	//               0 = Disable (Output 0 V)
-	//
-	// REG_36 <5:3>  7 PA gain 1 tuning
-	//               7 = max
-	//               0 = min
-	//
-	// REG_36 <2:0>  7 PA gain 2 tuning
-	//               7 = max
-	//               0 = min
-	//
-	//                                  280MHz       gain 1 = 1  gain 2 = 0  gain 1 = 4  gain 2 = 2
-	const uint8_t enable = 1;
+void BK4819_SetupPowerAmplifier(uint8_t Bias, uint32_t Frequency) {
+  uint8_t Gain;
 
-		
-	#ifdef ENABLE_ULTRA_LOW_POWER_TX
-		uint8_t gain   = (frequency < 28000000) ? (1u << 3) | (0u << 0) : (4u << 3) | (2u << 0);
-		gain = 0b000010;
-		(void)bias;
-		(void)frequency;
-		BK4819_WriteRegister(BK4819_REG_36, (16 << 8) | (enable << 7) | (gain << 0));
-	#else
-		const uint8_t gain   = (frequency < 28000000) ? (1u << 3) | (0u << 0) : (4u << 3) | (2u << 0);
-		BK4819_WriteRegister(BK4819_REG_36, (bias << 8) | (enable << 7) | (gain << 0));
-	#endif
+  if (Frequency < 28000000) {
+    // Gain 1 = 1
+    // Gain 2 = 0
+    Gain = 0x08U;
+  } else {
+    // Gain 1 = 4
+    // Gain 2 = 2
+    Gain = 0x22U;
+  }
+  // Enable PACTLoutput
+  BK4819_WriteRegister(BK4819_REG_36, (Bias << 8) | 0x80U | Gain);
 }
 
 void BK4819_SetFrequency(uint32_t Frequency)

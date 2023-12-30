@@ -496,17 +496,12 @@ void RADIO_ConfigureSquelchAndOutputPower(VFO_Info_t *pInfo)
 	EEPROM_ReadBuffer(0x1ED0 + (Band * 16) + (pInfo->OUTPUT_POWER * 3), Txp, 3);
 
 
-#ifdef ENABLE_REDUCE_LOW_MID_TX_POWER
-	// make low and mid even lower
+#ifdef ENABLE_REDUCE_LOW_POWER
+	// make low even lower
 	if (pInfo->OUTPUT_POWER == OUTPUT_POWER_LOW) {
-		Txp[0] /= 5;
-		Txp[1] /= 5;
-		Txp[2] /= 5;
-	}
-	else if (pInfo->OUTPUT_POWER == OUTPUT_POWER_MID){
-		Txp[0] /= 3;
-		Txp[1] /= 3;
-		Txp[2] /= 3;
+		Txp[0] /= 2;
+		Txp[1] /= 2;
+		Txp[2] /= 2;
 	}
 #endif
 
