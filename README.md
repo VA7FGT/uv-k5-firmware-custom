@@ -141,7 +141,7 @@ ENABLE_RSSI_BAR                    := 1       enable a dBm/Sn RSSI bar graph lev
 ENABLE_AUDIO_BAR                   := 1       experimental, display an audio bar level when TX'ing
 ENABLE_COPY_CHAN_TO_VFO            := 1       copy current channel into the other VFO. Long press `1 BAND` when in channel mode
 ENABLE_SPECTRUM                    := 1       fagci spectrum analyzer, activated with `F` + `5 NOAA`
-ENABLE_REDUCE_LOW_POWER            := 1       makes low power settings even lower (L=0.6W M=3.56W H=4.67W (f=147Mhz))
+ENABLE_REDUCE_LOW_POWER            := 1       makes low power settings even lower (L=0.45W M=3W H=4.7W (f=147Mhz))
 ENABLE_BYP_RAW_DEMODULATORS        := 0       additional BYP (bypass?) and RAW demodulation options, proved not to be very useful, but it is there if you want to experiment
 ENABLE_BLMIN_TMP_OFF               := 0       additional function for configurable buttons that toggles `BLMin` on and off wihout saving it to the EEPROM
 ENABLE_SCAN_RANGES                 := 1       scan range mode for frequency scanning, see wiki for instructions (radio operation -> frequency scanning)
