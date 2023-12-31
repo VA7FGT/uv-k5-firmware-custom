@@ -134,8 +134,6 @@ static uint8_t DBm2S(int dbm) {
   return i;
 }
 
-static int Rssi2DBm(uint16_t rssi) { return (rssi >> 1) - 160; }
-
 static uint16_t GetRegMenuValue(uint8_t st) {
   RegisterSpec s = registerSpecs[st];
   return (BK4819_ReadRegister(s.num) >> s.offset) & s.mask;

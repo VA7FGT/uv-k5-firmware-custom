@@ -294,3 +294,25 @@ bool IsValueInArray(int val, const int *arr, const int size) {
     }
     return false;
 }
+
+sLevelAttributes GetSLevelAttributes(const int16_t rssi, const uint32_t frequency)
+{
+	sLevelAttributes att;
+	// S0 .. base level
+	int16_t      s0_dBm       = -130;
+
+	// adjust S-level for bands above HF
+	if(frequency > HF_FREQUENCY)
+		s0_dBm-=20;
+
+	att.dBmRssi = Rssi2DBm(rssi);
+	att.sLevel  = MIN(MAX((att.dBmRssi - s0_dBm) / 6, 0), 9);
+	att.over    = MIN(MAX(att.dBmRssi - (s0_dBm + 9*6), 0), 99);
+
+	return att;
+}
+
+int Rssi2DBm(uint16_t rssi)
+{
+	return (rssi >> 1) - 160;
+}
