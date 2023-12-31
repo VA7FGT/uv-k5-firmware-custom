@@ -123,17 +123,6 @@ uint16_t statuslineUpdateTimer = 0;
 
 static void RelaunchScan();
 
-static uint8_t DBm2S(int dbm) {
-  uint8_t i = 0;
-  dbm *= -1;
-  for (i = 0; i < ARRAY_SIZE(U8RssiMap); i++) {
-    if (dbm >= U8RssiMap[i]) {
-      return i;
-    }
-  }
-  return i;
-}
-
 static uint16_t GetRegMenuValue(uint8_t st) {
   RegisterSpec s = registerSpecs[st];
   return (BK4819_ReadRegister(s.num) >> s.offset) & s.mask;
@@ -1195,12 +1184,21 @@ static void RenderStill() {
     }
   }
 
-  int dbm = Rssi2DBm(scanInfo.rssi);
-  uint8_t s = DBm2S(dbm);
-  sprintf(String, "S: %u", s);
+  sLevelAttributes sLevelAtt;
+  sLevelAtt = GetSLevelAttributes(scanInfo.rssi, scanInfo.f);
+
+  if(sLevelAtt.over > 0)
+  {
+    sprintf(String, "S%2d+%2d", sLevelAtt.sLevel, sLevelAtt.over);
+  }
+  else
+  {
+    sprintf(String, "S%2d", sLevelAtt.sLevel);
+  }
+
   GUI_DisplaySmallest(String, 4, 25, false, true);
-  sprintf(String, "%d dBm", dbm);
-  GUI_DisplaySmallest(String, 28, 25, false, true);
+  sprintf(String, "%d dBm", sLevelAtt.dBmRssi);
+  GUI_DisplaySmallest(String, 40, 25, false, true);
 
   if (!monitorMode) {
     uint8_t x = Rssi2PX(settings.rssiTriggerLevel, 0, 121);
