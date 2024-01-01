@@ -221,7 +221,7 @@ void RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure
 	else
 		base = 0x0C80 + ((channel - FREQ_CHANNEL_FIRST) * 32) + (VFO * 16);
 
-	if (configure == VFO_CONFIGURE_RELOAD)
+	if (configure == VFO_CONFIGURE_RELOAD || IS_FREQ_CHANNEL(channel))
 	{
 		uint8_t tmp;
 		uint8_t data[8];
@@ -308,7 +308,9 @@ void RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure
 		{
 			const uint8_t d4 = data[4];
 			pVfo->FrequencyReverse  = !!((d4 >> 0) & 1u);
-			pVfo->CHANNEL_BANDWIDTH = !!((d4 >> 1) & 1u);
+			if(IS_MR_CHANNEL(channel)){
+				pVfo->CHANNEL_BANDWIDTH = !!((d4 >> 1) & 1u);
+			}
 			pVfo->OUTPUT_POWER      =   ((d4 >> 2) & 3u);
 			pVfo->BUSY_CHANNEL_LOCK = !!((d4 >> 4) & 1u);
 		}	
