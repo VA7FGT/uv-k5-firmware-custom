@@ -646,7 +646,7 @@ void UI_DisplayMain(void)
 			// 	String[1] = '\0';
 			// }
 			// UI_PrintStringSmall(String, LCD_WIDTH + 70, 0, line + 1);
-			UI_PrintStringSmall(bwNames[gEeprom.VfoInfo[vfo_num].CHANNEL_BANDWIDTH], LCD_WIDTH + 62, 0, line + 1);
+			UI_PrintStringSmall(bwNames[gEeprom.VfoInfo[vfo_num].CHANNEL_BANDWIDTH], LCD_WIDTH + 70, 0, line + 1);
 		}
 
 #ifdef ENABLE_DTMF_CALLING
