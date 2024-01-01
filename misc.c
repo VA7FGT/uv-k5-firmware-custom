@@ -301,11 +301,22 @@ sLevelAttributes GetSLevelAttributes(const int16_t rssi, const uint32_t frequenc
 	// S0 .. base level
 	int16_t      s0_dBm       = -130;
 
-	// adjust S-level for bands above HF
+	// all S1 on max gain, no antenna
+	const int8_t dBmCorrTable[7] = {
+		-5, // band 1
+		-38, // band 2
+		-37, // band 3
+		-20, // band 4
+		-23, // band 5
+		-23, // band 6
+		-16  // band 7
+	};
+
+	// use UHF/VHF S-table for bands above HF
 	if(frequency > HF_FREQUENCY)
 		s0_dBm-=20;
 
-	att.dBmRssi = Rssi2DBm(rssi);
+	att.dBmRssi = Rssi2DBm(rssi)+dBmCorrTable[FREQUENCY_GetBand(frequency)];
 	att.sLevel  = MIN(MAX((att.dBmRssi - s0_dBm) / 6, 0), 9);
 	att.over    = MIN(MAX(att.dBmRssi - (s0_dBm + 9*6), 0), 99);
 

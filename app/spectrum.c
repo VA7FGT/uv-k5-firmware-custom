@@ -1185,7 +1185,7 @@ static void RenderStill() {
   }
 
   sLevelAttributes sLevelAtt;
-  sLevelAtt = GetSLevelAttributes(scanInfo.rssi, scanInfo.f);
+  sLevelAtt = GetSLevelAttributes(scanInfo.rssi, fMeasure);
 
   if(sLevelAtt.over > 0)
   {
