@@ -166,12 +166,6 @@ const char gSubMenu_SFT_D[][4] =
 	"-"
 };
 
-const char gSubMenu_W_N[][7] =
-{
-	"WIDE",
-	"NARROW"
-};
-
 const char gSubMenu_OFF_ON[][4] =
 {
 	"OFF",
@@ -577,7 +571,7 @@ void UI_DisplayMenu(void)
 				break;
 
 			case MENU_W_N:
-				strcpy(String, gSubMenu_W_N[gSubMenuSelection]);
+				strcpy(String, bwNames[gSubMenuSelection]);
 				break;
 
 			case MENU_SCR:

@@ -600,7 +600,7 @@ static void ToggleModulation() {
 }
 
 static void ToggleListeningBW() {
-  if (settings.listenBw == BK4819_FILTER_BW_NARROWER) {
+  if (settings.listenBw == BK4819_FILTER_BW_NARROWEST) {
     settings.listenBw = BK4819_FILTER_BW_WIDE;
   } else {
     settings.listenBw++;
@@ -802,7 +802,7 @@ static void DrawF(uint32_t f) {
 
   sprintf(String, "%3s", gModulationStr[settings.modulationType]);
   GUI_DisplaySmallest(String, 116, 1, false, true);
-  sprintf(String, "%s", bwOptions[settings.listenBw]);
+  sprintf(String, "%s", bwNames[settings.listenBw]);
   GUI_DisplaySmallest(String, 108, 7, false, true);
 }
 #ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
@@ -1473,11 +1473,11 @@ void APP_RunSpectrum() {
   ToggleRX(true), ToggleRX(false); // hack to prevent noise when squelch off
   #ifdef ENABLE_SPECTRUM_COPY_VFO
     RADIO_SetModulation(settings.modulationType = gTxVfo->Modulation);
-    BK4819_SetFilterBandwidth(settings.listenBw = gTxVfo->CHANNEL_BANDWIDTH, false);
+    BK4819_SetFilterBandwidth(settings.listenBw = gTxVfo->CHANNEL_BANDWIDTH);
     settings.scanStepIndex = GetScanStepFromStepFrequency(gTxVfo->StepFrequency);
   #elif
     RADIO_SetModulation(settings.modulationType = MODULATION_FM);
-    BK4819_SetFilterBandwidth(settings.listenBw = BK4819_FILTER_BW_WIDE, false);
+    BK4819_SetFilterBandwidth(settings.listenBw = BK4819_FILTER_BW_WIDE);
   #endif
 
   RelaunchScan();

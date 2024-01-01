@@ -29,8 +29,11 @@ enum {
 };
 
 enum {
-	BANDWIDTH_WIDE = 0,
-	BANDWIDTH_NARROW
+  BANDWIDTH_WIDE = 0U,
+  BANDWIDTH_NARROW = 1U,
+  BANDWIDTH_NARROWAVIATION = 2U,
+  BANDWIDTH_NARROWER = 3U,
+  BANDWIDTH_NARROWEST = 4U
 };
 
 enum PTT_ID_t {
@@ -68,6 +71,8 @@ typedef enum {
 } ModulationMode_t;
 
 extern const char gModulationStr[MODULATION_UKNOWN][4];
+
+extern const char *bwNames[5];
 
 typedef struct
 {

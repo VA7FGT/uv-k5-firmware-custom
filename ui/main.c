@@ -640,12 +640,13 @@ void UI_DisplayMain(void)
 
 		{	// show the narrow band symbol
 			String[0] = '\0';
-			if (gEeprom.VfoInfo[vfo_num].CHANNEL_BANDWIDTH == BANDWIDTH_NARROW)
-			{
-				String[0] = 'N';
-				String[1] = '\0';
-			}
-			UI_PrintStringSmall(String, LCD_WIDTH + 70, 0, line + 1);
+			// if (gEeprom.VfoInfo[vfo_num].CHANNEL_BANDWIDTH == BANDWIDTH_NARROW)
+			// {
+			// 	String[0] = 'N';
+			// 	String[1] = '\0';
+			// }
+			// UI_PrintStringSmall(String, LCD_WIDTH + 70, 0, line + 1);
+			UI_PrintStringSmall(bwNames[gEeprom.VfoInfo[vfo_num].CHANNEL_BANDWIDTH], LCD_WIDTH + 62, 0, line + 1);
 		}
 
 #ifdef ENABLE_DTMF_CALLING
