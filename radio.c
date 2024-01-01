@@ -54,6 +54,8 @@ const char gModulationStr[][4] =
 #endif
 };
 
+const char *bwNames[5] = {"  25k", "12.5k", "8.33k", "6.25k", "   5k"};
+
 bool RADIO_CheckValidChannel(uint16_t Channel, bool bCheckScanList, uint8_t VFO)
 {	// return true if the channel appears valid
 
@@ -219,7 +221,7 @@ void RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure
 	else
 		base = 0x0C80 + ((channel - FREQ_CHANNEL_FIRST) * 32) + (VFO * 16);
 
-	if (configure == VFO_CONFIGURE_RELOAD || IS_FREQ_CHANNEL(channel))
+	if (configure == VFO_CONFIGURE_RELOAD)
 	{
 		uint8_t tmp;
 		uint8_t data[8];
@@ -309,7 +311,7 @@ void RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure
 			pVfo->CHANNEL_BANDWIDTH = !!((d4 >> 1) & 1u);
 			pVfo->OUTPUT_POWER      =   ((d4 >> 2) & 3u);
 			pVfo->BUSY_CHANNEL_LOCK = !!((d4 >> 4) & 1u);
-		}
+		}	
 
 		if (data[5] == 0xFF)
 		{
@@ -468,9 +470,18 @@ void RADIO_ConfigureSquelchAndOutputPower(VFO_Info_t *pInfo)
 			glitch_open = (glitch_open * 4) / 3;
 		#endif
 
-		rssi_close   = (rssi_open   *  9) / 10;
-		noise_close  = (noise_open  * 10) / 9;
-		glitch_close = (glitch_open * 10) / 9;
+		// make squelch more sensitive for HF bands
+		if(Band <= BAND1_50MHz) {
+			rssi_close   = (rssi_open   * 5) / 6;
+			noise_close  = (noise_open  * 6) / 5;
+			glitch_close = (glitch_open * 6) / 5;
+		}
+		else
+		{
+			rssi_close   = (rssi_open   *  9) / 10;
+			noise_close  = (noise_open  * 10) / 9;
+			glitch_close = (glitch_open * 10) / 9;
+		}
 
 		// ensure the 'close' threshold is lower than the 'open' threshold
 		if (rssi_close   == rssi_open   && rssi_close   >= 2)
@@ -564,30 +575,16 @@ void RADIO_SelectVfos(void)
 
 void RADIO_SetupRegisters(bool switchToForeground)
 {
-	BK4819_FilterBandwidth_t Bandwidth = gRxVfo->CHANNEL_BANDWIDTH;
-
 	AUDIO_AudioPathOff();
 
 	gEnableSpeaker = false;
 
 	BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, false);
 
-	switch (Bandwidth)
-	{
-		default:
-			Bandwidth = BK4819_FILTER_BW_WIDE;
-			[[fallthrough]];
-		case BK4819_FILTER_BW_WIDE:
-		case BK4819_FILTER_BW_NARROW:
-			#ifdef ENABLE_AM_FIX
-//				BK4819_SetFilterBandwidth(Bandwidth, gRxVfo->Modulation == MODULATION_AM && gSetting_AM_fix);
-				BK4819_SetFilterBandwidth(Bandwidth, true);
-			#else
-				BK4819_SetFilterBandwidth(Bandwidth, false);
-			#endif
-			break;
-	}
+	BK4819_FilterBandwidth_t Bandwidth = gRxVfo->CHANNEL_BANDWIDTH;
 
+	BK4819_SetFilterBandwidth(Bandwidth);
+	
 	BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, false);
 
 	BK4819_SetupPowerAmplifier(0, 0);
@@ -816,29 +813,17 @@ void RADIO_SetupRegisters(bool switchToForeground)
 
 void RADIO_SetTxParameters(void)
 {
-	BK4819_FilterBandwidth_t Bandwidth = gCurrentVfo->CHANNEL_BANDWIDTH;
-
+	
 	AUDIO_AudioPathOff();
 
 	gEnableSpeaker = false;
 
 	BK4819_ToggleGpioOut(BK4819_GPIO0_PIN28_RX_ENABLE, false);
 
-	switch (Bandwidth)
-	{
-		default:
-			Bandwidth = BK4819_FILTER_BW_WIDE;
-			[[fallthrough]];
-		case BK4819_FILTER_BW_WIDE:
-		case BK4819_FILTER_BW_NARROW:
-			#ifdef ENABLE_AM_FIX
-//				BK4819_SetFilterBandwidth(Bandwidth, gCurrentVfo->Modulation == MODULATION_AM && gSetting_AM_fix);
-				BK4819_SetFilterBandwidth(Bandwidth, true);
-			#else
-				BK4819_SetFilterBandwidth(Bandwidth, false);
-			#endif
-			break;
-	}
+	BK4819_FilterBandwidth_t Bandwidth = gCurrentVfo->CHANNEL_BANDWIDTH;
+
+	BK4819_SetFilterBandwidth(Bandwidth);
+
 
 	BK4819_SetFrequency(gCurrentVfo->pTX->Frequency);
 

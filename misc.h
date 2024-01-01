@@ -205,6 +205,13 @@ extern ChannelFrequencyAttributes gMR_ChannelFrequencyAttributes[200];
 
 extern ChannelAttributes_t   gMR_ChannelAttributes[207];
 
+typedef struct
+{
+	uint8_t      sLevel; // S-level value
+	uint8_t      over;   // over S9 value
+	int          dBmRssi;// RSSI in dBm
+}  __attribute__((packed))  sLevelAttributes;
+
 extern volatile uint16_t     gBatterySaveCountdown_10ms;
 
 extern volatile bool         gPowerSaveCountdownExpired;
@@ -354,6 +361,8 @@ int32_t NUMBER_AddWithWraparound(int32_t Base, int32_t Add, int32_t LowerLimit, 
 unsigned long StrToUL(const char * str);
 
 bool IsValueInArray(int val, const int *arr, const int size);
+sLevelAttributes GetSLevelAttributes (const int16_t rssi, const uint32_t frequency);
+int Rssi2DBm(const uint16_t rssi);
 
 #endif
 

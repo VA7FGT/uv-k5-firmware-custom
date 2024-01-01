@@ -123,19 +123,6 @@ uint16_t statuslineUpdateTimer = 0;
 
 static void RelaunchScan();
 
-static uint8_t DBm2S(int dbm) {
-  uint8_t i = 0;
-  dbm *= -1;
-  for (i = 0; i < ARRAY_SIZE(U8RssiMap); i++) {
-    if (dbm >= U8RssiMap[i]) {
-      return i;
-    }
-  }
-  return i;
-}
-
-static int Rssi2DBm(uint16_t rssi) { return (rssi >> 1) - 160; }
-
 static uint16_t GetRegMenuValue(uint8_t st) {
   RegisterSpec s = registerSpecs[st];
   return (BK4819_ReadRegister(s.num) >> s.offset) & s.mask;
@@ -613,7 +600,7 @@ static void ToggleModulation() {
 }
 
 static void ToggleListeningBW() {
-  if (settings.listenBw == BK4819_FILTER_BW_NARROWER) {
+  if (settings.listenBw == BK4819_FILTER_BW_NARROWEST) {
     settings.listenBw = BK4819_FILTER_BW_WIDE;
   } else {
     settings.listenBw++;
@@ -815,7 +802,7 @@ static void DrawF(uint32_t f) {
 
   sprintf(String, "%3s", gModulationStr[settings.modulationType]);
   GUI_DisplaySmallest(String, 116, 1, false, true);
-  sprintf(String, "%s", bwOptions[settings.listenBw]);
+  sprintf(String, "%s", bwNames[settings.listenBw]);
   GUI_DisplaySmallest(String, 108, 7, false, true);
 }
 #ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
@@ -1197,12 +1184,21 @@ static void RenderStill() {
     }
   }
 
-  int dbm = Rssi2DBm(scanInfo.rssi);
-  uint8_t s = DBm2S(dbm);
-  sprintf(String, "S: %u", s);
+  sLevelAttributes sLevelAtt;
+  sLevelAtt = GetSLevelAttributes(scanInfo.rssi, fMeasure);
+
+  if(sLevelAtt.over > 0)
+  {
+    sprintf(String, "S%2d+%2d", sLevelAtt.sLevel, sLevelAtt.over);
+  }
+  else
+  {
+    sprintf(String, "S%2d", sLevelAtt.sLevel);
+  }
+
   GUI_DisplaySmallest(String, 4, 25, false, true);
-  sprintf(String, "%d dBm", dbm);
-  GUI_DisplaySmallest(String, 28, 25, false, true);
+  sprintf(String, "%d dBm", sLevelAtt.dBmRssi);
+  GUI_DisplaySmallest(String, 40, 25, false, true);
 
   if (!monitorMode) {
     uint8_t x = Rssi2PX(settings.rssiTriggerLevel, 0, 121);
@@ -1477,11 +1473,11 @@ void APP_RunSpectrum() {
   ToggleRX(true), ToggleRX(false); // hack to prevent noise when squelch off
   #ifdef ENABLE_SPECTRUM_COPY_VFO
     RADIO_SetModulation(settings.modulationType = gTxVfo->Modulation);
-    BK4819_SetFilterBandwidth(settings.listenBw = gTxVfo->CHANNEL_BANDWIDTH, false);
+    BK4819_SetFilterBandwidth(settings.listenBw = gTxVfo->CHANNEL_BANDWIDTH);
     settings.scanStepIndex = GetScanStepFromStepFrequency(gTxVfo->StepFrequency);
   #elif
     RADIO_SetModulation(settings.modulationType = MODULATION_FM);
-    BK4819_SetFilterBandwidth(settings.listenBw = BK4819_FILTER_BW_WIDE, false);
+    BK4819_SetFilterBandwidth(settings.listenBw = BK4819_FILTER_BW_WIDE);
   #endif
 
   RelaunchScan();

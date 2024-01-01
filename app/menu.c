@@ -203,7 +203,7 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 
 		case MENU_W_N:
 			*pMin = 0;
-			*pMax = ARRAY_SIZE(gSubMenu_W_N) - 1;
+			*pMax = ARRAY_SIZE(bwNames) - 1;
 			break;
 
 		#ifdef ENABLE_ALARM
