@@ -564,26 +564,17 @@ void RADIO_SelectVfos(void)
 
 void RADIO_SetupRegisters(bool switchToForeground)
 {
-	BK4819_FilterBandwidth_t Bandwidth = gRxVfo->CHANNEL_BANDWIDTH;
-
 	AUDIO_AudioPathOff();
 
 	gEnableSpeaker = false;
 
 	BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, false);
 
-	switch (Bandwidth)
-	{
-		default:
-			Bandwidth = BK4819_FILTER_BW_WIDE;
-			[[fallthrough]];
-		case BK4819_FILTER_BW_WIDE:
-		case BK4819_FILTER_BW_NARROW:
-			// lower filters bandwidth for weak signals for all modulations except AM
-			BK4819_SetFilterBandwidth(Bandwidth, gRxVfo->Modulation == MODULATION_AM);
-			break;
-	}
+	BK4819_FilterBandwidth_t Bandwidth = gRxVfo->CHANNEL_BANDWIDTH;
 
+	// lower filters bandwidth for weak signals for all modulations except AM
+	BK4819_SetFilterBandwidth(Bandwidth, gRxVfo->Modulation == MODULATION_AM);
+	
 	BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, false);
 
 	BK4819_SetupPowerAmplifier(0, 0);
