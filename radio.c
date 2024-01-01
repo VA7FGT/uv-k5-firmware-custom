@@ -470,9 +470,18 @@ void RADIO_ConfigureSquelchAndOutputPower(VFO_Info_t *pInfo)
 			glitch_open = (glitch_open * 4) / 3;
 		#endif
 
-		rssi_close   = (rssi_open   *  9) / 10;
-		noise_close  = (noise_open  * 10) / 9;
-		glitch_close = (glitch_open * 10) / 9;
+		// make squelch more sensitive for HF bands
+		if(Band <= BAND1_50MHz) {
+			rssi_close   = (rssi_open   * 5) / 6;
+			noise_close  = (noise_open  * 6) / 5;
+			glitch_close = (glitch_open * 6) / 5;
+		}
+		else
+		{
+			rssi_close   = (rssi_open   *  9) / 10;
+			noise_close  = (noise_open  * 10) / 9;
+			glitch_close = (glitch_open * 10) / 9;
+		}
 
 		// ensure the 'close' threshold is lower than the 'open' threshold
 		if (rssi_close   == rssi_open   && rssi_close   >= 2)
