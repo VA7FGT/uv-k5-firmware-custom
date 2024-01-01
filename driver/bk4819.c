@@ -527,7 +527,6 @@ const uint16_t listenBWRegValues[5] = {
 void BK4819_SetFilterBandwidth(const BK4819_FilterBandwidth_t Bandwidth)
 {
 	BK4819_WriteRegister(BK4819_REG_43, listenBWRegValues[Bandwidth]);
-	// UART_printf("\n Bandwidth : %i | %04x", Bandwidth, listenBWRegValues[Bandwidth]);
 }
 
 void BK4819_SetupPowerAmplifier(uint8_t Bias, uint32_t Frequency) {
