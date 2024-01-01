@@ -323,7 +323,7 @@ sLevelAttributes GetSLevelAttributes(const int16_t rssi, const uint32_t frequenc
 	return att;
 }
 
-int Rssi2DBm(uint16_t rssi)
+int Rssi2DBm(const uint16_t rssi)
 {
 	return (rssi >> 1) - 160;
 }

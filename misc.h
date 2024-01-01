@@ -362,7 +362,7 @@ unsigned long StrToUL(const char * str);
 
 bool IsValueInArray(int val, const int *arr, const int size);
 sLevelAttributes GetSLevelAttributes (const int16_t rssi, const uint32_t frequency);
-int Rssi2DBm(uint16_t rssi);
+int Rssi2DBm(const uint16_t rssi);
 
 #endif
 
