@@ -40,6 +40,7 @@ const t_menu_item MenuList[] =
 {
 //   text,     voice ID,                               menu ID
 	{"Step",   VOICE_ID_FREQUENCY_STEP,                MENU_STEP          },
+	{"Bandw",  VOICE_ID_CHANNEL_BANDWIDTH,             MENU_W_N           },
 	{"TxPwr",  VOICE_ID_POWER,                         MENU_TXP           }, // was "TXP"
 	{"RxDCS",  VOICE_ID_DCS,                           MENU_R_DCS         }, // was "R_DCS"
 	{"RxCTCS", VOICE_ID_CTCSS,                         MENU_R_CTCS        }, // was "R_CTCS"
@@ -48,7 +49,6 @@ const t_menu_item MenuList[] =
 	{"TxODir", VOICE_ID_TX_OFFSET_FREQUENCY_DIRECTION, MENU_SFT_D         }, // was "SFT_D"
 	{"TxOffs", VOICE_ID_TX_OFFSET_FREQUENCY,           MENU_OFFSET        }, // was "OFFSET"
 	{"RxOffs", VOICE_ID_INVALID,                       MENU_RX_OFFSET     },
-	{"W/N",    VOICE_ID_CHANNEL_BANDWIDTH,             MENU_W_N           },
 	{"Scramb", VOICE_ID_SCRAMBLER_ON,                  MENU_SCR           }, // was "SCR"
 	{"BusyCL", VOICE_ID_BUSY_LOCKOUT,                  MENU_BCL           }, // was "BCL"
 	{"Compnd", VOICE_ID_INVALID,                       MENU_COMPAND       },
