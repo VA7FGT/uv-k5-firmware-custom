@@ -23,7 +23,6 @@
 #include "driver/gpio.h"
 #include "driver/system.h"
 #include "driver/systick.h"
-#include "debugging.h"
 
 #ifndef ARRAY_SIZE
 	#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
@@ -541,7 +540,7 @@ void BK4819_SetFilterBandwidth(const BK4819_FilterBandwidth_t Bandwidth, const b
 	// 	0x4858, // 6.25
 	// 	0x0058  // 5
 	// };
-	//fagci
+	//fagci (narrower 25, 12.5)
 	// filter bandwidth lowers when signal is low
 	const uint16_t listenBWRegDynamicValues[5] = {
 		0x3428, // 25
@@ -560,13 +559,7 @@ void BK4819_SetFilterBandwidth(const BK4819_FilterBandwidth_t Bandwidth, const b
 		0x0058  // 5
 	};
 
-	uint16_t val;
-	val = dynamic==true ? listenBWRegDynamicValues[Bandwidth] : listenBWRegValues[Bandwidth];
-	char String[26];
-	sprintf(String, "b:%d d:%d v:%#06x\n\r", Bandwidth, dynamic, val);
-	LogUart(String);
-
-	BK4819_WriteRegister(BK4819_REG_43, val);
+	BK4819_WriteRegister(BK4819_REG_43, dynamic==true ? listenBWRegDynamicValues[Bandwidth] : listenBWRegValues[Bandwidth]);
 }
 
 void BK4819_SetupPowerAmplifier(uint8_t Bias, uint32_t Frequency) {
