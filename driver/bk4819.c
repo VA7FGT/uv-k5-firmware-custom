@@ -23,6 +23,7 @@
 #include "driver/gpio.h"
 #include "driver/system.h"
 #include "driver/systick.h"
+#include "debugging.h"
 
 #ifndef ARRAY_SIZE
 	#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
@@ -522,10 +523,29 @@ void BK4819_EnableVox(uint16_t VoxEnableThreshold, uint16_t VoxDisableThreshold,
 */
 void BK4819_SetFilterBandwidth(const BK4819_FilterBandwidth_t Bandwidth, const bool dynamic)
 {
+	//1o11
+	// // filter bandwidth lowers when signal is low
+	// const uint16_t listenBWRegDynamicValues[5] = {
+	// 	0x45a8, // 25
+	// 	0x4408, // 12.5
+	// 	0x1148,	// 8.33
+	// 	0x4458, // 6.25
+	// 	0x0058  // 5
+	// };
+
+	// // filter bandwidth stays the same when signal is low
+	// const uint16_t listenBWRegValues[5] = {
+	// 	0x49a8, // 25
+	// 	0x4808, // 12.5
+	// 	0x1348,	// 8.33
+	// 	0x4858, // 6.25
+	// 	0x0058  // 5
+	// };
+	//fagci
 	// filter bandwidth lowers when signal is low
 	const uint16_t listenBWRegDynamicValues[5] = {
-		0x45a8, // 25
-		0x4408, // 12.5
+		0x3428, // 25
+		0x7B08, // 12.5
 		0x1148,	// 8.33
 		0x4458, // 6.25
 		0x0058  // 5
@@ -533,14 +553,20 @@ void BK4819_SetFilterBandwidth(const BK4819_FilterBandwidth_t Bandwidth, const b
 
 	// filter bandwidth stays the same when signal is low
 	const uint16_t listenBWRegValues[5] = {
-		0x49a8, // 25
-		0x4808, // 12.5
+		0x3628, // 25
+		0x7F08, // 12.5
 		0x1348,	// 8.33
 		0x4858, // 6.25
 		0x0058  // 5
 	};
 
-	BK4819_WriteRegister(BK4819_REG_43, dynamic==true ? listenBWRegDynamicValues[Bandwidth] : listenBWRegValues[Bandwidth]);
+	uint16_t val;
+	val = dynamic==true ? listenBWRegDynamicValues[Bandwidth] : listenBWRegValues[Bandwidth];
+	char String[26];
+	sprintf(String, "b:%d d:%d v:%#06x\n\r", Bandwidth, dynamic, val);
+	LogUart(String);
+
+	BK4819_WriteRegister(BK4819_REG_43, val);
 }
 
 void BK4819_SetupPowerAmplifier(uint8_t Bias, uint32_t Frequency) {
