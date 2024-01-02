@@ -516,17 +516,50 @@ void BK4819_EnableVox(uint16_t VoxEnableThreshold, uint16_t VoxDisableThreshold,
 	BK4819_WriteRegister(BK4819_REG_31, REG_31_Value | (1u << 2));    // VOX Enable
 }
 
-const uint16_t listenBWRegValues[5] = {
-    0x3028, // 25
-    0x4048, // 12.5
-    0x0349,	// 8.33
-    0x205C, // 6.25
-	0x01F4  // 5
-};
-
-void BK4819_SetFilterBandwidth(const BK4819_FilterBandwidth_t Bandwidth)
+/* 	
+	Sets filter bandwidth
+    dynamic:  if set to true, it will use dynamic filters that lower bandwidth when signal is low
+*/
+void BK4819_SetFilterBandwidth(const BK4819_FilterBandwidth_t Bandwidth, const bool dynamic)
 {
-	BK4819_WriteRegister(BK4819_REG_43, listenBWRegValues[Bandwidth]);
+	//1o11
+	// // filter bandwidth lowers when signal is low
+	// const uint16_t listenBWRegDynamicValues[5] = {
+	// 	0x45a8, // 25
+	// 	0x4408, // 12.5
+	// 	0x1148,	// 8.33
+	// 	0x4458, // 6.25
+	// 	0x0058  // 5
+	// };
+
+	// // filter bandwidth stays the same when signal is low
+	// const uint16_t listenBWRegValues[5] = {
+	// 	0x49a8, // 25
+	// 	0x4808, // 12.5
+	// 	0x1348,	// 8.33
+	// 	0x4858, // 6.25
+	// 	0x0058  // 5
+	// };
+	//fagci (narrower 25, 12.5)
+	// filter bandwidth lowers when signal is low
+	const uint16_t listenBWRegDynamicValues[5] = {
+		0x3428, // 25
+		0x7B08, // 12.5
+		0x1148,	// 8.33
+		0x4458, // 6.25
+		0x0058  // 5
+	};
+
+	// filter bandwidth stays the same when signal is low
+	const uint16_t listenBWRegValues[5] = {
+		0x3628, // 25
+		0x7F08, // 12.5
+		0x1348,	// 8.33
+		0x4858, // 6.25
+		0x0058  // 5
+	};
+
+	BK4819_WriteRegister(BK4819_REG_43, dynamic==true ? listenBWRegDynamicValues[Bandwidth] : listenBWRegValues[Bandwidth]);
 }
 
 void BK4819_SetupPowerAmplifier(uint8_t Bias, uint32_t Frequency) {

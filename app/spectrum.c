@@ -398,9 +398,10 @@ static void ToggleRX(bool on) {
 
   if (on) {
     listenT = 1000;
-    BK4819_WriteRegister(0x43, listenBWRegValues[settings.listenBw]);
+    BK4819_SetFilterBandwidth(settings.listenBw, false);
   } else {
-    BK4819_WriteRegister(0x43, GetBWRegValueForScan());
+    if(appMode!=CHANNEL_MODE)
+      BK4819_WriteRegister(0x43, GetBWRegValueForScan());
   }
 }
 
@@ -605,6 +606,7 @@ static void ToggleListeningBW() {
   } else {
     settings.listenBw++;
   }
+  BK4819_SetFilterBandwidth(settings.listenBw, false);
   redrawScreen = true;
 }
 
@@ -1365,9 +1367,10 @@ static void UpdateListening() {
   }
 
   if (currentState == SPECTRUM) {
-    BK4819_WriteRegister(0x43, GetBWRegValueForScan());
+    if(appMode!=CHANNEL_MODE)
+      BK4819_WriteRegister(0x43, GetBWRegValueForScan());
     Measure();
-    BK4819_WriteRegister(0x43, listenBWRegValues[settings.listenBw]);
+    BK4819_SetFilterBandwidth(settings.listenBw, false);
   } else {
     Measure();
   }
@@ -1473,11 +1476,11 @@ void APP_RunSpectrum() {
   ToggleRX(true), ToggleRX(false); // hack to prevent noise when squelch off
   #ifdef ENABLE_SPECTRUM_COPY_VFO
     RADIO_SetModulation(settings.modulationType = gTxVfo->Modulation);
-    BK4819_SetFilterBandwidth(settings.listenBw = gTxVfo->CHANNEL_BANDWIDTH);
+    BK4819_SetFilterBandwidth(settings.listenBw = gTxVfo->CHANNEL_BANDWIDTH, false);
     settings.scanStepIndex = GetScanStepFromStepFrequency(gTxVfo->StepFrequency);
   #elif
     RADIO_SetModulation(settings.modulationType = MODULATION_FM);
-    BK4819_SetFilterBandwidth(settings.listenBw = BK4819_FILTER_BW_WIDE);
+    BK4819_SetFilterBandwidth(settings.listenBw = BK4819_FILTER_BW_WIDE, false);
   #endif
 
   RelaunchScan();
