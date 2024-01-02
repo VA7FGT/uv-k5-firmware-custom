@@ -400,7 +400,8 @@ static void ToggleRX(bool on) {
     listenT = 1000;
     BK4819_SetFilterBandwidth(settings.listenBw, false);
   } else {
-    BK4819_WriteRegister(0x43, GetBWRegValueForScan());
+    if(appMode!=CHANNEL_MODE)
+      BK4819_WriteRegister(0x43, GetBWRegValueForScan());
   }
 }
 
@@ -1366,7 +1367,8 @@ static void UpdateListening() {
   }
 
   if (currentState == SPECTRUM) {
-    BK4819_WriteRegister(0x43, GetBWRegValueForScan());
+    if(appMode!=CHANNEL_MODE)
+      BK4819_WriteRegister(0x43, GetBWRegValueForScan());
     Measure();
     BK4819_SetFilterBandwidth(settings.listenBw, false);
   } else {
