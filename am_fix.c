@@ -223,7 +223,7 @@ int16_t rssi_gain_diff[2] = {0, 0};
 unsigned int max_index = ARRAY_SIZE(gain_table) - 1;
 
 // -110dBm, any higher and the AM demodulator starts to saturate/clip/distort
-const int16_t desired_rssi = (-110 + 165) * 2;
+const int16_t desired_rssi = (-110 + 180) * 2;
 
 void AM_fix_init(void)
 {	// called at boot-up
