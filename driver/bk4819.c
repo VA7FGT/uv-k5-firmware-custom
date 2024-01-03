@@ -545,8 +545,8 @@ void BK4819_SetFilterBandwidth(const BK4819_FilterBandwidth_t Bandwidth, const b
 	const uint16_t listenBWRegDynamicValues[5] = {
 		0x3428, // 25
 		0x7B08, // 12.5
-		0x1148,	// 8.33
-		0x4458, // 6.25
+		0x4458,	// 8.33
+		0x1148, // 6.25
 		0x0058  // 5
 	};
 
@@ -554,8 +554,8 @@ void BK4819_SetFilterBandwidth(const BK4819_FilterBandwidth_t Bandwidth, const b
 	const uint16_t listenBWRegValues[5] = {
 		0x3628, // 25
 		0x7F08, // 12.5
-		0x1348,	// 8.33
-		0x4858, // 6.25
+		0x4858,	// 8.33
+		0x1348, // 6.25
 		0x0058  // 5
 	};
 
