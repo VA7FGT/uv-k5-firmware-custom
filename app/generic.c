@@ -36,6 +36,7 @@
 #include "settings.h"
 #include "ui/inputbox.h"
 #include "ui/ui.h"
+#include "driver/bk4819.h"
 
 void GENERIC_Key_F(bool bKeyPressed, bool bKeyHeld)
 {
@@ -156,7 +157,8 @@ void GENERIC_Key_PTT(bool bKeyPressed)
 		goto cancel_tx;
 	}
 
-
+	// set maximum squelch to protect the screen from glitching
+	BK4819_SetupSquelch(255, 255, 127, 127, 255, 255);
 
 #ifdef ENABLE_FMRADIO
 	if (gFM_ScanState != FM_SCAN_OFF)
@@ -234,4 +236,7 @@ done:
 		gRequestDisplayScreen = DISPLAY_MAIN;
 	gUpdateStatus  = true;
 	gUpdateDisplay = true;
+
+	//done tx - restore squelch here
+	gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
 }
