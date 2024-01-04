@@ -313,15 +313,8 @@ static void ExitAndCopyToVfo() {
   else
   // frequency mode
   {
-    //if we entered spectrum from the channel mode
-    if (IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE)){	
-      // swap to frequency mode
-      COMMON_SwitchToVFOMode();
-    }
-
     gTxVfo->STEP_SETTING = FREQUENCY_GetStepIdxFromStepFrequency(GetScanStep());
     gTxVfo->Modulation = settings.modulationType;
-    // TODO: Add support for NARROW- bandwidth in VFO (settings etc)
     gTxVfo->CHANNEL_BANDWIDTH = settings.listenBw;
 
     SETTINGS_SetVfoFrequency(peak.f);
