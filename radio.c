@@ -970,6 +970,12 @@ void RADIO_PrepareTX(void)
 			State = VFO_STATE_TX_DISABLE;
 		}
 		else
+		if(gEeprom.RX_OFFSET!=0)
+		{
+			// disable TX when using RX_OFFSET to protect the upconverter
+			State = VFO_STATE_TX_DISABLE;
+		}
+		else
 		if (TX_freq_check(gCurrentVfo->pTX->Frequency) == 0)
 		{	// TX frequency is allowed
 			if (gCurrentVfo->BUSY_CHANNEL_LOCK && gCurrentFunction == FUNCTION_RECEIVE)
