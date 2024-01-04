@@ -275,8 +275,8 @@ uint16_t GetStepsCount()
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
   if (appMode==CHANNEL_MODE)
   {
-    // hack: adds 1 step count to properly average and display last channel
-    return scanChannelsCount+1;
+    // hack: adds 1 step count if steps > 128 to properly average and display last channel
+    return scanChannelsCount <= 128 ? scanChannelsCount : scanChannelsCount+1;
   }
 #endif
 #ifdef ENABLE_SCAN_RANGES
