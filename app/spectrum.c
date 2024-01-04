@@ -25,6 +25,7 @@
 #ifdef ENABLE_SPECTRUM_COPY_VFO
   #include "common.h"
 #endif
+#include "action.h"
 
 struct FrequencyBandInfo {
     uint32_t lower;
@@ -594,12 +595,7 @@ static void ToggleModulation() {
 }
 
 static void ToggleListeningBW() {
-  if (settings.listenBw == BK4819_FILTER_BW_NARROWEST) {
-    settings.listenBw = BK4819_FILTER_BW_WIDE;
-  } else {
-    settings.listenBw++;
-  }
-  BK4819_SetFilterBandwidth(settings.listenBw, false);
+  settings.listenBw = ACTION_NextBandwidth(settings.listenBw, false);
   redrawScreen = true;
 }
 

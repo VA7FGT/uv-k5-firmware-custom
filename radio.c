@@ -824,8 +824,7 @@ void RADIO_SetTxParameters(void)
 
 	BK4819_FilterBandwidth_t Bandwidth = gCurrentVfo->CHANNEL_BANDWIDTH;
 
-	BK4819_SetFilterBandwidth(Bandwidth, gRxVfo->Modulation != MODULATION_AM);
-
+	BK4819_SetFilterBandwidth(Bandwidth, gTxVfo->Modulation != MODULATION_AM);
 
 	BK4819_SetFrequency(gCurrentVfo->pTX->Frequency);
 

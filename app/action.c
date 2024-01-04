@@ -38,6 +38,7 @@
 #include "settings.h"
 #include "ui/inputbox.h"
 #include "ui/ui.h"
+#include "spectrum.h"
 
 static void ACTION_FlashLight(void)
 {
@@ -311,6 +312,22 @@ void ACTION_SwitchDemodul(void)
 	gRequestSaveChannel = 1;
 }
 
+BK4819_FilterBandwidth_t ACTION_NextBandwidth(BK4819_FilterBandwidth_t currentBandwidth, const bool dynamic)
+{
+  BK4819_FilterBandwidth_t nextBandwidth;
+  if (currentBandwidth == BK4819_FILTER_BW_NARROWEST)
+  {
+	nextBandwidth = BK4819_FILTER_BW_WIDE;
+  }
+  else 
+  {
+	nextBandwidth = currentBandwidth + 1;
+  }
+
+  BK4819_SetFilterBandwidth(nextBandwidth, dynamic);
+  return nextBandwidth;
+}
+
 #ifdef ENABLE_BLMIN_TMP_OFF
 void ACTION_BlminTmpOff(void)
 {
@@ -442,6 +459,13 @@ void ACTION_Handle(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 			break;
 		case ACTION_OPT_SWITCH_DEMODUL:
 			ACTION_SwitchDemodul();
+			break;
+		case ACTION_OPT_BANDWIDTH:
+			gTxVfo->CHANNEL_BANDWIDTH =
+				ACTION_NextBandwidth(gTxVfo->CHANNEL_BANDWIDTH, gTxVfo->Modulation != MODULATION_AM);
+			break;
+		case ACTION_OPT_SPECTRUM:
+			APP_RunSpectrum(IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE));
 			break;
 #ifdef ENABLE_BLMIN_TMP_OFF
 		case ACTION_OPT_BLMIN_TMP_OFF:

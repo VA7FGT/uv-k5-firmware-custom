@@ -237,16 +237,8 @@ static void processFKeyFunction(const KEY_Code_t Key, const bool beep)
 #elif defined(ENABLE_SPECTRUM)
 				#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
 					// if we are in channel mode then enter spectrum in channel mode
-					if(IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE))
-					{
-						APP_RunSpectrum(CHANNEL_MODE);
-					}
 					// otherwise enter spectrum in frequency mode
-					else
-					{
-						APP_RunSpectrum(FREQUENCY_MODE);
-					}
-					
+					APP_RunSpectrum(IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE));
 				#elif
 					APP_RunSpectrum();
 				#endif
