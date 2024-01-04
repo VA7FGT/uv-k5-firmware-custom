@@ -824,8 +824,7 @@ void RADIO_SetTxParameters(void)
 
 	BK4819_FilterBandwidth_t Bandwidth = gCurrentVfo->CHANNEL_BANDWIDTH;
 
-	BK4819_SetFilterBandwidth(Bandwidth, gRxVfo->Modulation != MODULATION_AM);
-
+	BK4819_SetFilterBandwidth(Bandwidth, gTxVfo->Modulation != MODULATION_AM);
 
 	BK4819_SetFrequency(gCurrentVfo->pTX->Frequency);
 
@@ -967,6 +966,12 @@ void RADIO_PrepareTX(void)
 		#endif
 		if (gSerialConfigCountDown_500ms > 0)
 		{	// TX is disabled or config upload/download in progress
+			State = VFO_STATE_TX_DISABLE;
+		}
+		else
+		if(gEeprom.RX_OFFSET!=0)
+		{
+			// disable TX when using RX_OFFSET to protect the upconverter
 			State = VFO_STATE_TX_DISABLE;
 		}
 		else

@@ -25,6 +25,7 @@
 #ifdef ENABLE_SPECTRUM_COPY_VFO
   #include "common.h"
 #endif
+#include "action.h"
 
 struct FrequencyBandInfo {
     uint32_t lower;
@@ -313,15 +314,8 @@ static void ExitAndCopyToVfo() {
   else
   // frequency mode
   {
-    //if we entered spectrum from the channel mode
-    if (IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE)){	
-      // swap to frequency mode
-      COMMON_SwitchToVFOMode();
-    }
-
     gTxVfo->STEP_SETTING = FREQUENCY_GetStepIdxFromStepFrequency(GetScanStep());
     gTxVfo->Modulation = settings.modulationType;
-    // TODO: Add support for NARROW- bandwidth in VFO (settings etc)
     gTxVfo->CHANNEL_BANDWIDTH = settings.listenBw;
 
     SETTINGS_SetVfoFrequency(peak.f);
@@ -601,12 +595,7 @@ static void ToggleModulation() {
 }
 
 static void ToggleListeningBW() {
-  if (settings.listenBw == BK4819_FILTER_BW_NARROWEST) {
-    settings.listenBw = BK4819_FILTER_BW_WIDE;
-  } else {
-    settings.listenBw++;
-  }
-  BK4819_SetFilterBandwidth(settings.listenBw, false);
+  settings.listenBw = ACTION_NextBandwidth(settings.listenBw, false);
   redrawScreen = true;
 }
 

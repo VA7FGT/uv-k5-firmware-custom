@@ -18,6 +18,7 @@
 #define APP_ACTION_H
 
 #include "driver/keyboard.h"
+#include "driver/bk4819.h"
 
 //static void ACTION_FlashLight(void)
 void ACTION_Power(void);
@@ -42,3 +43,4 @@ void ACTION_Handle(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 
 #endif
 
+BK4819_FilterBandwidth_t ACTION_NextBandwidth(BK4819_FilterBandwidth_t currentBandwidth, const bool dynamic);
