@@ -96,7 +96,7 @@ void AIRCOPY_StorePacket(void)
 				pData = &g_FSK_Buffer[2];
 				for (i = 0; i < 8; i++)
 				{
-					EEPROM_WriteBuffer(Offset, pData);
+					EEPROM_WriteBuffer(Offset, pData, true);
 					pData  += 4;
 					Offset += 8;
 				}

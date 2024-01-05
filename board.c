@@ -887,7 +887,7 @@ void BOARD_FactoryReset(bool bIsAll)
 				))
 			)
 		{
-			EEPROM_WriteBuffer(i, Template);
+			EEPROM_WriteBuffer(i, Template, true);
 		}
 	}
 

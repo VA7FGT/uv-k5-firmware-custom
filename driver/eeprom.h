@@ -18,9 +18,10 @@
 #define DRIVER_EEPROM_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 void EEPROM_ReadBuffer(uint16_t Address, void *pBuffer, uint8_t Size);
-void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer);
+void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer, const bool safe);
 
 #endif
 

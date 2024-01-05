@@ -39,7 +39,7 @@ struct FrequencyBandInfo {
   Mode appMode;
   //Idea - make this user adjustable to compensate for different antennas, frontends, conditions
   #define UHF_NOISE_FLOOR 40
-  uint8_t scanChannel[MR_CHANNEL_LAST+1];
+  uint8_t scanChannel[MR_CHANNEL_LAST+3];
   uint8_t scanChannelsCount;
   void ToggleScanList();
   void AutoAdjustResolution();
@@ -275,8 +275,7 @@ uint16_t GetStepsCount()
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
   if (appMode==CHANNEL_MODE)
   {
-    // hack: adds 1 step count if steps > 128 to properly average and display last channel
-    return scanChannelsCount <= 128 ? scanChannelsCount : scanChannelsCount+1;
+    return scanChannelsCount;
   }
 #endif
 #ifdef ENABLE_SCAN_RANGES
@@ -415,6 +414,9 @@ static void InitScan() {
 
   scanInfo.scanStep = GetScanStep();
   scanInfo.measurementsCount = GetStepsCount();
+  // prevents phantom channel bar
+  if(appMode==CHANNEL_MODE)
+    scanInfo.measurementsCount++;
 }
 
 static void ResetBlacklist() {
@@ -427,7 +429,6 @@ static void ResetBlacklist() {
   blacklistFreqsIdx = 0;
 #endif
   if(appMode==CHANNEL_MODE){
-      scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
       LoadValidMemoryChannels();
       AutoAdjustResolution();
   }
@@ -844,7 +845,7 @@ static void DrawNums() {
       sprintf(String, "M:%d", scanChannel[0]+1);
       GUI_DisplaySmallest(String, 0, 49, false, true);
 
-      sprintf(String, "M:%d", scanChannel[scanChannelsCount-1]+1);
+      sprintf(String, "M:%d", scanChannel[GetStepsCount()-1]+1);
       GUI_DisplaySmallest(String, 108, 49, false, true);
     }
     else
@@ -1311,7 +1312,7 @@ static void NextScanStep() {
 static void UpdateScan() {
   Scan();
 
-  if (scanInfo.i < scanInfo.measurementsCount) {
+  if (scanInfo.i < GetStepsCount()) {
     NextScanStep();
     return;
   }
@@ -1519,7 +1520,6 @@ void APP_RunSpectrum() {
       settings.scanList++;
     }
 
-    scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
     LoadValidMemoryChannels();
     ResetBlacklist();
     AutoAdjustResolution();
@@ -1527,7 +1527,7 @@ void APP_RunSpectrum() {
 
   void AutoAdjustResolution()
   {
-    if (scanChannelsCount <= 64)
+    if (GetStepsCount() <= 64)
     {
       settings.stepsCount = STEPS_64;
     }
