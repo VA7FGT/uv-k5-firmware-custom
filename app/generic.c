@@ -238,5 +238,5 @@ done:
 	gUpdateDisplay = true;
 
 	//done tx - restore squelch here
-	gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
+	gVfoConfigureMode = VFO_CONFIGURE;
 }
