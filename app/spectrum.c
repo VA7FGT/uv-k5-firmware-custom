@@ -276,7 +276,7 @@ uint16_t GetStepsCount()
   if (appMode==CHANNEL_MODE)
   {
     // hack: adds 1 step count if steps > 128 to properly average and display last channel
-    return scanChannelsCount <= 128 ? scanChannelsCount : scanChannelsCount+1;
+    return scanChannelsCount;
   }
 #endif
 #ifdef ENABLE_SCAN_RANGES
@@ -414,7 +414,7 @@ static void InitScan() {
   scanInfo.f = GetFStart();
 
   scanInfo.scanStep = GetScanStep();
-  scanInfo.measurementsCount = GetStepsCount();
+  scanInfo.measurementsCount = GetStepsCount()+1;
 }
 
 static void ResetBlacklist() {
@@ -1310,7 +1310,7 @@ static void NextScanStep() {
 static void UpdateScan() {
   Scan();
 
-  if (scanInfo.i < scanInfo.measurementsCount) {
+  if (scanInfo.i < scanInfo.measurementsCount-1) {
     NextScanStep();
     return;
   }
