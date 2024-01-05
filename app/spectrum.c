@@ -414,7 +414,10 @@ static void InitScan() {
   scanInfo.f = GetFStart();
 
   scanInfo.scanStep = GetScanStep();
-  scanInfo.measurementsCount = GetStepsCount()+1;
+  scanInfo.measurementsCount = GetStepsCount();
+  // prevents phantom channel bar
+  if(appMode==CHANNEL_MODE)
+    scanInfo.measurementsCount++;
 }
 
 static void ResetBlacklist() {
@@ -1310,7 +1313,7 @@ static void NextScanStep() {
 static void UpdateScan() {
   Scan();
 
-  if (scanInfo.i < scanInfo.measurementsCount-1) {
+  if (scanInfo.i < GetStepsCount()) {
     NextScanStep();
     return;
   }
