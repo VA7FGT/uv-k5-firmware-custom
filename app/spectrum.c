@@ -427,7 +427,6 @@ static void ResetBlacklist() {
   blacklistFreqsIdx = 0;
 #endif
   if(appMode==CHANNEL_MODE){
-      scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
       LoadValidMemoryChannels();
       AutoAdjustResolution();
   }
@@ -844,7 +843,7 @@ static void DrawNums() {
       sprintf(String, "M:%d", scanChannel[0]+1);
       GUI_DisplaySmallest(String, 0, 49, false, true);
 
-      sprintf(String, "M:%d", scanChannel[scanChannelsCount-1]+1);
+      sprintf(String, "M:%d", scanChannel[GetStepsCount()-1]+1);
       GUI_DisplaySmallest(String, 108, 49, false, true);
     }
     else
@@ -1519,7 +1518,6 @@ void APP_RunSpectrum() {
       settings.scanList++;
     }
 
-    scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
     LoadValidMemoryChannels();
     ResetBlacklist();
     AutoAdjustResolution();
@@ -1527,7 +1525,7 @@ void APP_RunSpectrum() {
 
   void AutoAdjustResolution()
   {
-    if (scanChannelsCount <= 64)
+    if (GetStepsCount() <= 64)
     {
       settings.stepsCount = STEPS_64;
     }
