@@ -42,11 +42,16 @@ void EEPROM_ReadBuffer(uint16_t Address, void *pBuffer, uint8_t Size)
 	I2C_Stop();
 }
 
-void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer)
+/*
+Writes to EEPROM
+Address: EEPROM address
+pBuffer: value
+safe: if set to false will allow overwriting calibration data
+*/
+void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer, const bool safe)
 {
-	if (pBuffer == NULL || Address >= EEPROM_WRITE_MAX_ADDR)
+	if (pBuffer == NULL || (safe && Address >= EEPROM_WRITE_MAX_ADDR))
 		return;
-
 
 	uint8_t buffer[8];
 	EEPROM_ReadBuffer(Address, buffer, 8);
