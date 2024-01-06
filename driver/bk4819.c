@@ -312,7 +312,8 @@ void BK4819_InitAGC()
 	BK4819_WriteRegister(BK4819_REG_14, 0x0019);  // 0x0019 / 000000 00 000 11 001 / -79dB
 	//30, 10 - doesn't overload but sound low
 	//50, 10 - best so far
-	//50, 15, - signal doesn't fall too low - works best for now
+	//50, 15, - SOFT - signal doesn't fall too low - works best for now
+	//45, 25 - AGRESSIVE - lower histeresis, but volume jumps heavily, not good for music, might be good for aviation
 	//1 << 14 - way better, seems to open squelch and match squelch as opposed to 0
 	BK4819_WriteRegister(BK4819_REG_49, (0b00 << 14) | (50 << 7) | (15 << 0)); //0x2A38 / 00 1010100 0111000 / 84, 56
 	BK4819_WriteRegister(BK4819_REG_7B, 0x8420);
