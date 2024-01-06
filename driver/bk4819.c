@@ -252,7 +252,7 @@ void BK4819_SetAGC(bool enable)
 	// }
 	// else {
 	// 	BK4819_WriteRegister(BK4819_REG_7B, 0x318C);
-
+	
 	// 	BK4819_WriteRegister(BK4819_REG_7C, 0x595E);
 	// 	BK4819_WriteRegister(BK4819_REG_20, 0x8DEF);
 
@@ -310,7 +310,12 @@ void BK4819_InitAGC()
 	BK4819_WriteRegister(BK4819_REG_11, 0x027B);  // 0x027B / 000000 10 011 11 011 / -43dB
 	BK4819_WriteRegister(BK4819_REG_10, 0x007A);  // 0x007A / 000000 00 011 11 010 / -58dB
 	BK4819_WriteRegister(BK4819_REG_14, 0x0019);  // 0x0019 / 000000 00 000 11 001 / -79dB
-	BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (84 << 7) | (56 << 0)); //0x2A38 / 00 1010100 0111000 / 84, 56
+	//30, 10 - doesn't overload but sound low
+	//50, 10 - best so far
+	//50, 15, - SOFT - signal doesn't fall too low - works best for now
+	//45, 25 - AGRESSIVE - lower histeresis, but volume jumps heavily, not good for music, might be good for aviation
+	//1 << 14 - way better, seems to open squelch and match squelch as opposed to 0
+	BK4819_WriteRegister(BK4819_REG_49, (0b00 << 14) | (50 << 7) | (15 << 0)); //0x2A38 / 00 1010100 0111000 / 84, 56
 	BK4819_WriteRegister(BK4819_REG_7B, 0x8420);
 
 }
