@@ -732,20 +732,20 @@ void BK4819_PickRXFilterPathBasedOnFrequency(uint32_t Frequency)
 {
 	if (Frequency < 28000000)
 	{	// VHF
-			BK4819_ToggleGpioOut(BK4819_GPIO4_PIN32_VHF_LNA, true);
-			BK4819_ToggleGpioOut(BK4819_GPIO3_PIN31_UHF_LNA, false);
-			}
+		BK4819_ToggleGpioOut(BK4819_GPIO4_PIN32_VHF_LNA, true);
+		BK4819_ToggleGpioOut(BK4819_GPIO3_PIN31_UHF_LNA, false);
+	}
 	else
 	if (Frequency == 0xFFFFFFFF)
 	{	// OFF
-			BK4819_ToggleGpioOut(BK4819_GPIO4_PIN32_VHF_LNA, false);
-			BK4819_ToggleGpioOut(BK4819_GPIO3_PIN31_UHF_LNA, false);
-			}
+		BK4819_ToggleGpioOut(BK4819_GPIO4_PIN32_VHF_LNA, false);
+		BK4819_ToggleGpioOut(BK4819_GPIO3_PIN31_UHF_LNA, false);
+	}
 	else
 	{	// UHF
-			BK4819_ToggleGpioOut(BK4819_GPIO4_PIN32_VHF_LNA, false);
-			BK4819_ToggleGpioOut(BK4819_GPIO3_PIN31_UHF_LNA, true);
-			}
+		BK4819_ToggleGpioOut(BK4819_GPIO4_PIN32_VHF_LNA, false);
+		BK4819_ToggleGpioOut(BK4819_GPIO3_PIN31_UHF_LNA, true);
+	}
 }
 
 void BK4819_DisableScramble(void)
