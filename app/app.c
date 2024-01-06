@@ -485,12 +485,20 @@ void APP_StartListening(FUNCTION_Type_t Function, const bool reset_am_fix)
 
 #ifdef ENABLE_AM_FIX
 
-		BK4819_SetAGC(gRxVfo->Modulation != MODULATION_AM || !gSetting_AM_fix);
+		BK4819_SetAGC(!gSetting_AM_fix);
 
-		if (gRxVfo->Modulation == MODULATION_AM && gSetting_AM_fix) {	// AM RX mode
-			if (reset_am_fix)
-				AM_fix_reset(chan);      // TODO: only reset it when moving channel/frequency
-			AM_fix_10ms(chan);
+		if (gRxVfo->Modulation == MODULATION_AM) {	// AM RX mode
+			if(gSetting_AM_fix)
+			{
+				if (reset_am_fix)
+					AM_fix_reset(chan);      // TODO: only reset it when moving channel/frequency
+				AM_fix_10ms(chan);
+			}
+			else
+			{
+				// if not getting AM fix restore gain settings to sane values after AM fix has been turned off
+				BK4819_SetDefaultAmplifierSettings();
+			}
 		}
 		else {	// FM RX mode
 			#ifndef ENABLE_ADJUSTABLE_RX_GAIN_SETTINGS
