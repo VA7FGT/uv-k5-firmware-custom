@@ -605,10 +605,11 @@ void BOARD_EEPROM_Init(void)
 	memmove(&gEeprom.POWER_ON_PASSWORD, Data, 4);
 
 	// 0EA0..0EA7
+	EEPROM_ReadBuffer(0x0EA0, Data, 8);
 	#ifdef ENABLE_VOX
-		EEPROM_ReadBuffer(0x0EA0, Data, 8);
 		gEeprom.VOX_DELAY = (Data[0] < 11) ? Data[0] : 4;
 	#endif
+	gEeprom.RX_AGC = (Data[1] < RX_AGC_LEN) ? Data[1] : RX_AGC_SLOW;
 
 	// 0EA8..0EAF
 	EEPROM_ReadBuffer(0x0EA8, Data, 8);
@@ -619,7 +620,7 @@ void BOARD_EEPROM_Init(void)
 	gEeprom.REPEATER_TAIL_TONE_ELIMINATION = (Data[2] < 11) ? Data[2] : 0;
 	gEeprom.TX_VFO                         = (Data[3] <  2) ? Data[3] : 0;
 	gEeprom.BATTERY_TYPE                   = (Data[4] < BATTERY_TYPE_UNKNOWN) ? Data[4] : BATTERY_TYPE_1600_MAH;
-
+	
 	// 0ED0..0ED7
 	EEPROM_ReadBuffer(0x0ED0, Data, 8);
 	gEeprom.DTMF_SIDE_TONE               = (Data[0] <   2) ? Data[0] : true;
