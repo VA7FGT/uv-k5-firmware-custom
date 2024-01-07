@@ -76,11 +76,11 @@ void Main(void)
 	memset(gDTMF_String, '-', sizeof(gDTMF_String));
 	gDTMF_String[sizeof(gDTMF_String) - 1] = 0;
 
-	BK4819_Init();
-
 	BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage, &gBatteryCurrent);
 
 	BOARD_EEPROM_Init();
+
+	BK4819_Init();
 
 	BOARD_EEPROM_LoadCalibration();
 
