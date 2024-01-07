@@ -75,9 +75,6 @@ enum
 #endif
 	MENU_COMPAND,
 	MENU_1_CALL,
-	MENU_S_LIST,
-	MENU_SLIST1,
-	MENU_SLIST2,
 #ifdef ENABLE_ALARM
 	MENU_AL_MOD,
 #endif
