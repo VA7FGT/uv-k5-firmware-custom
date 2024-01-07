@@ -165,10 +165,10 @@ const char gSubMenu_OFF_ON[][4] =
 const char gSubMenu_SAVE[][4] =
 {
 	"OFF",
-	"1:1",
-	"1:2",
-	"1:3",
-	"1:4"
+	"50%",
+	"67%",
+	"75%",
+	"80%"
 };
 
 const char gSubMenu_TOT[][7] =
