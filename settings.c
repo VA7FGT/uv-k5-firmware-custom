@@ -127,11 +127,13 @@ void SETTINGS_SaveSettings(void)
 	EEPROM_WriteBuffer(0x0E98, State, true);
 
 	memset(State, 0xFF, sizeof(State));
-#ifdef ENABLE_VOX
-	State[0] = gEeprom.VOX_DELAY;
+	#ifdef ENABLE_VOX
+		State[0] = gEeprom.VOX_DELAY;
+	#endif
+	State[1] = gEeprom.RX_AGC;
 	EEPROM_WriteBuffer(0x0EA0, State, true);
-#endif
-
+	
+	memset(State, 0xFF, sizeof(State));
 	#if defined(ENABLE_ALARM) || defined(ENABLE_TX1750)
 		State[0] = gEeprom.ALARM_MODE;
 	#else
@@ -186,12 +188,6 @@ void SETTINGS_SaveSettings(void)
 	//if (!gSetting_TX_EN)             State[7] &= ~(1u << 0);
 	if (!gSetting_live_DTMF_decoder) State[7] &= ~(1u << 1);
 	State[7] = (State[7] & ~(3u << 2)) | ((gSetting_battery_text & 3u) << 2);
-	#ifdef ENABLE_AUDIO_BAR
-		if (!gSetting_mic_bar)           State[7] &= ~(1u << 4);
-	#endif
-	#ifdef ENABLE_AM_FIX
-		if (!gSetting_AM_fix)            State[7] &= ~(1u << 5);
-	#endif
 	State[7] = (State[7] & ~(3u << 6)) | ((gSetting_backlight_on_tx_rx & 3u) << 6);
 	 
 	EEPROM_WriteBuffer(0x0F40, State, true);

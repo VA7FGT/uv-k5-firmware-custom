@@ -81,7 +81,7 @@ void ACTION_Monitor(void)
 			gNoaaChannel = gRxVfo->CHANNEL_SAVE - NOAA_CHANNEL_FIRST;
 #endif
 		RADIO_SetupRegisters(true);
-		APP_StartListening(FUNCTION_MONITOR, false);
+		APP_StartListening(FUNCTION_MONITOR);
 		return;
 	}
 
@@ -301,11 +301,6 @@ void ACTION_Scan(bool bRestart)
 
 void ACTION_SwitchDemodul(void)
 {
-	#if defined(ENABLE_ADJUSTABLE_RX_GAIN_SETTINGS) && defined(ENABLE_AM_FIX)
-		//if we switch back from AM modulation fix set gain to default values
-		if(gTxVfo->Modulation==MODULATION_AM)
-			BK4819_SetDefaultAmplifierSettings();
-	#endif
 	gTxVfo->Modulation++;
 	if(gTxVfo->Modulation == MODULATION_UKNOWN)
 		gTxVfo->Modulation = MODULATION_FM;

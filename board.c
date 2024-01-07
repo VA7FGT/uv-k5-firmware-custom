@@ -605,10 +605,11 @@ void BOARD_EEPROM_Init(void)
 	memmove(&gEeprom.POWER_ON_PASSWORD, Data, 4);
 
 	// 0EA0..0EA7
+	EEPROM_ReadBuffer(0x0EA0, Data, 8);
 	#ifdef ENABLE_VOX
-		EEPROM_ReadBuffer(0x0EA0, Data, 8);
 		gEeprom.VOX_DELAY = (Data[0] < 11) ? Data[0] : 4;
 	#endif
+	gEeprom.RX_AGC = (Data[1] < RX_AGC_LEN) ? Data[1] : RX_AGC_SLOW;
 
 	// 0EA8..0EAF
 	EEPROM_ReadBuffer(0x0EA8, Data, 8);
@@ -619,7 +620,7 @@ void BOARD_EEPROM_Init(void)
 	gEeprom.REPEATER_TAIL_TONE_ELIMINATION = (Data[2] < 11) ? Data[2] : 0;
 	gEeprom.TX_VFO                         = (Data[3] <  2) ? Data[3] : 0;
 	gEeprom.BATTERY_TYPE                   = (Data[4] < BATTERY_TYPE_UNKNOWN) ? Data[4] : BATTERY_TYPE_1600_MAH;
-
+	
 	// 0ED0..0ED7
 	EEPROM_ReadBuffer(0x0ED0, Data, 8);
 	gEeprom.DTMF_SIDE_TONE               = (Data[0] <   2) ? Data[0] : true;
@@ -720,12 +721,6 @@ void BOARD_EEPROM_Init(void)
 	//gSetting_TX_EN             = (Data[7] & (1u << 0)) ? true : false;
 	gSetting_live_DTMF_decoder = (Data[7] & (1u << 1)) ? true : false;
 	gSetting_battery_text      = (((Data[7] >> 2) & 3u) <= 2) ? (Data[7] >> 2) & 3 : 2;
-	#ifdef ENABLE_AUDIO_BAR
-		gSetting_mic_bar       = (Data[7] & (1u << 4)) ? true : false;
-	#endif
-	#ifdef ENABLE_AM_FIX
-		gSetting_AM_fix        = (Data[7] & (1u << 5)) ? true : false;
-	#endif
 	gSetting_backlight_on_tx_rx = (Data[7] >> 6) & 3u;
 	// Read RxOffset setting
 	EEPROM_ReadBuffer(RX_OFFSET_ADDR, Data, 4);

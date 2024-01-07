@@ -40,8 +40,7 @@ enum {
 	F_LOCK_GB,
 	F_LOCK_430,
 	F_LOCK_438,
-	F_LOCK_ALL,	// disable TX on all frequencies
-	F_LOCK_NONE, // enable TX on all frequencies
+	F_LOCK_ALL,	// disable TX on all frequencies, scanner mode
 	F_LOCK_LEN
 };
 
@@ -73,6 +72,13 @@ enum {
 	OUTPUT_POWER_LOW = 0,
 	OUTPUT_POWER_MID,
 	OUTPUT_POWER_HIGH
+};
+
+enum {
+	RX_AGC_OFF = 0,
+	RX_AGC_SLOW,
+	RX_AGC_FAST,
+	RX_AGC_LEN
 };
 
 enum {
@@ -253,6 +259,7 @@ typedef struct {
 	uint8_t               BACKLIGHT_MAX;
 	BATTERY_Type_t		  BATTERY_TYPE;
 	uint32_t              RX_OFFSET;
+	uint8_t				  RX_AGC;
 } EEPROM_Config_t;
 
 extern EEPROM_Config_t gEeprom;

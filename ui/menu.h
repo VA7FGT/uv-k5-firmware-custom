@@ -70,14 +70,8 @@ enum
 	MENU_STE,
 	MENU_RP_STE,
 	MENU_MIC,
-#ifdef ENABLE_AUDIO_BAR
-	MENU_MIC_BAR,
-#endif
 	MENU_COMPAND,
 	MENU_1_CALL,
-	MENU_S_LIST,
-	MENU_SLIST1,
-	MENU_SLIST2,
 #ifdef ENABLE_ALARM
 	MENU_AL_MOD,
 #endif
@@ -103,9 +97,6 @@ enum
 	MENU_VOL,
 	MENU_BAT_TXT,
 	MENU_AM,
-#ifdef ENABLE_AM_FIX
-	MENU_AM_FIX,
-#endif
 #ifdef ENABLE_NOAA
 	MENU_NOAA_S,
 #endif
@@ -125,7 +116,8 @@ enum
 	MENU_F2SHRT,
 	MENU_F2LONG,
 	MENU_MLONG,
-	MENU_BATTYP
+	MENU_BATTYP,
+	MENU_RX_AGC
 };
 
 extern const uint8_t FIRST_HIDDEN_MENU_ITEM;
@@ -160,6 +152,7 @@ extern const char        gSubMenu_RX_TX[4][6];
 extern const char        gSubMenu_BAT_TXT[3][8];
 extern const char 		 gSubMenu_BATTYP[2][9];
 extern const char        gSubMenu_SCRAMBLER[11][7];
+extern const char        gSubMenu_RX_AGC[3][6];
 
 typedef struct {char* name; uint8_t id;} t_sidefunction;
 extern const uint8_t 		 gSubMenu_SIDEFUNCTIONS_size;

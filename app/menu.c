@@ -47,8 +47,6 @@
 	#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 #endif
 
-uint8_t gUnlockAllTxConfCnt;
-
 #ifdef ENABLE_F_CAL_MENU
 	void writeXtalFreqCal(const int32_t value, const bool update_eeprom)
 	{
@@ -224,12 +222,6 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			*pMax = ARRAY_SIZE(gSubMenu_RX_TX) - 1;
 			break;
 
-		#ifdef ENABLE_AM_FIX
-			case MENU_AM_FIX:
-		#endif
-		#ifdef ENABLE_AUDIO_BAR
-			case MENU_MIC_BAR:
-		#endif
 		case MENU_BCL:
 		case MENU_BEEP:
 		case MENU_AUTOLK:
@@ -256,6 +248,11 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 		case MENU_AM:
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(gModulationStr) - 1;
+			break;
+
+		case MENU_RX_AGC:
+			*pMin = 0;
+			*pMax = ARRAY_SIZE(gSubMenu_RX_AGC) - 1;
 			break;
 
 		case MENU_SCR:
@@ -285,12 +282,6 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			*pMax = MR_CHANNEL_LAST;
 			break;
 
-		case MENU_SLIST1:
-		case MENU_SLIST2:
-			*pMin = -1;
-			*pMax = MR_CHANNEL_LAST;
-			break;
-
 		case MENU_SAVE:
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(gSubMenu_SAVE) - 1;
@@ -301,10 +292,6 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			*pMax = 4;
 			break;
 
-		case MENU_S_LIST:
-			*pMin = 0;
-			*pMax = 2;
-			break;
 			
 #ifdef ENABLE_DTMF_CALLING
 		case MENU_D_RSP:
@@ -637,12 +624,6 @@ void MENU_AcceptSetting(void)
 			gFlagReconfigureVfos = true;
 			break;
 
-		#ifdef ENABLE_AUDIO_BAR
-			case MENU_MIC_BAR:
-				gSetting_mic_bar = gSubMenuSelection;
-				break;
-		#endif
-
 		case MENU_COMPAND:
 			gTxVfo->Compander = gSubMenuSelection;
 			SETTINGS_UpdateChannel(gTxVfo->CHANNEL_SAVE, gTxVfo, true);
@@ -653,10 +634,6 @@ void MENU_AcceptSetting(void)
 
 		case MENU_1_CALL:
 			gEeprom.CHAN_1_CALL = gSubMenuSelection;
-			break;
-
-		case MENU_S_LIST:
-			gEeprom.SCAN_LIST_DEFAULT = gSubMenuSelection;
 			break;
 
 		#ifdef ENABLE_ALARM
@@ -735,13 +712,11 @@ void MENU_AcceptSetting(void)
 			gRequestSaveChannel = 1;
 			return;
 
-		#ifdef ENABLE_AM_FIX
-			case MENU_AM_FIX:
-				gSetting_AM_fix = gSubMenuSelection;
-				gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
-				gFlagResetVfos    = true;
-				break;
-		#endif
+		case MENU_RX_AGC:
+			gEeprom.RX_AGC    = gSubMenuSelection;
+			gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
+			gFlagResetVfos    = true;
+			break;
 
 		#ifdef ENABLE_NOAA
 			case MENU_NOAA_S:
@@ -765,14 +740,6 @@ void MENU_AcceptSetting(void)
 			break;
 
 		case MENU_F_LOCK: {
-			if(gSubMenuSelection == F_LOCK_NONE) { // select 10 times to enable
-				gUnlockAllTxConfCnt++;
-				if(gUnlockAllTxConfCnt < 10)
-					return;
-			}
-			else
-				gUnlockAllTxConfCnt = 0;
-
 			gSetting_F_LOCK = gSubMenuSelection;
 			break;
 		}
@@ -1039,30 +1006,12 @@ void MENU_ShowCurrentSetting(void)
 			gSubMenuSelection = gEeprom.MIC_SENSITIVITY;
 			break;
 
-#ifdef ENABLE_AUDIO_BAR
-		case MENU_MIC_BAR:
-			gSubMenuSelection = gSetting_mic_bar;
-			break;
-#endif
-
 		case MENU_COMPAND:
 			gSubMenuSelection = gTxVfo->Compander;
 			return;
 
 		case MENU_1_CALL:
 			gSubMenuSelection = gEeprom.CHAN_1_CALL;
-			break;
-
-		case MENU_S_LIST:
-			gSubMenuSelection = gEeprom.SCAN_LIST_DEFAULT;
-			break;
-
-		case MENU_SLIST1:
-			gSubMenuSelection = RADIO_FindNextChannel(0, 1, true, 0);
-			break;
-
-		case MENU_SLIST2:
-			gSubMenuSelection = RADIO_FindNextChannel(0, 1, true, 1);
 			break;
 
 		#ifdef ENABLE_ALARM
@@ -1121,11 +1070,10 @@ void MENU_ShowCurrentSetting(void)
 			gSubMenuSelection = gTxVfo->Modulation;
 			break;
 
-#ifdef ENABLE_AM_FIX
-		case MENU_AM_FIX:
-			gSubMenuSelection = gSetting_AM_fix;
+		case MENU_RX_AGC:
+			gSubMenuSelection = gEeprom.RX_AGC;
 			break;
-#endif
+
 		#ifdef ENABLE_NOAA
 			case MENU_NOAA_S:
 				gSubMenuSelection = gEeprom.NOAA_AUTO_SCAN;
@@ -1715,13 +1663,6 @@ static void MENU_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 		case MENU_1_CALL:
 		case MENU_MEM_NAME:
 			bCheckScanList = false;
-			break;
-
-		case MENU_SLIST2:
-			VFO = 1;
-			[[fallthrough]];
-		case MENU_SLIST1:
-			bCheckScanList = true;
 			break;
 
 		default:

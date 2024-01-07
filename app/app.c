@@ -44,7 +44,6 @@
 #include "driver/keyboard.h"
 #include "driver/st7565.h"
 #include "driver/system.h"
-#include "am_fix.h"
 #include "dtmf.h"
 #include "external/printf/printf.h"
 #include "frequencies.h"
@@ -70,12 +69,6 @@ static void FlashlightTimeSlice();
 static void UpdateRSSI(const int vfo)
 {
 	int16_t rssi = BK4819_GetRSSI();
-
-	// #ifdef ENABLE_AM_FIX
-	// 	// add RF gain adjust compensation
-	// 	if (gEeprom.VfoInfo[vfo].Modulation == MODULATION_AM && gSetting_AM_fix)
-	// 		rssi -= rssi_gain_diff[vfo];
-	// #endif
 
 	if (gCurrentRSSI[vfo] == rssi)
 		return;     // no change
@@ -231,7 +224,7 @@ static void HandleIncoming(void)
 	}
 #endif
 
-	APP_StartListening(gMonitor ? FUNCTION_MONITOR : FUNCTION_RECEIVE, false);
+	APP_StartListening(gMonitor ? FUNCTION_MONITOR : FUNCTION_RECEIVE);
 }
 
 static void HandleReceive(void)
@@ -426,7 +419,7 @@ static void HandleFunction(void)
 	}
 }
 
-void APP_StartListening(FUNCTION_Type_t Function, const bool reset_am_fix)
+void APP_StartListening(FUNCTION_Type_t Function)
 {
 	const unsigned int chan = gEeprom.RX_VFO;
 //	const unsigned int chan = gRxVfo->CHANNEL_SAVE;
@@ -481,37 +474,8 @@ void APP_StartListening(FUNCTION_Type_t Function, const bool reset_am_fix)
 		gUpdateStatus    = true;
 	}
 
-	{
-
-#ifdef ENABLE_AM_FIX
-
-		BK4819_SetAGC(!gSetting_AM_fix);
-
-		if (gRxVfo->Modulation == MODULATION_AM) {	// AM RX mode
-			if(gSetting_AM_fix)
-			{
-				if (reset_am_fix)
-					AM_fix_reset(chan);      // TODO: only reset it when moving channel/frequency
-				AM_fix_10ms(chan);
-			}
-			else
-			{
-				// if not getting AM fix restore gain settings to sane values after AM fix has been turned off
-				BK4819_SetDefaultAmplifierSettings();
-			}
-		}
-		else {	// FM RX mode
-			#ifndef ENABLE_ADJUSTABLE_RX_GAIN_SETTINGS
-				BK4819.BK4819_SetDefaultAmplifierSettings();
-			#endif
-		}
-#else
-		(void)reset_am_fix;
-		#ifndef ENABLE_ADJUSTABLE_RX_GAIN_SETTINGS
-			BK4819.BK4819_SetDefaultAmplifierSettings();
-		#endif
-#endif
-	}
+	BK4819_InitAGC(gEeprom.RX_AGC);
+	BK4819_SetAGC(gEeprom.RX_AGC!=RX_AGC_OFF);
 
 	// AF gain - original QS values
 	// if (gRxVfo->Modulation != MODULATION_FM){
@@ -1183,12 +1147,6 @@ void APP_TimeSlice10ms(void)
 				AUDIO_PlayBeep(BEEP_880HZ_40MS_OPTIONAL);
 	#endif
 
-	#ifdef ENABLE_AM_FIX
-//		if (gEeprom.VfoInfo[gEeprom.RX_VFO].Modulation != MODULATION_FM && gSetting_AM_fix)
-		if (gRxVfo->Modulation == MODULATION_AM && gSetting_AM_fix)
-			AM_fix_10ms(gEeprom.RX_VFO);
-	#endif
-
 	if (UART_IsCommandAvailable())
 	{
 		__disable_irq();
@@ -1205,7 +1163,7 @@ void APP_TimeSlice10ms(void)
 	if (gCurrentFunction == FUNCTION_TRANSMIT)
 	{	// transmitting
 		#ifdef ENABLE_AUDIO_BAR
-			if (gSetting_mic_bar && (gFlashLightBlinkCounter % (150 / 10)) == 0) // once every 150ms
+			if ((gFlashLightBlinkCounter % (150 / 10)) == 0) // once every 150ms
 				UI_DisplayAudioBar();
 		#endif
 	}

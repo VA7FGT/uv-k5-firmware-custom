@@ -22,7 +22,6 @@ ENABLE_PWRON_PASSWORD         := 0
 ENABLE_DTMF_CALLING           := 0
 
 #---- DEBUG ----
-ENABLE_AM_FIX_SHOW_DATA            := 0
 ENABLE_ULTRA_LOW_POWER_TX          := 0
 
 # ---- CUSTOM MODS ----
@@ -37,7 +36,6 @@ ENABLE_BOOT_BEEPS                  := 0
 ENABLE_SHOW_CHARGE_LEVEL           := 1
 ENABLE_REVERSE_BAT_SYMBOL          := 0
 ENABLE_NO_CODE_SCAN_TIMEOUT        := 1
-ENABLE_AM_FIX                      := 1
 ENABLE_SQUELCH_MORE_SENSITIVE      := 0
 ENABLE_FASTER_CHANNEL_SCAN         := 1
 ENABLE_RSSI_BAR                    := 1
@@ -129,9 +127,6 @@ endif
 OBJS += app/scanner.o
 ifeq ($(ENABLE_UART),1)
 	OBJS += app/uart.o
-endif
-ifeq ($(ENABLE_AM_FIX), 1)
-	OBJS += am_fix.o
 endif
 OBJS += audio.o
 OBJS += bitmaps.o
@@ -319,12 +314,6 @@ ifeq ($(ENABLE_REVERSE_BAT_SYMBOL),1)
 endif
 ifeq ($(ENABLE_NO_CODE_SCAN_TIMEOUT),1)
 	CFLAGS  += -DENABLE_CODE_SCAN_TIMEOUT
-endif
-ifeq ($(ENABLE_AM_FIX),1)
-	CFLAGS  += -DENABLE_AM_FIX
-endif
-ifeq ($(ENABLE_AM_FIX_SHOW_DATA),1)
-	CFLAGS  += -DENABLE_AM_FIX_SHOW_DATA
 endif
 ifeq ($(ENABLE_SQUELCH_MORE_SENSITIVE),1)
 	CFLAGS  += -DENABLE_SQUELCH_MORE_SENSITIVE

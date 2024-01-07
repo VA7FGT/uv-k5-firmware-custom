@@ -17,9 +17,6 @@
 #include <string.h>
 #include <stdio.h>     // NULL
 
-#ifdef ENABLE_AM_FIX
-	#include "am_fix.h"
-#endif
 #include "app/app.h"
 #include "app/dtmf.h"
 #include "audio.h"
@@ -79,11 +76,11 @@ void Main(void)
 	memset(gDTMF_String, '-', sizeof(gDTMF_String));
 	gDTMF_String[sizeof(gDTMF_String) - 1] = 0;
 
-	BK4819_Init();
-
 	BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage, &gBatteryCurrent);
 
 	BOARD_EEPROM_Init();
+
+	BK4819_Init();
 
 	BOARD_EEPROM_LoadCalibration();
 
@@ -98,10 +95,6 @@ void Main(void)
 		BOARD_ADC_GetBatteryInfo(&gBatteryVoltages[i], &gBatteryCurrent);
 
 	BATTERY_GetReadings(false);
-
-	#ifdef ENABLE_AM_FIX
-		AM_fix_init();
-	#endif
 
 	BootMode = BOOT_GetMode();
 	

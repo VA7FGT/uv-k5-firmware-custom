@@ -23,6 +23,7 @@
 #include "driver/gpio.h"
 #include "driver/system.h"
 #include "driver/systick.h"
+#include "settings.h"
 
 #ifndef ARRAY_SIZE
 	#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
@@ -55,8 +56,10 @@ void BK4819_Init(void)
 	BK4819_WriteRegister(BK4819_REG_37, 0x1D0F);
 	BK4819_WriteRegister(BK4819_REG_36, 0x0022);
 
-	BK4819_InitAGC();
-	BK4819_SetAGC(true);
+	BK4819_SetDefaultAmplifierSettings();
+
+	BK4819_InitAGC(gEeprom.RX_AGC);
+	BK4819_SetAGC(gEeprom.RX_AGC!=RX_AGC_OFF);
 
 	BK4819_WriteRegister(BK4819_REG_19, 0b0001000001000001);   // <15> MIC AGC  1 = disable  0 = enable
 
@@ -263,7 +266,7 @@ void BK4819_SetAGC(bool enable)
 	// }
 }
 
-void BK4819_InitAGC()
+void BK4819_InitAGC(const uint8_t agcType)
 {
 	// REG_10, REG_11, REG_12 REG_13, REG_14
 	//
@@ -304,7 +307,17 @@ void BK4819_InitAGC()
 	//         0 = -33dB
 	//
 
-	BK4819_SetDefaultAmplifierSettings();         // 0x03BE / 000000 11 101 11 110 /  -7dB
+		switch(agcType)
+	{
+		case RX_AGC_SLOW:
+			BK4819_WriteRegister(BK4819_REG_49, (0b00 << 14) | (50 << 7) | (15 << 0));
+			break;
+		case RX_AGC_FAST:
+			BK4819_WriteRegister(BK4819_REG_49, (0b00 << 14) | (45 << 7) | (25 << 0));
+			break;
+		default:
+			return;
+	}
 
 	BK4819_WriteRegister(BK4819_REG_12, 0x037B);  // 0x037B / 000000 11 011 11 011 / -24dB
 	BK4819_WriteRegister(BK4819_REG_11, 0x027B);  // 0x027B / 000000 10 011 11 011 / -43dB
@@ -315,8 +328,8 @@ void BK4819_InitAGC()
 	//50, 15, - SOFT - signal doesn't fall too low - works best for now
 	//45, 25 - AGRESSIVE - lower histeresis, but volume jumps heavily, not good for music, might be good for aviation
 	//1 << 14 - way better, seems to open squelch and match squelch as opposed to 0
-	BK4819_WriteRegister(BK4819_REG_49, (0b00 << 14) | (50 << 7) | (15 << 0)); //0x2A38 / 00 1010100 0111000 / 84, 56
-	BK4819_WriteRegister(BK4819_REG_7B, 0x8420);
+
+	BK4819_WriteRegister(BK4819_REG_7B, 0x8420); // ?
 
 }
 

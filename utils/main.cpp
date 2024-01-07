@@ -234,25 +234,6 @@ void create_gain_table(const char *filename)
 	// ***************************
 	// save the table to a file
 
-/*
-	typedef struct
-	{
-		#if 1
-			// bitfields take up less flash bytes
-			uint8_t lna_short:2;   // 0 ~ 3
-			uint8_t       lna:3;   // 0 ~ 7
-			uint8_t     mixer:2;   // 0 ~ 3
-			uint8_t       pga:3;   // 0 ~ 7
-		#else
-			uint8_t lna_short;     // 0 ~ 3
-			uint8_t       lna;     // 0 ~ 7
-			uint8_t     mixer;     // 0 ~ 3
-			uint8_t       pga;     // 0 ~ 7
-		#endif
-	} t_am_fix_gain_table;
-	//} __attribute__((packed)) t_am_fix_gain_table;
-*/
-
 	FILE *file = fopen(filename, "w");
 	if (file == NULL)
 		return;
