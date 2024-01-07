@@ -274,8 +274,7 @@ const char * const gSubMenu_F_LOCK[] =
 	"GB HAM\n144-148\n430-440",
 	"137-174\n400-430",
 	"137-174\n400-438",
-	"DISABLE\nALL",
-	"UNLOCK\nALL",
+	"DISABLE\nALL"
 };
 
 const char gSubMenu_BACKLIGHT[][7] =
@@ -793,10 +792,7 @@ void UI_DisplayMenu(void)
 				break;
 
 			case MENU_F_LOCK:
-				if(!gIsInSubMenu && gUnlockAllTxConfCnt>0 && gUnlockAllTxConfCnt<10)
-					strcpy(String, "READ\nMANUAL");
-				else
-					strcpy(String, gSubMenu_F_LOCK[gSubMenuSelection]);
+				strcpy(String, gSubMenu_F_LOCK[gSubMenuSelection]);
 				break;
 
 			#ifdef ENABLE_F_CAL_MENU
