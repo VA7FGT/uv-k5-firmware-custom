@@ -70,10 +70,7 @@ const t_menu_item MenuList[] =
 	{"KeyLck", VOICE_ID_INVALID,                       MENU_AUTOLK        }, // was "AUTOLk"
 	{"TxTOut", VOICE_ID_TRANSMIT_OVER_TIME,            MENU_TOT           }, // was "TOT"
 	{"BatSav", VOICE_ID_SAVE_MODE,                     MENU_SAVE          }, // was "SAVE"
-	{"Mic",    VOICE_ID_INVALID,                       MENU_MIC           },
-#ifdef ENABLE_AUDIO_BAR
-	{"MicBar", VOICE_ID_INVALID,                       MENU_MIC_BAR       },
-#endif		
+	{"Mic",    VOICE_ID_INVALID,                       MENU_MIC           },	
 	{"ChDisp", VOICE_ID_INVALID,                       MENU_MDF           }, // was "MDF"
 	{"POnMsg", VOICE_ID_INVALID,                       MENU_PONMSG        },
 	{"BatTxt", VOICE_ID_INVALID,                       MENU_BAT_TXT       },	
@@ -505,12 +502,6 @@ void UI_DisplayMenu(void)
 					sprintf(String, "+%u.%01udB", mic / 2, mic % 2);
 				}
 				break;
-
-			#ifdef ENABLE_AUDIO_BAR
-				case MENU_MIC_BAR:
-					strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
-					break;
-			#endif
 
 			case MENU_STEP: {
 				uint16_t step = gStepFrequencyTable[FREQUENCY_GetStepIdxFromSortedIdx(gSubMenuSelection)];

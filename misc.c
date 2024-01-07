@@ -95,9 +95,6 @@ uint8_t           gSetting_backlight_on_tx_rx;
 	bool          gSetting_AM_fix;
 #endif
 
-#ifdef ENABLE_AUDIO_BAR
-	bool          gSetting_mic_bar;
-#endif
 bool              gSetting_live_DTMF_decoder;
 uint8_t           gSetting_battery_text;
 

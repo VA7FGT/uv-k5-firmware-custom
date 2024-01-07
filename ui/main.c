@@ -100,42 +100,40 @@ unsigned int sqrt16(unsigned int value)
 
 void UI_DisplayAudioBar(void)
 {
-	if (gSetting_mic_bar)
+	if(gLowBattery && !gLowBatteryConfirmed)
+		return;
+
+	const unsigned int line      = 3;
+
+	if (gCurrentFunction != FUNCTION_TRANSMIT ||
+		gScreenToDisplay != DISPLAY_MAIN
+	#ifdef ENABLE_DTMF_CALLING
+		|| gDTMF_CallState != DTMF_CALL_STATE_NONE
+	#endif
+		)
 	{
-		if(gLowBattery && !gLowBatteryConfirmed)
-			return;
-
-		const unsigned int line      = 3;
-
-		if (gCurrentFunction != FUNCTION_TRANSMIT ||
-			gScreenToDisplay != DISPLAY_MAIN
-#ifdef ENABLE_DTMF_CALLING
-			|| gDTMF_CallState != DTMF_CALL_STATE_NONE
-#endif
-			)
-		{
-			return;  // screen is in use
-		}
-				
-#if defined(ENABLE_ALARM) || defined(ENABLE_TX1750)
+		return;  // screen is in use
+	}
+			
+	#if defined(ENABLE_ALARM) || defined(ENABLE_TX1750)
 		if (gAlarmState != ALARM_STATE_OFF)
 			return;
-#endif
-		const unsigned int voice_amp  = BK4819_GetVoiceAmplitudeOut();  // 15:0
+	#endif
+	const unsigned int voice_amp  = BK4819_GetVoiceAmplitudeOut();  // 15:0
 
-		// make non-linear to make more sensitive at low values
-		const unsigned int level      = MIN(voice_amp * 8, 65535u);
-		const unsigned int sqrt_level = MIN(sqrt16(level), 124u);
-		uint8_t bars = 13 * sqrt_level / 124;
+	// make non-linear to make more sensitive at low values
+	const unsigned int level      = MIN(voice_amp * 8, 65535u);
+	const unsigned int sqrt_level = MIN(sqrt16(level), 124u);
+	uint8_t bars = 13 * sqrt_level / 124;
 
-		uint8_t *p_line = gFrameBuffer[line];
-		memset(p_line, 0, LCD_WIDTH);
+	uint8_t *p_line = gFrameBuffer[line];
+	memset(p_line, 0, LCD_WIDTH);
 
-		DrawLevelBar(62, line, bars);
+	DrawLevelBar(62, line, bars);
 
-		if (gCurrentFunction == FUNCTION_TRANSMIT)
-			ST7565_BlitFullScreen();
-	}
+	if (gCurrentFunction == FUNCTION_TRANSMIT)
+		ST7565_BlitFullScreen();
+
 }
 #endif
 
@@ -661,7 +659,7 @@ void UI_DisplayMain(void)
 		                 gCurrentFunction == FUNCTION_INCOMING);
 
 #ifdef ENABLE_AUDIO_BAR
-		if (gSetting_mic_bar && gCurrentFunction == FUNCTION_TRANSMIT) {
+		if (gCurrentFunction == FUNCTION_TRANSMIT) {
 			center_line = CENTER_LINE_AUDIO_BAR;
 			UI_DisplayAudioBar();
 		}
