@@ -720,9 +720,6 @@ void BOARD_EEPROM_Init(void)
 	//gSetting_TX_EN             = (Data[7] & (1u << 0)) ? true : false;
 	gSetting_live_DTMF_decoder = (Data[7] & (1u << 1)) ? true : false;
 	gSetting_battery_text      = (((Data[7] >> 2) & 3u) <= 2) ? (Data[7] >> 2) & 3 : 2;
-	#ifdef ENABLE_AM_FIX
-		gSetting_AM_fix        = (Data[7] & (1u << 5)) ? true : false;
-	#endif
 	gSetting_backlight_on_tx_rx = (Data[7] >> 6) & 3u;
 	// Read RxOffset setting
 	EEPROM_ReadBuffer(RX_OFFSET_ADDR, Data, 4);

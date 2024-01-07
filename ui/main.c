@@ -19,9 +19,6 @@
 
 #include "app/chFrScanner.h"
 #include "app/dtmf.h"
-#ifdef ENABLE_AM_FIX_SHOW_DATA
-	#include "am_fix.h"
-#endif
 #include "bitmaps.h"
 #include "board.h"
 #include "driver/bk4819.h"
@@ -662,23 +659,6 @@ void UI_DisplayMain(void)
 		if (gCurrentFunction == FUNCTION_TRANSMIT) {
 			center_line = CENTER_LINE_AUDIO_BAR;
 			UI_DisplayAudioBar();
-		}
-		else
-#endif
-
-#if defined(ENABLE_AM_FIX) && defined(ENABLE_AM_FIX_SHOW_DATA)
-		if (rx && gEeprom.VfoInfo[gEeprom.RX_VFO].Modulation == MODULATION_AM && gSetting_AM_fix)
-		{
-			if (gScreenToDisplay != DISPLAY_MAIN 
-#ifdef ENABLE_DTMF_CALLING
-				|| gDTMF_CallState != DTMF_CALL_STATE_NONE
-#endif
-				)
-				return;
-
-			center_line = CENTER_LINE_AM_FIX_DATA;
-			AM_fix_print_data(gEeprom.RX_VFO, String);
-			UI_PrintStringSmall(String, 2, 0, 3);
 		}
 		else
 #endif

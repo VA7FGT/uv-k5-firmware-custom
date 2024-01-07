@@ -59,6 +59,7 @@ Anyway, have fun.
    * `ENABLE_ADJUSTABLE_RX_GAIN_SETTINGS` keeps the rx gain settings set in spectrum mode after exit (otherwise these are always overwritten to default value), this makes much more sense considering that we have a radio with user adjustable gain so why not use it to adjust to current radio conditions, maximum gain allows to greatly increase reception in scan memory channels mode (in this configuration default gain settings are only set at boot and when exiting AM modulation mode to set it to sane value after am fix)
    * `ENABLE_SPECTRUM_CHANNEL_SCAN` this enables spectrum channel scan mode (enter by going into memory mode and press F+5, this allows SUPER fast channel scanning (4.5x faster than regular scanning), regular scan of 200 memory channels takes roughly 18 seconds, spectrum memory scan takes roughly 4 seconds, if you have less channels stored i.e 50 - the spectrum memory scan will take only **1 second**
    * `VOXSen` fixed and improved VOX sensitivity setting from menu. Added `VoxDel` - VOX delay setting allowing to set value to `0` for no VOX delay which might be useful for packet radio enthusiasts (APRS etc.).
+   * Fixed AM AGC so **AM demodulation is crystal clear**, no audible clicks, no need for `AM_FIX`.
 
  ## Keyboard shortcuts
 * In `VFO mode` long press `5` to enter `scan range mode`
@@ -133,8 +134,6 @@ ENABLE_BOOT_BEEPS                  := 0       gives user audio feedback on volum
 ENABLE_SHOW_CHARGE_LEVEL           := 1       show the charge level when the radio is on charge
 ENABLE_REVERSE_BAT_SYMBOL          := 0       mirror the battery symbol on the status bar (+ pole on the right)
 ENABLE_NO_CODE_SCAN_TIMEOUT        := 1       disable 32-sec CTCSS/DCS scan timeout (press exit butt instead of time-out to end scan)
-ENABLE_AM_FIX                      := 1       dynamically adjust the front end gains when in AM mode to help prevent AM demodulator saturation, ignore the on-screen RSSI level (for now)
-ENABLE_AM_FIX_SHOW_DATA            := 0       show debug data for the AM fix
 ENABLE_SQUELCH_MORE_SENSITIVE      := 0       make squelch levels a little bit more sensitive - this has been reported to cause radio freeze in presence of strong signals
 ENABLE_FASTER_CHANNEL_SCAN         := 1       increases the channel scan speed, but the squelch is also made more twitchy
 ENABLE_RSSI_BAR                    := 1       enable a dBm/Sn RSSI bar graph level in place of the little antenna symbols
@@ -236,9 +235,3 @@ You may obtain a copy of the License at
   <img src="/images/image2.png" width=300 />
   <img src="/images/image3.png" width=300 />
 </p>
-
-Video showing the AM fix working ..
-
-<video src="/images/AM_fix.mp4"></video>
-
-<video src="https://github.com/OneOfEleven/uv-k5-firmware-custom/assets/51590168/2a3a9cdc-97da-4966-bf0d-1ce6ad09779c"></video>

@@ -102,9 +102,6 @@ const t_menu_item MenuList[] =
 	{"D List", VOICE_ID_INVALID,                       MENU_D_LIST        },
 #endif
 	{"D Live", VOICE_ID_INVALID,                       MENU_D_LIVE_DEC    }, // live DTMF decoder
-#ifdef ENABLE_AM_FIX
-	{"AM Fix", VOICE_ID_INVALID,                       MENU_AM_FIX        },
-#endif
 #ifdef ENABLE_VOX
 	{"VOXSen", VOICE_ID_VOX,                           MENU_VOX           }, // VOX Sensibility or OFF
 	{"VOXDel", VOICE_ID_VOX,                           MENU_VOX_DELAY     }, // VOX delay
@@ -608,9 +605,6 @@ void UI_DisplayMenu(void)
 				strcpy(String, gSubMenu_RX_TX[gSubMenuSelection]);
 				break;
 
-			#ifdef ENABLE_AM_FIX
-				case MENU_AM_FIX:
-			#endif
 			case MENU_BCL:
 			case MENU_BEEP:
 			case MENU_S_ADD1:
