@@ -58,7 +58,7 @@ void BK4819_Init(void)
 
 	BK4819_SetDefaultAmplifierSettings();
 
-	BK4819_InitAGC(gEeprom.RX_AGC);
+	BK4819_InitAGC(gEeprom.RX_AGC, gTxVfo->Modulation);
 	BK4819_SetAGC(gEeprom.RX_AGC!=RX_AGC_OFF);
 
 	BK4819_WriteRegister(BK4819_REG_19, 0b0001000001000001);   // <15> MIC AGC  1 = disable  0 = enable
@@ -247,7 +247,7 @@ void BK4819_SetAGC(bool enable)
 
 	BK4819_WriteRegister(BK4819_REG_7E, (regVal & ~(1 << 15) & ~(0b111 << 12)) 
 		| (!enable << 15)   // 0  AGC fix mode
-		| (3u << 12)       // 3  AGC fix index
+		| (0b100 << 12)       // 3  AGC fix index -> changed to min as experiment
 	);
 
 	// if(enable) {
@@ -266,7 +266,7 @@ void BK4819_SetAGC(bool enable)
 	// }
 }
 
-void BK4819_InitAGC(const uint8_t agcType)
+void BK4819_InitAGC(const uint8_t agcType, ModulationMode_t modulation)
 {
 	// REG_10, REG_11, REG_12 REG_13, REG_14
 	//
@@ -307,29 +307,48 @@ void BK4819_InitAGC(const uint8_t agcType)
 	//         0 = -33dB
 	//
 
-		switch(agcType)
+	if(modulation==MODULATION_AM)
 	{
-		case RX_AGC_SLOW:
-			BK4819_WriteRegister(BK4819_REG_49, (0b00 << 14) | (50 << 7) | (15 << 0));
-			break;
-		case RX_AGC_FAST:
-			BK4819_WriteRegister(BK4819_REG_49, (0b00 << 14) | (45 << 7) | (25 << 0));
-			break;
-		default:
-			return;
+		//AM modulation
+		switch(agcType)
+		{	
+			case RX_AGC_SLOW:
+				BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (50 << 7) | (15 << 0));
+				break;
+			case RX_AGC_FAST:
+				BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (50 << 7) | (25 << 0));
+				break;
+			default:
+				return;
+		}
 	}
-
-	BK4819_WriteRegister(BK4819_REG_12, 0x037B);  // 0x037B / 000000 11 011 11 011 / -24dB
-	BK4819_WriteRegister(BK4819_REG_11, 0x027B);  // 0x027B / 000000 10 011 11 011 / -43dB
-	BK4819_WriteRegister(BK4819_REG_10, 0x007A);  // 0x007A / 000000 00 011 11 010 / -58dB
-	BK4819_WriteRegister(BK4819_REG_14, 0x0019);  // 0x0019 / 000000 00 000 11 001 / -79dB
+	else
+	{
+		//FM, USB modulation
+		switch(agcType)
+		{	
+			case RX_AGC_SLOW:
+				BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (84 << 7) | (56 << 0));
+				break;
+			case RX_AGC_FAST:
+				BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (84 << 7) | (66 << 0));
+				break;
+			default:
+				return;
+		}
+	}
+	// switched values to ones from 1o11 am_fix:
+	BK4819_WriteRegister(BK4819_REG_12, 0x0393);  // 0x037B / 000000 11 011 11 011 / -24dB
+	BK4819_WriteRegister(BK4819_REG_11, 0x01B5);  // 0x027B / 000000 10 011 11 011 / -43dB
+	BK4819_WriteRegister(BK4819_REG_10, 0x0145);  // 0x007A / 000000 00 011 11 010 / -58dB
+	BK4819_WriteRegister(BK4819_REG_14, 0x0141);  // 0x0019 / 000000 00 000 11 001 / -79dB
 	//30, 10 - doesn't overload but sound low
 	//50, 10 - best so far
 	//50, 15, - SOFT - signal doesn't fall too low - works best for now
 	//45, 25 - AGRESSIVE - lower histeresis, but volume jumps heavily, not good for music, might be good for aviation
 	//1 << 14 - way better, seems to open squelch and match squelch as opposed to 0
-
-	BK4819_WriteRegister(BK4819_REG_7B, 0x8420); // ?
+	// what is this for? turned off, seems like rssi is increased?
+	// BK4819_WriteRegister(BK4819_REG_7B, 0x8420); 
 
 }
 
