@@ -592,6 +592,7 @@ static void ToggleModulation() {
     settings.modulationType = MODULATION_FM;
   }
   RADIO_SetModulation(settings.modulationType);
+  BK4819_InitAGC(gEeprom.RX_AGC, settings.modulationType);
   redrawScreen = true;
 }
 
