@@ -474,9 +474,6 @@ void APP_StartListening(FUNCTION_Type_t Function)
 		gUpdateStatus    = true;
 	}
 
-	BK4819_InitAGC(gEeprom.RX_AGC, gTxVfo->Modulation);
-	BK4819_SetAGC(gEeprom.RX_AGC!=RX_AGC_OFF);
-
 	// AF gain - original QS values
 	// if (gRxVfo->Modulation != MODULATION_FM){
 	// 	BK4819_WriteRegister(BK4819_REG_48, 0xB3A8);

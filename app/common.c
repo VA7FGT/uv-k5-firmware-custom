@@ -47,9 +47,8 @@ void COMMON_SwitchToVFOMode()
     #ifdef ENABLE_VOICE
         gAnotherVoiceID        = VOICE_ID_FREQUENCY_MODE;
     #endif
-    const uint8_t Vfo = gEeprom.TX_VFO;
-    SETTINGS_SaveVfoIndices();
-    RADIO_ConfigureChannel(Vfo, VFO_CONFIGURE_RELOAD);
+    gRequestSaveVFO     = true;
+    gVfoConfigureMode   = VFO_CONFIGURE_RELOAD;
     return;
 }
 void COMMON_SwitchToChannelMode()

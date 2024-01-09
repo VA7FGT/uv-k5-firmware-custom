@@ -58,9 +58,6 @@ void BK4819_Init(void)
 
 	BK4819_SetDefaultAmplifierSettings();
 
-	BK4819_InitAGC(gEeprom.RX_AGC, gTxVfo->Modulation);
-	BK4819_SetAGC(gEeprom.RX_AGC!=RX_AGC_OFF);
-
 	BK4819_WriteRegister(BK4819_REG_19, 0b0001000001000001);   // <15> MIC AGC  1 = disable  0 = enable
 
 	BK4819_WriteRegister(BK4819_REG_7D, 0xE940);
