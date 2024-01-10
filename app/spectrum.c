@@ -379,6 +379,7 @@ uint8_t GetScanStepFromStepFrequency(uint16_t stepFrequency)
 static void DeInitSpectrum() {
   SetF(initialFreq);
   RestoreRegisters();
+  gVfoConfigureMode = VFO_CONFIGURE;
   isInitialized = false;
 }
 
