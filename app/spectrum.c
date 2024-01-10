@@ -33,6 +33,8 @@ struct FrequencyBandInfo {
     uint32_t middle;
 };
 
+bool gTailFound;
+
 #define F_MAX frequencyBandTable[ARRAY_SIZE(frequencyBandTable) - 1].upper
 
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
@@ -47,7 +49,9 @@ struct FrequencyBandInfo {
 
 const uint16_t RSSI_MAX_VALUE = 65535;
 
-static uint16_t R30, R37, R3D, R43, R47, R48, R7E;
+#define SQUELCH_OFF_DELAY 10
+
+static uint16_t R30, R37, R3D, R43, R47, R48, R7E, R02, R3F;
 static uint32_t initialFreq;
 static char String[32];
 
@@ -123,6 +127,8 @@ RegisterSpec registerSpecs[] = {
 uint16_t statuslineUpdateTimer = 0;
 
 static void RelaunchScan();
+static void CheckIfTailFound();
+static void ResetInterrupts();
 
 static uint16_t GetRegMenuValue(uint8_t st) {
   RegisterSpec s = registerSpecs[st];
@@ -228,6 +234,8 @@ static void BackupRegisters() {
   R47 = BK4819_ReadRegister(BK4819_REG_47);
   R48 = BK4819_ReadRegister(BK4819_REG_48);
   R7E = BK4819_ReadRegister(BK4819_REG_7E);
+  R02 = BK4819_ReadRegister(BK4819_REG_02);
+  R3F = BK4819_ReadRegister(BK4819_REG_3F);
 }
 
 static void RestoreRegisters() {
@@ -238,6 +246,9 @@ static void RestoreRegisters() {
   BK4819_WriteRegister(BK4819_REG_47, R47);
   BK4819_WriteRegister(BK4819_REG_48, R48);
   BK4819_WriteRegister(BK4819_REG_7E, R7E);
+  BK4819_WriteRegister(BK4819_REG_02, R02);
+  BK4819_WriteRegister(BK4819_REG_3F, R3F);
+
 }
 
 static void ToggleAFDAC(bool on) {
@@ -260,6 +271,33 @@ static void SetF(uint32_t f) {
 // Spectrum related
 
 bool IsPeakOverLevel() { return peak.rssi >= settings.rssiTriggerLevel; }
+
+void CheckIfTailFound()
+{
+  uint16_t interrupt_status_bits;
+  // if interrupt waiting to be handled
+  if(BK4819_ReadRegister(BK4819_REG_0C) & 1u) {
+    // reset the interrupt
+    BK4819_WriteRegister(BK4819_REG_02, 0);
+    // fetch the interrupt status bits
+    interrupt_status_bits = BK4819_ReadRegister(BK4819_REG_02);
+    // if tail found interrupt
+    if (interrupt_status_bits & BK4819_REG_02_CxCSS_TAIL)
+    {
+        gTailFound = true;
+        listenT = 0;
+        ResetInterrupts();
+    }
+  }
+}
+
+static void ResetInterrupts()
+{
+  // disable interupts
+  BK4819_WriteRegister(BK4819_REG_3F, 0);
+  // reset the interrupt
+  BK4819_WriteRegister(BK4819_REG_02, 0);
+}
 
 static void ResetPeak() {
   peak.t = 0;
@@ -301,6 +339,7 @@ static void TuneToPeak() {
 }
 #ifdef ENABLE_SPECTRUM_COPY_VFO
 static void ExitAndCopyToVfo() {
+  RestoreRegisters();
   if (appMode==CHANNEL_MODE)
   // channel mode
   {
@@ -390,8 +429,13 @@ static void ToggleRX(bool on) {
   ToggleAFBit(on);
 
   if (on) {
-    listenT = 1000;
+    listenT = SQUELCH_OFF_DELAY;
     BK4819_SetFilterBandwidth(settings.listenBw, false);
+
+    gTailFound=false;
+
+    // turn on CSS tail found interrupt
+    BK4819_WriteRegister(BK4819_REG_3F, BK4819_REG_02_CxCSS_TAIL);
   } else {
     if(appMode!=CHANNEL_MODE)
       BK4819_WriteRegister(0x43, GetBWRegValueForScan());
@@ -592,6 +636,7 @@ static void ToggleModulation() {
     settings.modulationType = MODULATION_FM;
   }
   RADIO_SetModulation(settings.modulationType);
+  BK4819_InitAGC(gEeprom.RX_AGC, settings.modulationType);
   redrawScreen = true;
 }
 
@@ -1368,8 +1413,10 @@ static void UpdateListening() {
   peak.rssi = scanInfo.rssi;
   redrawScreen = true;
 
-  if (IsPeakOverLevel() || monitorMode) {
-    listenT = 1000;
+  CheckIfTailFound();
+
+  if ((IsPeakOverLevel() || monitorMode) && !gTailFound) {
+    listenT = SQUELCH_OFF_DELAY;
     return;
   }
 
@@ -1456,6 +1503,8 @@ void APP_RunSpectrum() {
   currentFreq = initialFreq = gTxVfo->pRX->Frequency;
 
   BackupRegisters();
+
+  ResetInterrupts();
 
   isListening = true; // to turn off RX later
   redrawStatus = true;

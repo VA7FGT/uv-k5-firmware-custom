@@ -916,11 +916,7 @@ void MENU_ShowCurrentSetting(void)
 			break;
 
 		case MENU_MEM_CH:
-			#if 0
-				gSubMenuSelection = gEeprom.MrChannel[0];
-			#else
-				gSubMenuSelection = gEeprom.MrChannel[gEeprom.TX_VFO];
-			#endif
+			gSubMenuSelection = RADIO_ValidMemoryChannelsCount(false, 0);
 			break;
 
 		case MENU_MEM_NAME:
