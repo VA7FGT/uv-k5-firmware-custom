@@ -26,12 +26,16 @@
   #include "common.h"
 #endif
 #include "action.h"
+#include "debugging.h"
 
 struct FrequencyBandInfo {
     uint32_t lower;
     uint32_t upper;
     uint32_t middle;
 };
+
+uint16_t interrupt_status_bits=0;
+bool squelchLost;
 
 #define F_MAX frequencyBandTable[ARRAY_SIZE(frequencyBandTable) - 1].upper
 
@@ -386,12 +390,20 @@ static void ToggleRX(bool on) {
   BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, on);
 
   ToggleAudio(on);
-  ToggleAFDAC(on);
+  ToggleAFDAC(on); 
   ToggleAFBit(on);
 
   if (on) {
-    listenT = 1000;
+    listenT = 10;
     BK4819_SetFilterBandwidth(settings.listenBw, false);
+    
+    sprintf(String, "INTERUPT SETUP ON\r\n");
+    LogUart(String);
+
+    squelchLost=false;
+
+    // turn on squelch lost interrupt
+    BK4819_WriteRegister(BK4819_REG_3F, BK4819_REG_02_SQUELCH_LOST | BK4819_REG_02_CxCSS_TAIL);
   } else {
     if(appMode!=CHANNEL_MODE)
       BK4819_WriteRegister(0x43, GetBWRegValueForScan());
@@ -485,6 +497,38 @@ static void UpdatePeakInfo() {
 
 static void Measure() 
 { 
+      // fetch the interrupt status bits
+  // interrupt_status_bits = BK4819_ReadRegister(BK4819_REG_0C);
+  // if interrupt waiting to be handled
+  if(BK4819_ReadRegister(BK4819_REG_0C) & 1u) {
+    		// reset the interrupt ?
+		BK4819_WriteRegister(BK4819_REG_02, 0);
+
+		// fetch the interrupt status bits
+		interrupt_status_bits = BK4819_ReadRegister(BK4819_REG_02);
+
+     sprintf(String, "LINK REGISTRY: %u\r\n", (unsigned int)interrupt_status_bits);
+  LogUart(String);
+
+  if (interrupt_status_bits & BK4819_REG_02_CxCSS_TAIL)
+  {
+      sprintf(String, "SQUELCH LOST!\r\n");
+      LogUart(String);
+
+    // squelch lost
+      squelchLost = true;
+      // // reset the interrupt ?
+      // BK4819_WriteRegister(BK4819_REG_02, 0);
+      // disable interupts?
+      BK4819_WriteRegister(BK4819_REG_3F, 0);
+
+      listenT = 0;
+  }
+
+  }
+
+ 
+
   uint16_t rssi = scanInfo.rssi = GetRssi();
 #ifdef ENABLE_SCAN_RANGES  
   if(scanInfo.measurementsCount > 128) {
@@ -1369,13 +1413,16 @@ static void UpdateListening() {
   peak.rssi = scanInfo.rssi;
   redrawScreen = true;
 
-  if (IsPeakOverLevel() || monitorMode) {
-    listenT = 1000;
+  if ((IsPeakOverLevel() || monitorMode) && !squelchLost) {
+    listenT = 10;
     return;
   }
 
   ToggleRX(false);
   ResetScanStats();
+
+  sprintf(String, "LISTENING STOPPED\r\n");
+  LogUart(String);
 }
 
 static void Tick() {
@@ -1430,6 +1477,11 @@ static void Tick() {
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
 void APP_RunSpectrum(Mode mode) {
   appMode = mode;
+
+  // reset the interrupt ?
+  BK4819_WriteRegister(BK4819_REG_02, 0);
+  // disable interupts?
+  BK4819_WriteRegister(BK4819_REG_3F, 0);
 #elif
 void APP_RunSpectrum() {
 #endif
