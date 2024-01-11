@@ -1917,6 +1917,10 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 				case DISPLAY_MENU:
 					MENU_ProcessKeys(Key, bKeyPressed, bKeyHeld);
 					break;
+				
+				case DISPLAY_MSG:
+					MSG_ProcessKeys(Key, bKeyPressed, bKeyHeld);
+					break;
 
 				case DISPLAY_SCANNER:
 					SCANNER_ProcessKeys(Key, bKeyPressed, bKeyHeld);
