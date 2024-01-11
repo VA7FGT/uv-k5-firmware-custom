@@ -238,15 +238,14 @@ static void processFKeyFunction(const KEY_Code_t Key, const bool beep)
 				gRequestSaveVFO   = true;
 				gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
 #elif defined(ENABLE_SPECTRUM)
-				// #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-				// 	// if we are in channel mode then enter spectrum in channel mode
-				// 	// otherwise enter spectrum in frequency mode
-				// 	APP_RunSpectrum(IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE));
-				// #elif
-				// 	APP_RunSpectrum();
-				// #endif
-				// gRequestDisplayScreen = DISPLAY_MAIN;
-				gRequestDisplayScreen = DISPLAY_MSG;
+				#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+					// if we are in channel mode then enter spectrum in channel mode
+					// otherwise enter spectrum in frequency mode
+					APP_RunSpectrum(IS_MR_CHANNEL(gTxVfo->CHANNEL_SAVE));
+				#elif
+					APP_RunSpectrum();
+				#endif
+				gRequestDisplayScreen = DISPLAY_MAIN;
 #endif
 			}
 			else {
