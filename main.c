@@ -38,6 +38,9 @@
 #include "ui/welcome.h"
 #include "ui/menu.h"
 #include "version.h"
+#ifdef ENABLE_MESSENGER
+	#include "app/messenger.h"
+#endif
 
 void _putchar(char c)
 {
@@ -98,6 +101,10 @@ void Main(void)
 		BOARD_ADC_GetBatteryInfo(&gBatteryVoltages[i], &gBatteryCurrent);
 
 	BATTERY_GetReadings(false);
+
+	#ifdef ENABLE_MESSENGER
+		MSG_Init();
+	#endif
 
 	BootMode = BOOT_GetMode();
 	

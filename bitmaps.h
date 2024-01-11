@@ -48,3 +48,7 @@ extern const uint8_t BITMAP_compand[6];
 
 #endif
 
+#ifdef ENABLE_MESSENGER
+	extern const uint8_t BITMAP_NEWMSG[8];
+#endif
+

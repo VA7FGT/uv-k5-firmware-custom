@@ -62,6 +62,14 @@
 #include "ui/status.h"
 #include "ui/ui.h"
 #include "driver/systick.h"
+#ifdef ENABLE_MESSENGER
+	#include "app/messenger.h"
+#endif
+
+#ifdef ENABLE_MESSENGER_NOTIFICATION
+	bool gPlayMSGRing = false;
+	uint8_t gPlayMSGRingCount = 0;
+#endif
 
 static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 static void FlashlightTimeSlice();
@@ -716,6 +724,10 @@ static void CheckRadioInterrupts(void)
 				AIRCOPY_StorePacket();
 			}
 		#endif
+
+		#ifdef ENABLE_MESSENGER
+			MSG_StorePacket(interrupt_status_bits);
+		#endif
 	}
 }
 
@@ -1138,6 +1150,10 @@ void APP_TimeSlice10ms(void)
 {
 	gFlashLightBlinkCounter++;
 
+	#ifdef ENABLE_MESSENGER
+		keyTickCounter++;
+	#endif
+
 	#ifdef ENABLE_BOOT_BEEPS
 		if (boot_counter_10ms > 0)
 			if ((boot_counter_10ms % 25) == 0)
@@ -1315,6 +1331,27 @@ void cancelUserInputModes(void)
 void APP_TimeSlice500ms(void)
 {
 	bool exit_menu = false;
+
+	#ifdef ENABLE_MESSENGER_NOTIFICATION
+		if (gPlayMSGRing) {
+			gPlayMSGRingCount = 5;
+			gPlayMSGRing = false;
+		}
+		if (gPlayMSGRingCount > 0) {
+			AUDIO_PlayBeep(BEEP_880HZ_200MS);
+			gPlayMSGRingCount--;
+		}
+	#endif
+
+	#ifdef ENABLE_MESSENGER
+		if (hasNewMessage > 0) {
+			if (hasNewMessage == 1) {
+				hasNewMessage = 2;
+			} else if (hasNewMessage == 2) {
+				hasNewMessage = 1;
+			}
+		}
+	#endif
 
 	// Skipped authentic device check
 
@@ -1888,6 +1925,12 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 				case DISPLAY_MENU:
 					MENU_ProcessKeys(Key, bKeyPressed, bKeyHeld);
 					break;
+				
+				#ifdef ENABLE_MESSENGER
+					case DISPLAY_MSG:
+						MSG_ProcessKeys(Key, bKeyPressed, bKeyHeld);
+						break;
+				#endif
 
 				case DISPLAY_SCANNER:
 					SCANNER_ProcessKeys(Key, bKeyPressed, bKeyHeld);

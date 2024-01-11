@@ -34,6 +34,9 @@
 #include "ui/menu.h"
 #include "ui/scanner.h"
 #include "ui/ui.h"
+#ifdef ENABLE_MESSENGER
+	#include "ui/messenger.h"
+#endif
 
 GUI_DisplayType_t gScreenToDisplay;
 GUI_DisplayType_t gRequestDisplayScreen = DISPLAY_INVALID;
@@ -53,6 +56,12 @@ void GUI_DisplayScreen(void)
 		#ifdef ENABLE_FMRADIO
 			case DISPLAY_FM:
 				UI_DisplayFM();
+				break;
+		#endif
+
+		#ifdef ENABLE_MESSENGER
+			case DISPLAY_MSG:
+				UI_DisplayMSG();
 				break;
 		#endif
 		

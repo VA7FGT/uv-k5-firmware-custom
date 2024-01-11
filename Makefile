@@ -12,7 +12,7 @@ ENABLE_LTO                    := 1
 # ---- STOCK QUANSHENG FERATURES ----
 ENABLE_UART                   := 1
 ENABLE_AIRCOPY                := 0
-ENABLE_FMRADIO                := 1
+ENABLE_FMRADIO                := 0
 ENABLE_NOAA                   := 0
 ENABLE_VOICE                  := 0
 ENABLE_VOX                    := 1
@@ -25,31 +25,34 @@ ENABLE_DTMF_CALLING           := 0
 ENABLE_ULTRA_LOW_POWER_TX          := 0
 
 # ---- CUSTOM MODS ----
-ENABLE_BIG_FREQ                    := 1
-ENABLE_SMALL_BOLD                  := 1
-ENABLE_KEEP_MEM_NAME               := 1
-ENABLE_WIDE_RX                     := 1
-ENABLE_TX_WHEN_AM                  := 0
-ENABLE_F_CAL_MENU                  := 0
-ENABLE_CTCSS_TAIL_PHASE_SHIFT      := 0
-ENABLE_BOOT_BEEPS                  := 0
-ENABLE_SHOW_CHARGE_LEVEL           := 1
-ENABLE_REVERSE_BAT_SYMBOL          := 0
-ENABLE_NO_CODE_SCAN_TIMEOUT        := 1
-ENABLE_SQUELCH_MORE_SENSITIVE      := 0
-ENABLE_FASTER_CHANNEL_SCAN         := 1
-ENABLE_RSSI_BAR                    := 1
-ENABLE_AUDIO_BAR                   := 1
-ENABLE_COPY_CHAN_TO_VFO            := 1
-ENABLE_SPECTRUM                    := 1
-ENABLE_REDUCE_LOW_POWER            := 1
-ENABLE_BYP_RAW_DEMODULATORS        := 0
-ENABLE_BLMIN_TMP_OFF               := 0
-ENABLE_SCAN_RANGES                 := 1
-ENABLE_SPECTRUM_COPY_VFO           := 1
-ENABLE_SPECTRUM_SHOW_CHANNEL_NAME  := 1
-ENABLE_ADJUSTABLE_RX_GAIN_SETTINGS := 1
-ENABLE_SPECTRUM_CHANNEL_SCAN       := 1
+ENABLE_BIG_FREQ                         := 1
+ENABLE_SMALL_BOLD                       := 1
+ENABLE_KEEP_MEM_NAME                    := 1
+ENABLE_WIDE_RX                          := 1
+ENABLE_TX_WHEN_AM                       := 0
+ENABLE_F_CAL_MENU                       := 0
+ENABLE_CTCSS_TAIL_PHASE_SHIFT           := 0
+ENABLE_BOOT_BEEPS                       := 0
+ENABLE_SHOW_CHARGE_LEVEL                := 1
+ENABLE_REVERSE_BAT_SYMBOL               := 0
+ENABLE_NO_CODE_SCAN_TIMEOUT             := 1
+ENABLE_SQUELCH_MORE_SENSITIVE           := 0
+ENABLE_FASTER_CHANNEL_SCAN              := 1
+ENABLE_RSSI_BAR                         := 1
+ENABLE_AUDIO_BAR                        := 1
+ENABLE_COPY_CHAN_TO_VFO                 := 1
+ENABLE_SPECTRUM                         := 1
+ENABLE_REDUCE_LOW_POWER                 := 1
+ENABLE_BYP_RAW_DEMODULATORS             := 0
+ENABLE_BLMIN_TMP_OFF                    := 0
+ENABLE_SCAN_RANGES                      := 1
+ENABLE_SPECTRUM_COPY_VFO                := 1
+ENABLE_SPECTRUM_SHOW_CHANNEL_NAME       := 1
+ENABLE_SPECTRUM_CHANNEL_SCAN            := 1
+ENABLE_MESSENGER                        := 1
+ENABLE_MESSENGER_DELIVERY_NOTIFICATION  := 1
+ENABLE_MESSENGER_NOTIFICATION           := 1
+ENABLE_MESSENGER_UART                   := 0
 
 #############################################################
 
@@ -161,6 +164,10 @@ OBJS += ui/ui.o
 OBJS += ui/welcome.o
 OBJS += version.o
 OBJS += main.o
+ifeq ($(ENABLE_MESSENGER),1)
+	OBJS += app/messenger.o
+	OBJS += ui/messenger.o
+endif
 
 ifeq ($(OS), Windows_NT)
 	TOP := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -363,11 +370,20 @@ endif
 ifeq ($(ENABLE_ULTRA_LOW_POWER_TX),1)
 	CFLAGS  += -DENABLE_ULTRA_LOW_POWER_TX
 endif
-ifeq ($(ENABLE_ADJUSTABLE_RX_GAIN_SETTINGS),1)
-	CFLAGS  += -DENABLE_ADJUSTABLE_RX_GAIN_SETTINGS
-endif
 ifeq ($(ENABLE_SPECTRUM_CHANNEL_SCAN),1)
 	CFLAGS  += -DENABLE_SPECTRUM_CHANNEL_SCAN
+endif
+ifeq ($(ENABLE_MESSENGER),1)
+	CFLAGS  += -DENABLE_MESSENGER
+endif
+ifeq ($(ENABLE_MESSENGER_DELIVERY_NOTIFICATION),1)
+	CFLAGS  += -DENABLE_MESSENGER_DELIVERY_NOTIFICATION
+endif
+ifeq ($(ENABLE_MESSENGER_NOTIFICATION),1)
+	CFLAGS  += -DENABLE_MESSENGER_NOTIFICATION
+endif
+ifeq ($(ENABLE_MESSENGER_UART),1)
+	CFLAGS  += -DENABLE_MESSENGER_UART
 endif
 
 LDFLAGS =

@@ -39,6 +39,9 @@
 #include "settings.h"
 #include "ui/status.h"
 #include "ui/ui.h"
+#ifdef ENABLE_MESSENGER
+	#include "app/messenger.h"
+#endif
 
 FUNCTION_Type_t gCurrentFunction;
 
@@ -160,6 +163,9 @@ void FUNCTION_Select(FUNCTION_Type_t Function)
 			return;
 
 		case FUNCTION_TRANSMIT:
+			#ifdef ENABLE_MESSENGER
+				MSG_EnableRX(false);	
+			#endif	
 
 			// if DTMF is enabled when TX'ing, it changes the TX audio filtering !! .. 1of11
 			BK4819_DisableDTMF();
