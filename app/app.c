@@ -724,6 +724,10 @@ static void CheckRadioInterrupts(void)
 				AIRCOPY_StorePacket();
 			}
 		#endif
+
+		#ifdef ENABLE_MESSENGER
+			MSG_StorePacket(interrupt_status_bits);
+		#endif
 	}
 }
 
@@ -1145,6 +1149,10 @@ static void CheckKeys(void)
 void APP_TimeSlice10ms(void)
 {
 	gFlashLightBlinkCounter++;
+
+	#ifdef ENABLE_MESSENGER
+		keyTickCounter++;
+	#endif
 
 	#ifdef ENABLE_BOOT_BEEPS
 		if (boot_counter_10ms > 0)

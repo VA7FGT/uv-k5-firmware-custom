@@ -33,6 +33,9 @@
 #include "ui/helper.h"
 #include "ui/ui.h"
 #include "ui/status.h"
+#ifdef ENABLE_MESSENGER
+	#include "app/messenger.h"
+#endif
 
 void UI_DisplayStatus()
 {
@@ -76,8 +79,15 @@ void UI_DisplayStatus()
 			x1 = x + sizeof(BITMAP_NOAA);
 		}
 		x += sizeof(BITMAP_NOAA);
-	#else
-		// hmmm, what to put in it's place
+	#endif
+
+	#ifdef ENABLE_MESSENGER
+		if (hasNewMessage > 0) { // New Message indicator
+			if (hasNewMessage == 1)
+				memcpy(line + x, BITMAP_NEWMSG, sizeof(BITMAP_NEWMSG));
+			x1 = x + sizeof(BITMAP_NEWMSG);
+		}
+		x += sizeof(BITMAP_NEWMSG);
 	#endif
 
 #ifdef ENABLE_DTMF_CALLING

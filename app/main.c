@@ -42,6 +42,9 @@
 #include "ui/inputbox.h"
 #include "ui/ui.h"
 #include <stdlib.h>
+#ifdef ENABLE_MESSENGER
+	#include "app/messenger.h"
+#endif
 
 void toggle_chan_scanlist(void)
 {	// toggle the selected channels scanlist setting
@@ -551,6 +554,14 @@ static void MAIN_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 
 	if (!bKeyPressed && !gDTMF_InputMode)
 	{	// menu key released
+		#ifdef ENABLE_MESSENGER
+			if (gWasFKeyPressed) {
+				
+				hasNewMessage = 0;
+				gRequestDisplayScreen = DISPLAY_MSG;
+				return;
+			}
+		#endif	
 		const bool bFlag = (gInputBoxIndex == 0);
 		gInputBoxIndex   = 0;
 
