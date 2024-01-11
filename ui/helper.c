@@ -250,3 +250,63 @@ void UI_DisplayPopup(const char *string)
 	UI_PrintString(string, 9, 118, 2, 8);
 	UI_PrintStringSmall("Press EXIT", 9, 118, 6);
 }
+
+void UI_DrawDottedLineBuffer(uint8_t (*buffer)[128], int16_t x1, int16_t y1, int16_t x2, int16_t y2, bool black, int dotSpacing)
+{
+    if (x2 == x1) {
+        sort(&y1, &y2);
+        for (int16_t i = y1; i <= y2; i += dotSpacing) {
+            UI_DrawPixelBuffer(buffer, x1, i, black);
+        }
+    } else {
+        const int multipl = 1000;
+        int a = (y2 - y1) * multipl / (x2 - x1);
+        int b = y1 - a * x1 / multipl;
+
+        sort(&x1, &x2);
+        for (int i = x1; i <= x2; i += dotSpacing) {
+            UI_DrawPixelBuffer(buffer, i, i * a / multipl + b, black);
+        }
+    }
+}
+
+// GUI functions
+
+void PutPixel(uint8_t x, uint8_t y, bool fill) {
+  UI_DrawPixelBuffer(gFrameBuffer, x, y, fill);
+}
+void PutPixelStatus(uint8_t x, uint8_t y, bool fill) {
+  UI_DrawPixelBuffer(&gStatusLine, x, y, fill);
+}
+
+void DrawVLine(int sy, int ey, int nx, bool fill) {
+  for (int i = sy; i <= ey; i++) {
+    if (i < 56 && nx < 128) {
+      PutPixel(nx, i, fill);
+    }
+  }
+}
+
+void GUI_DisplaySmallest(const char *pString, uint8_t x, uint8_t y,
+                                bool statusbar, bool fill) {
+  uint8_t c;
+  uint8_t pixels;
+  const uint8_t *p = (const uint8_t *)pString;
+
+  while ((c = *p++) && c != '\0') {
+    c -= 0x20;
+    for (int i = 0; i < 3; ++i) {
+      pixels = gFont3x5[c][i];
+      for (int j = 0; j < 6; ++j) {
+        if (pixels & 1) {
+          if (statusbar)
+            PutPixelStatus(x + i, y + j, fill);
+          else
+            PutPixel(x + i, y + j, fill);
+        }
+        pixels >>= 1;
+      }
+    }
+    x += 4;
+  }
+}
