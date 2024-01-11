@@ -573,7 +573,8 @@ void MSG_Send(const char txMessage[TX_MSG_LENGTH], bool bServiceMessage) {
 		//RADIO_SetTxParameters();
 		FUNCTION_Select(FUNCTION_TRANSMIT);
 		//SYSTEM_DelayMs(500);
-		BK4819_PlayRogerNormal(98);
+		// BK4819_PlayRogerNormal(98);
+        BK4819_PlayRogerMDC();
 		SYSTEM_DelayMs(100);
 
 		BK4819_ExitTxMute();
@@ -658,7 +659,9 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 			#ifdef ENABLE_MESSENGER_DELIVERY_NOTIFICATION
 				// If the next 4 bytes are "RCVD", then it's a delivery notification
 				if (msgFSKBuffer[5] == 'R' && msgFSKBuffer[6] == 'C' && msgFSKBuffer[7] == 'V' && msgFSKBuffer[8] == 'D') {
-					UART_printf("SVC<RCPT\r\n");
+					#ifdef ENABLE_MESSENGER_UART
+                        UART_printf("SVC<RCPT\r\n");
+                    #endif
 					rxMessage[3][strlen(rxMessage[3])] = '+';
 					gUpdateStatus = true;
 					gUpdateDisplay = true;

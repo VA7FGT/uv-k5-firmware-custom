@@ -53,7 +53,7 @@ ENABLE_SPECTRUM_CHANNEL_SCAN            := 1
 ENABLE_MESSENGER                        := 1
 ENABLE_MESSENGER_DELIVERY_NOTIFICATION  := 1
 ENABLE_MESSENGER_NOTIFICATION           := 1
-ENABLE_MESSENGER_UART                   := 1
+ENABLE_MESSENGER_UART                   := 0
 
 #############################################################
 
