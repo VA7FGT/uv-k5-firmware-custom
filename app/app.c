@@ -1926,9 +1926,11 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 					MENU_ProcessKeys(Key, bKeyPressed, bKeyHeld);
 					break;
 				
-				case DISPLAY_MSG:
-					MSG_ProcessKeys(Key, bKeyPressed, bKeyHeld);
-					break;
+				#ifdef ENABLE_MESSENGER
+					case DISPLAY_MSG:
+						MSG_ProcessKeys(Key, bKeyPressed, bKeyHeld);
+						break;
+				#endif
 
 				case DISPLAY_SCANNER:
 					SCANNER_ProcessKeys(Key, bKeyPressed, bKeyHeld);
