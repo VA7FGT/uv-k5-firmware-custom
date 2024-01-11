@@ -570,21 +570,24 @@ void MSG_Send(const char txMessage[TX_MSG_LENGTH], bool bServiceMessage) {
 
 		BK4819_DisableDTMF();
 
-		//RADIO_SetTxParameters();
+		RADIO_SetTxParameters();
 		FUNCTION_Select(FUNCTION_TRANSMIT);
-		//SYSTEM_DelayMs(500);
+		SYSTEM_DelayMs(500);
 		// BK4819_PlayRogerNormal(98);
-        BK4819_PlayRogerMDC();
+        // BK4819_PlayRogerMDC();
 		SYSTEM_DelayMs(100);
 
 		BK4819_ExitTxMute();
 		
 		MSG_FSKSendData();
 
-		//SYSTEM_DelayMs(100);
+		SYSTEM_DelayMs(100);
 
-		// APP_EndTransmission(true);
+
         APP_EndTransmission();
+		// this must be run after end of TX, otherwise radio will still TX transmit without even RED LED on
+		FUNCTION_Select(FUNCTION_FOREGROUND);
+
 		RADIO_SetVfoState(VFO_STATE_NORMAL);
 
 		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, false);
