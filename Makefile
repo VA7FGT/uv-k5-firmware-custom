@@ -83,9 +83,6 @@ OBJS += external/printf/printf.o
 
 # Drivers
 OBJS += driver/adc.o
-ifeq ($(ENABLE_UART),1)
-	OBJS += driver/aes.o
-endif
 OBJS += driver/backlight.o
 ifeq ($(ENABLE_FMRADIO),1)
 	OBJS += driver/bk1080.o

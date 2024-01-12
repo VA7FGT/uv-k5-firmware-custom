@@ -26,7 +26,6 @@
 #include "board.h"
 #include "bsp/dp32g030/dma.h"
 #include "bsp/dp32g030/gpio.h"
-#include "driver/aes.h"
 #include "driver/backlight.h"
 #include "driver/bk4819.h"
 #include "driver/crc.h"
@@ -122,11 +121,6 @@ typedef struct {
 
 typedef struct {
 	Header_t Header;
-	uint32_t Response[4];
-} CMD_052D_t;
-
-typedef struct {
-	Header_t Header;
 	struct {
 		bool bIsLocked;
 		uint8_t Padding[3];
@@ -205,25 +199,6 @@ static void SendVersion(void)
 	Reply.Data.Challenge[3] = gChallenge[3];
 
 	SendReply(&Reply, sizeof(Reply));
-}
-
-static bool IsBadChallenge(const uint32_t *pKey, const uint32_t *pIn, const uint32_t *pResponse)
-{
-	unsigned int i;
-	uint32_t     IV[4];
-
-	IV[0] = 0;
-	IV[1] = 0;
-	IV[2] = 0;
-	IV[3] = 0;
-
-	AES_Encrypt(pKey, IV, pIn, IV, true);
-
-	for (i = 0; i < 4; i++)
-		if (IV[i] != pResponse[i])
-			return true;
-
-	return false;
 }
 
 static void CMD_0514(const uint8_t *pBuffer)
@@ -342,47 +317,6 @@ static void CMD_0529(void)
 
 	// Original doesn't actually send current!
 	BOARD_ADC_GetBatteryInfo(&Reply.Data.Voltage, &Reply.Data.Current);
-
-	SendReply(&Reply, sizeof(Reply));
-}
-
-static void CMD_052D(const uint8_t *pBuffer)
-{
-	const CMD_052D_t *pCmd = (const CMD_052D_t *)pBuffer;
-	REPLY_052D_t      Reply;
-	bool              bIsLocked;
-
-	#ifdef ENABLE_FMRADIO
-		gFmRadioCountdown_500ms = fm_radio_countdown_500ms;
-	#endif
-	Reply.Header.ID   = 0x052E;
-	Reply.Header.Size = sizeof(Reply.Data);
-
-	bIsLocked = bHasCustomAesKey;
-
-	if (!bIsLocked)
-		bIsLocked = IsBadChallenge(gCustomAesKey, gChallenge, pCmd->Response);
-
-	if (!bIsLocked)
-	{
-		bIsLocked = IsBadChallenge(gDefaultAesKey, gChallenge, pCmd->Response);
-		if (bIsLocked)
-			gTryCount++;
-	}
-
-	if (gTryCount < 3)
-	{
-		if (!bIsLocked)
-			gTryCount = 0;
-	}
-	else
-	{
-		gTryCount = 3;
-		bIsLocked = true;
-	}
-	
-	gIsLocked            = bIsLocked;
-	Reply.Data.bIsLocked = bIsLocked;
 
 	SendReply(&Reply, sizeof(Reply));
 }
@@ -542,10 +476,6 @@ void UART_HandleCommand(void)
 	
 		case 0x0529:
 			CMD_0529();
-			break;
-	
-		case 0x052D:
-			CMD_052D(UART_Command.Buffer);
 			break;
 	
 		case 0x052F:
