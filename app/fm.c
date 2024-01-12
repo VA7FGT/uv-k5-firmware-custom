@@ -51,39 +51,6 @@ void FM_TurnOff(void)
 	gUpdateStatus  = true;
 }
 
-void FM_Tune(uint16_t Frequency, int8_t Step)
-{
-	AUDIO_AudioPathOff();
-
-	gEnableSpeaker = false;
-
-	gFmPlayCountdown_10ms = (gFM_ScanState == FM_SCAN_OFF) ? fm_play_countdown_noscan_10ms : fm_play_countdown_scan_10ms;
-
-	gScheduleFM                 = false;
-	gAskToSave                  = false;
-	gAskToDelete                = false;
-	gEeprom.FM_FrequencyPlaying = Frequency;
-
-	gFM_ScanState = Step;
-
-	BK1080_SetFrequency(gEeprom.FM_FrequencyPlaying);
-}
-
-void FM_PlayAndUpdate(void)
-{
-	gFM_ScanState = FM_SCAN_OFF;
-
-	BK1080_SetFrequency(gEeprom.FM_FrequencyPlaying);
-
-	gFmPlayCountdown_10ms = 0;
-	gScheduleFM           = false;
-	gAskToSave            = false;
-
-	AUDIO_AudioPathOn();
-
-	gEnableSpeaker   = true;
-}
-
 static void Key_EXIT()
 {
 	ACTION_FM();
@@ -124,21 +91,21 @@ void FM_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 	}
 }
 
-void FM_Play(void)
-{
-	FM_PlayAndUpdate();
-	GUI_SelectNextDisplay(DISPLAY_FM);
-}
-
 void FM_Start(void)
 {
 	gFmRadioMode              = true;
 	gFM_ScanState             = FM_SCAN_OFF;
 	gFM_RestoreCountdown_10ms = 0;
 
+	gFmPlayCountdown_10ms = 0;
+	gScheduleFM           = false;
+	gAskToSave            = false;
+
 	BK1080_Init(gEeprom.FM_FrequencyPlaying, true);
 
 	AUDIO_AudioPathOn();
+
+	GUI_SelectNextDisplay(DISPLAY_FM);
 
 	gEnableSpeaker       = true;
 	gUpdateStatus        = true;

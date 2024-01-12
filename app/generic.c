@@ -163,7 +163,7 @@ void GENERIC_Key_PTT(bool bKeyPressed)
 #ifdef ENABLE_FMRADIO
 	if (gFM_ScanState != FM_SCAN_OFF)
 	{	// FM radio is scanning .. stop
-		FM_PlayAndUpdate();
+		FM_Start();
 		#ifdef ENABLE_VOICE
 			gAnotherVoiceID = VOICE_ID_SCANNING_STOP;
 		#endif

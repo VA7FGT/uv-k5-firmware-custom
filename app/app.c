@@ -926,7 +926,7 @@ void APP_Update(void)
 		gCurrentFunction != FUNCTION_RECEIVE &&
 		gCurrentFunction != FUNCTION_TRANSMIT)
 	{	// switch to FM radio mode
-		FM_Play();
+		FM_Start();
 		gScheduleFM = false;
 	}
 #endif

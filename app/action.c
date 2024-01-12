@@ -128,19 +128,10 @@ void ACTION_Scan(bool bRestart)
 
 			if (gFM_ScanState != FM_SCAN_OFF)
 			{
-				FM_PlayAndUpdate();
+				FM_Start();
 
 #ifdef ENABLE_VOICE
 				gAnotherVoiceID = VOICE_ID_SCANNING_STOP;
-#endif
-			}
-			else
-			{
-				uint16_t Frequency;
-				Frequency = gEeprom.FM_FrequencyPlaying;
-				FM_Tune(Frequency, 1);
-#ifdef ENABLE_VOICE
-				gAnotherVoiceID = VOICE_ID_SCANNING_BEGIN;
 #endif
 			}
 		}
