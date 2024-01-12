@@ -22,8 +22,10 @@ enum BK1080_Register_t {
 	BK1080_REG_02_POWER_CONFIGURATION   = 0x02U,
 	BK1080_REG_03_CHANNEL               = 0x03U,
 	BK1080_REG_05_SYSTEM_CONFIGURATION2 = 0x05U,
+	BK1080_REG_06                       = 0x06U,
 	BK1080_REG_07                       = 0x07U,
 	BK1080_REG_10                       = 0x0AU,
+	BK1080_REG_11                       = 0x0BU,
 	BK1080_REG_25_INTERNAL              = 0x19U,
 };
 

@@ -27,30 +27,6 @@
 
 EEPROM_Config_t gEeprom;
 
-#ifdef ENABLE_FMRADIO
-	void SETTINGS_SaveFM(void)
-	{
-		unsigned int i;
-
-		struct
-		{
-			uint16_t Frequency;
-			uint8_t  Channel;
-			bool     IsChannelSelected;
-			uint8_t  Padding[4];
-		} State;
-
-		memset(&State, 0xFF, sizeof(State));
-		State.Channel           = gEeprom.FM_SelectedChannel;
-		State.Frequency         = gEeprom.FM_SelectedFrequency;
-		State.IsChannelSelected = gEeprom.FM_IsMrMode;
-
-		EEPROM_WriteBuffer(0x0E88, &State, true);
-		for (i = 0; i < 5; i++)
-			EEPROM_WriteBuffer(0x0E40 + (i * 8), &gFM_Channels[i * 4], true);
-	}
-#endif
-
 void SETTINGS_SaveVfoIndices(void)
 {
 	uint8_t State[8];
@@ -191,6 +167,13 @@ void SETTINGS_SaveSettings(void)
 	State[7] = (State[7] & ~(3u << 6)) | ((gSetting_backlight_on_tx_rx & 3u) << 6);
 	 
 	EEPROM_WriteBuffer(0x0F40, State, true);
+
+	#ifdef ENABLE_FMRADIO
+		//0x0E88..0x0E8F
+		memset(State, 0xFF, sizeof(State));
+		memcpy(&State[0], &gEeprom.FM_FrequencyPlaying, 2);
+		EEPROM_WriteBuffer(0x0E88, State, true);
+	#endif
 }
 
 void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, uint8_t Mode)

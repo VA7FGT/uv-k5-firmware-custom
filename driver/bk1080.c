@@ -1,6 +1,9 @@
 /* Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
  *
+ * Copyright 2024 kamilsss655
+ * https://github.com/kamilsss655
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,8 +39,8 @@ static const uint16_t BK1080_RegisterTable[] =
 
 static bool gIsInitBK1080;
 
-uint16_t BK1080_BaseFrequency;
-uint16_t BK1080_FrequencyDeviation;
+// uint16_t BK1080_BaseFrequency;
+// uint16_t BK1080_FrequencyDeviation;
 
 void BK1080_Init(uint16_t Frequency, bool bDoScan)
 {
@@ -67,21 +70,20 @@ void BK1080_Init(uint16_t Frequency, bool bDoScan)
 		}
 
 		BK1080_WriteRegister(BK1080_REG_05_SYSTEM_CONFIGURATION2, 0x0A5F);
-		BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
-
-		SYSTEM_DelayMs(10);
-
-		BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
+		BK1080_SetFrequency(Frequency);
 	}
 	else
 	{
 		BK1080_WriteRegister(BK1080_REG_02_POWER_CONFIGURATION, 0x0241);
 		GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_BK1080);
 	}
+
+	// Europe/USA configuration
+	BK1080_WriteRegister(BK1080_REG_05_SYSTEM_CONFIGURATION2, (0u << 8) | (0b00 << 6) | (0b01 << 4) | (0b1111 << 0));
 }
 
 uint16_t BK1080_ReadRegister(BK1080_Register_t Register)
-{
+{ 
 	uint8_t Value[2];
 
 	I2C_Start();
@@ -108,15 +110,56 @@ void BK1080_Mute(bool Mute)
 	BK1080_WriteRegister(BK1080_REG_02_POWER_CONFIGURATION, Mute ? 0x4201 : 0x0201);
 }
 
-void BK1080_SetFrequency(uint16_t Frequency)
+void BK1080_TuneNext(bool direction)
 {
-	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
-	SYSTEM_DelayMs(10);
-	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
+	uint16_t reg_11;
+	uint16_t reg_02;
+
+	reg_02 = BK1080_ReadRegister(BK1080_REG_02_POWER_CONFIGURATION);
+	reg_11 = BK1080_ReadRegister(BK1080_REG_11);
+
+	// tune bit 0
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (0u << 15));
+
+	// seek bit 1, mute, direction
+	BK1080_WriteRegister(
+		BK1080_REG_02_POWER_CONFIGURATION, (1u << 0) | (1u << 8) | (direction << 9) | (1u << 14)
+	);
+
+	// wait until we find the channel
+	while((BK1080_ReadRegister(BK1080_REG_10) >> 14) == 0){
+		SYSTEM_DelayMs(2);
+	}
+
+	//read found freq
+	reg_11 = BK1080_GetFrequency();
+
+	// tune bit 0
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (0u << 15));
+
+	// tune to new freq
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (reg_11 | 1u << 15));
+
+	// seek bit 0, unmute
+	BK1080_WriteRegister(
+		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (0u << 8) | (0u << 14) )
+	);
 }
 
-void BK1080_GetFrequencyDeviation(uint16_t Frequency)
+void BK1080_SetFrequency(uint16_t Frequency)
 {
-	BK1080_BaseFrequency      = Frequency;
-	BK1080_FrequencyDeviation = BK1080_ReadRegister(BK1080_REG_07) / 16;
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 875);
+	SYSTEM_DelayMs(10);
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 875) | 0x8000);
 }
+
+uint16_t BK1080_GetFrequency()
+{
+	return BK1080_ReadRegister(BK1080_REG_11) + 875;
+}
+
+// void BK1080_GetFrequencyDeviation(uint16_t Frequency)
+// {
+// 	BK1080_BaseFrequency      = Frequency;
+// 	BK1080_FrequencyDeviation = BK1080_ReadRegister(BK1080_REG_07) / 16;
+// }

@@ -562,30 +562,8 @@ void BOARD_EEPROM_Init(void)
 	#endif
 
 #ifdef ENABLE_FMRADIO
-	{	// 0E88..0E8F
-		struct
-		{
-			uint16_t SelectedFrequency;
-			uint8_t  SelectedChannel;
-			uint8_t  IsMrMode;
-			uint8_t  Padding[8];
-		} __attribute__((packed)) FM;
-
-		EEPROM_ReadBuffer(0x0E88, &FM, 8);
-		gEeprom.FM_LowerLimit = 760;
-		gEeprom.FM_UpperLimit = 1080;
-		if (FM.SelectedFrequency < gEeprom.FM_LowerLimit || FM.SelectedFrequency > gEeprom.FM_UpperLimit)
-			gEeprom.FM_SelectedFrequency = 960;
-		else
-			gEeprom.FM_SelectedFrequency = FM.SelectedFrequency;
-
-		gEeprom.FM_SelectedChannel = FM.SelectedChannel;
-		gEeprom.FM_IsMrMode        = (FM.IsMrMode < 2) ? FM.IsMrMode : false;
-	}
-
-	// 0E40..0E67
-	EEPROM_ReadBuffer(0x0E40, gFM_Channels, sizeof(gFM_Channels));
-	FM_ConfigureChannelState();
+	EEPROM_ReadBuffer(0x0E88, Data, 8);
+	memmove(&gEeprom.FM_FrequencyPlaying, Data, 2);
 #endif
 
 	// 0E90..0E97
