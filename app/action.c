@@ -137,21 +137,7 @@ void ACTION_Scan(bool bRestart)
 			else
 			{
 				uint16_t Frequency;
-
-				if (bRestart)
-				{
-					gFM_AutoScan        = true;
-					gFM_ChannelPosition = 0;
-					Frequency           = gEeprom.FM_LowerLimit;
-				}
-				else
-				{
-					gFM_AutoScan        = false;
-					gFM_ChannelPosition = 0;
-					Frequency           = gEeprom.FM_FrequencyPlaying;
-				}
-
-				BK1080_GetFrequencyDeviation(Frequency);
+				Frequency = gEeprom.FM_FrequencyPlaying;
 				FM_Tune(Frequency, 1, bRestart);
 #ifdef ENABLE_VOICE
 				gAnotherVoiceID = VOICE_ID_SCANNING_BEGIN;

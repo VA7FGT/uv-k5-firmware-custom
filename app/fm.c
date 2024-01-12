@@ -30,18 +30,12 @@
 #include "settings.h"
 #include "ui/ui.h"
 
-#ifndef ARRAY_SIZE
-	#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
-#endif
-
 bool              gFmRadioMode;
 uint8_t           gFmRadioCountdown_500ms;
 volatile uint16_t gFmPlayCountdown_10ms;
 volatile int8_t   gFM_ScanState;
-bool              gFM_AutoScan;
 uint8_t           gFM_ChannelPosition;
 bool              gFM_FoundFrequency;
-bool              gFM_AutoScan;
 uint16_t          gFM_RestoreCountdown_10ms;
 
 
@@ -103,12 +97,6 @@ void FM_Tune(uint16_t Frequency, int8_t Step, bool bFlag)
 void FM_PlayAndUpdate(void)
 {
 	gFM_ScanState = FM_SCAN_OFF;
-
-	if (gFM_AutoScan)
-	{
-		gEeprom.FM_IsMrMode        = true;
-		gEeprom.FM_SelectedChannel = 0;
-	}
 
 	BK1080_SetFrequency(gEeprom.FM_FrequencyPlaying);
 
