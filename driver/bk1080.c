@@ -70,21 +70,20 @@ void BK1080_Init(uint16_t Frequency, bool bDoScan)
 		}
 
 		BK1080_WriteRegister(BK1080_REG_05_SYSTEM_CONFIGURATION2, 0x0A5F);
-		BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
-
-		SYSTEM_DelayMs(10);
-
-		BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
+		BK1080_SetFrequency(Frequency);
 	}
 	else
 	{
 		BK1080_WriteRegister(BK1080_REG_02_POWER_CONFIGURATION, 0x0241);
 		GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_BK1080);
 	}
+
+	// Europe/USA configuration
+	BK1080_WriteRegister(BK1080_REG_05_SYSTEM_CONFIGURATION2, (0u << 8) | (0b00 << 6) | (0b01 << 4) | (0b1111 << 0));
 }
 
 uint16_t BK1080_ReadRegister(BK1080_Register_t Register)
-{
+{ 
 	uint8_t Value[2];
 
 	I2C_Start();
@@ -149,14 +148,14 @@ void BK1080_TuneNext(bool direction)
 
 void BK1080_SetFrequency(uint16_t Frequency)
 {
-	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 875);
 	SYSTEM_DelayMs(10);
-	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 875) | 0x8000);
 }
 
 uint16_t BK1080_GetFrequency()
 {
-	return BK1080_ReadRegister(BK1080_REG_11) + 760;
+	return BK1080_ReadRegister(BK1080_REG_11) + 875;
 }
 
 // void BK1080_GetFrequencyDeviation(uint16_t Frequency)
