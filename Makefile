@@ -12,7 +12,7 @@ ENABLE_LTO                    := 1
 # ---- STOCK QUANSHENG FERATURES ----
 ENABLE_UART                   := 1
 ENABLE_AIRCOPY                := 0
-ENABLE_FMRADIO                := 0
+ENABLE_FMRADIO                := 1
 ENABLE_NOAA                   := 0
 ENABLE_VOICE                  := 0
 ENABLE_VOX                    := 1
@@ -49,9 +49,9 @@ ENABLE_SCAN_RANGES                      := 1
 ENABLE_SPECTRUM_COPY_VFO                := 1
 ENABLE_SPECTRUM_SHOW_CHANNEL_NAME       := 1
 ENABLE_SPECTRUM_CHANNEL_SCAN            := 1
-ENABLE_MESSENGER                        := 1
-ENABLE_MESSENGER_DELIVERY_NOTIFICATION  := 1
-ENABLE_MESSENGER_NOTIFICATION           := 1
+ENABLE_MESSENGER                        := 0
+ENABLE_MESSENGER_DELIVERY_NOTIFICATION  := 0
+ENABLE_MESSENGER_NOTIFICATION           := 0
 ENABLE_MESSENGER_UART                   := 0
 
 #############################################################
