@@ -19,17 +19,13 @@
 
 #ifdef ENABLE_FMRADIO
 
-#include <string.h>
+// #include <string.h>
 
 #include "app/action.h"
 #include "app/fm.h"
 #include "app/generic.h"
 #include "audio.h"
-#include "bsp/dp32g030/gpio.h"
 #include "driver/bk1080.h"
-#include "driver/eeprom.h"
-#include "driver/gpio.h"
-#include "functions.h"
 #include "misc.h"
 #include "settings.h"
 #include "ui/ui.h"
