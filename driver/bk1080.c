@@ -130,7 +130,7 @@ void BK1080_TuneNext(bool direction)
 
 	// wait until we find the channel
 	while((BK1080_ReadRegister(BK1080_REG_10) >> 14) == 0){
-		SYSTEM_DelayMs(1);
+		SYSTEM_DelayMs(5);
 	}
 
 	//read found freq
@@ -147,6 +147,8 @@ void BK1080_TuneNext(bool direction)
 	BK1080_WriteRegister(
 		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (0u << 8) | (0u << 14) )
 	);
+
+	SYSTEM_DelayMs(200);
 }
 
 void BK1080_SetFrequency(uint16_t Frequency)
