@@ -113,8 +113,6 @@ void BK1080_Mute(bool Mute)
 
 void BK1080_TuneNext(bool direction)
 {
-	(void)direction;
-
 	uint16_t reg_11;
 	uint16_t reg_02;
 
@@ -126,9 +124,9 @@ void BK1080_TuneNext(bool direction)
 	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (0u << 15));
 	SYSTEM_DelayMs(10);
 
-	// seek bit 1, mute
+	// seek bit 1, mute, direction
 	BK1080_WriteRegister(
-		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (1u << 8) | (1u << 14) )
+		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (1u << 8) | (direction << 9) | (1u << 14) )
 	);
 
 	// wait until we find the channel
