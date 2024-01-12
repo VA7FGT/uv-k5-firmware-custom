@@ -135,7 +135,7 @@ void BK1080_TuneNext(bool direction)
 	}
 
 	//read found freq
-	reg_11 = BK1080_ReadRegister(BK1080_REG_11);
+	reg_11 = BK1080_GetFrequency();
 
 	// tune bit 0
 	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (0u << 15));
@@ -156,6 +156,11 @@ void BK1080_SetFrequency(uint16_t Frequency)
 	// BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
 	// SYSTEM_DelayMs(10);
 	// BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
+}
+
+uint16_t BK1080_GetFrequency()
+{
+	return BK1080_ReadRegister(BK1080_REG_11) + 760;
 }
 
 void BK1080_GetFrequencyDeviation(uint16_t Frequency)

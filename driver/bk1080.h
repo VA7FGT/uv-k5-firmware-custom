@@ -1,6 +1,9 @@
 /* Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
  *
+ * Copyright 2024 kamilsss655
+ * https://github.com/kamilsss655
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +34,7 @@ void BK1080_Mute(bool Mute);
 void BK1080_SetFrequency(uint16_t Frequency);
 void BK1080_GetFrequencyDeviation(uint16_t Frequency);
 void BK1080_TuneNext(bool direction);
+uint16_t BK1080_GetFrequency();
 
 #endif
 

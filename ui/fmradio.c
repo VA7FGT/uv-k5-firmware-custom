@@ -43,32 +43,10 @@ void UI_DisplayFM(void)
 	UI_PrintString(String, 0, 127, 2, 10);
 
 	memset(String, 0, sizeof(String));
-	if (gAskToSave || (gEeprom.FM_IsMrMode && gInputBoxIndex > 0))
-	{
-		UI_GenerateChannelString(String, gFM_ChannelPosition);
-	}
-	else
-	if (!gAskToDelete)
-	{
-		if (gInputBoxIndex == 0)
-		{
-			sprintf(String, "%3d.%d", gEeprom.FM_FrequencyPlaying / 10, gEeprom.FM_FrequencyPlaying % 10);
-			UI_DisplayFrequency(String, 32, 4, true);
-		}
-		else {
-			const char * ascii = INPUTBOX_GetAscii();
-			sprintf(String, "%.3s.%.1s",ascii, ascii + 3);
-			UI_DisplayFrequency(String, 32, 4, false);
-		}
 
-		ST7565_BlitFullScreen();
-		return;
-	}
-	else
-	{
-		sprintf(String, "CH-%02u", gEeprom.FM_SelectedChannel + 1);
-	}
-	UI_PrintString(String, 0, 127, 4, 10);
+	sprintf(String, "%3d.%d", gEeprom.FM_FrequencyPlaying / 10, gEeprom.FM_FrequencyPlaying % 10);
+	UI_DisplayFrequency(String, 32, 4, true);
+		
 
 	ST7565_BlitFullScreen();
 }
