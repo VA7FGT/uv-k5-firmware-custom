@@ -126,58 +126,6 @@ void FM_PlayAndUpdate(void)
 	gEnableSpeaker   = true;
 }
 
-int FM_CheckFrequencyLock(uint16_t Frequency, uint16_t LowerLimit)
-{
-	int ret = -1;
-
-	const uint16_t Test2 = BK1080_ReadRegister(BK1080_REG_07);
-
-	// This is supposed to be a signed value, but above function is unsigned
-	const uint16_t Deviation = BK1080_REG_07_GET_FREQD(Test2);
-
-	if (BK1080_REG_07_GET_SNR(Test2) >= 2)
-	{
-		const uint16_t Status = BK1080_ReadRegister(BK1080_REG_10);
-		if ((Status & BK1080_REG_10_MASK_AFCRL) == BK1080_REG_10_AFCRL_NOT_RAILED && BK1080_REG_10_GET_RSSI(Status) >= 10)
-		{
-			//if (Deviation > -281 && Deviation < 280)
-			if (Deviation < 280 || Deviation > 3815)
-			{
-				// not BLE(less than or equal)
-
-				if (Frequency > LowerLimit && (Frequency - BK1080_BaseFrequency) == 1)
-				{
-					if (BK1080_FrequencyDeviation & 0x800)
-						goto Bail;
-
-					if (BK1080_FrequencyDeviation < 20)
-						goto Bail;
-				}
-
-				// not BLT(less than)
-
-				if (Frequency >= LowerLimit && (BK1080_BaseFrequency - Frequency) == 1)
-				{
-					if ((BK1080_FrequencyDeviation & 0x800) == 0)
-						goto Bail;
-
-					// if (BK1080_FrequencyDeviation > -21)
-					if (BK1080_FrequencyDeviation > 4075)
-						goto Bail;
-				}
-
-				ret = 0;
-			}
-		}
-	}
-
-Bail:
-	BK1080_FrequencyDeviation = Deviation;
-	BK1080_BaseFrequency      = Frequency;
-
-	return ret;
-}
-
 static void Key_EXIT(uint8_t state)
 {
 	if (state != BUTTON_EVENT_SHORT)
@@ -240,6 +188,7 @@ static void Key_UP_DOWN(uint8_t state, bool direction)
 	(void)state;
 	BK1080_TuneNext(direction);
 	gEeprom.FM_FrequencyPlaying = BK1080_GetFrequency();
+	// save
 }
 
 void FM_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)

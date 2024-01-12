@@ -152,10 +152,9 @@ void BK1080_TuneNext(bool direction)
 
 void BK1080_SetFrequency(uint16_t Frequency)
 {
-	(void)Frequency;
-	// BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
-	// SYSTEM_DelayMs(10);
-	// BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
+	SYSTEM_DelayMs(10);
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
 }
 
 uint16_t BK1080_GetFrequency()
