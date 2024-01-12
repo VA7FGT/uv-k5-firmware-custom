@@ -142,7 +142,6 @@ void ACTION_Scan(bool bRestart)
 				{
 					gFM_AutoScan        = true;
 					gFM_ChannelPosition = 0;
-					FM_EraseChannels();
 					Frequency           = gEeprom.FM_LowerLimit;
 				}
 				else

@@ -1674,14 +1674,6 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 			gFlagSaveSettings = false;
 		}
 
-		#ifdef ENABLE_FMRADIO
-			if (gFlagSaveFM)
-			{
-				SETTINGS_SaveFM();
-				gFlagSaveFM = false;
-			}
-		#endif
-
 		if (gFlagSaveChannel)
 		{
 			SETTINGS_SaveChannel(gTxVfo->CHANNEL_SAVE, gEeprom.TX_VFO, gTxVfo, gFlagSaveChannel);
@@ -1985,17 +1977,6 @@ Skip:
 		gRequestSaveSettings = false;
 		gUpdateStatus        = true;
 	}
-
-	#ifdef ENABLE_FMRADIO
-		if (gRequestSaveFM)
-		{
-			if (!bKeyHeld)
-				SETTINGS_SaveFM();
-			else
-				gFlagSaveFM = true;
-			gRequestSaveFM = false;
-		}
-	#endif
 
 	if (gRequestSaveVFO)
 	{

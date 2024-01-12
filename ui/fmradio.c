@@ -30,7 +30,6 @@
 
 void UI_DisplayFM(void)
 {
-	unsigned int i;
 	char         String[16];
 
 	memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
@@ -40,44 +39,7 @@ void UI_DisplayFM(void)
 	UI_PrintString(String, 0, 127, 0, 12);
 
 	memset(String, 0, sizeof(String));
-	if (gAskToSave)
-	{
-		strcpy(String, "SAVE?");
-	}
-	else
-	if (gAskToDelete)
-	{
-		strcpy(String, "DEL?");
-	}
-	else
-	{
-		if (gFM_ScanState == FM_SCAN_OFF)
-		{
-			if (!gEeprom.FM_IsMrMode)
-			{
-				for (i = 0; i < 20; i++)
-				{
-					if (gEeprom.FM_FrequencyPlaying == gFM_Channels[i])
-					{
-						sprintf(String, "VFO(CH%02u)", i + 1);
-						break;
-					}
-				}
 
-				if (i == 20)
-					strcpy(String, "VFO");
-			}
-			else
-				sprintf(String, "MR(CH%02u)", gEeprom.FM_SelectedChannel + 1);
-		}
-		else
-		{
-			if (!gFM_AutoScan)
-				strcpy(String, "M-SCAN");
-			else
-				sprintf(String, "A-SCAN(%u)", gFM_ChannelPosition + 1);
-		}
-	}
 	UI_PrintString(String, 0, 127, 2, 10);
 
 	memset(String, 0, sizeof(String));

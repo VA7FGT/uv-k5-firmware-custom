@@ -583,9 +583,6 @@ void BOARD_EEPROM_Init(void)
 		gEeprom.FM_IsMrMode        = (FM.IsMrMode < 2) ? FM.IsMrMode : false;
 	}
 
-	// 0E40..0E67
-	EEPROM_ReadBuffer(0x0E40, gFM_Channels, sizeof(gFM_Channels));
-	FM_ConfigureChannelState();
 #endif
 
 	// 0E90..0E97
