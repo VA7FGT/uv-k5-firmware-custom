@@ -36,16 +36,6 @@ volatile uint16_t gFmPlayCountdown_10ms;
 volatile int8_t   gFM_ScanState;
 uint16_t          gFM_RestoreCountdown_10ms;
 
-
-
-const uint8_t BUTTON_STATE_PRESSED = 1 << 0;
-const uint8_t BUTTON_STATE_HELD = 1 << 1;
-
-const uint8_t BUTTON_EVENT_PRESSED = BUTTON_STATE_PRESSED;
-const uint8_t BUTTON_EVENT_HELD = BUTTON_STATE_PRESSED | BUTTON_STATE_HELD;
-const uint8_t BUTTON_EVENT_SHORT =  0;
-const uint8_t BUTTON_EVENT_LONG =  BUTTON_STATE_HELD;
-
 void FM_TurnOff(void)
 {
 	gFmRadioMode              = false;
@@ -61,7 +51,7 @@ void FM_TurnOff(void)
 	gUpdateStatus  = true;
 }
 
-void FM_Tune(uint16_t Frequency, int8_t Step, bool bFlag)
+void FM_Tune(uint16_t Frequency, int8_t Step)
 {
 	AUDIO_AudioPathOff();
 
@@ -73,18 +63,6 @@ void FM_Tune(uint16_t Frequency, int8_t Step, bool bFlag)
 	gAskToSave                  = false;
 	gAskToDelete                = false;
 	gEeprom.FM_FrequencyPlaying = Frequency;
-
-	if (!bFlag)
-	{
-		Frequency += Step;
-		if (Frequency < gEeprom.FM_LowerLimit)
-			Frequency = gEeprom.FM_UpperLimit;
-		else
-		if (Frequency > gEeprom.FM_UpperLimit)
-			Frequency = gEeprom.FM_LowerLimit;
-
-		gEeprom.FM_FrequencyPlaying = Frequency;
-	}
 
 	gFM_ScanState = Step;
 

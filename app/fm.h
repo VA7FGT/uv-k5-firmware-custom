@@ -37,7 +37,7 @@ extern uint16_t          gFM_RestoreCountdown_10ms;
 
 void    FM_TurnOff(void);
 
-void    FM_Tune(uint16_t Frequency, int8_t Step, bool bFlag);
+void    FM_Tune(uint16_t Frequency, int8_t Step);
 void    FM_PlayAndUpdate(void);
 void    FM_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 

@@ -138,7 +138,7 @@ void ACTION_Scan(bool bRestart)
 			{
 				uint16_t Frequency;
 				Frequency = gEeprom.FM_FrequencyPlaying;
-				FM_Tune(Frequency, 1, bRestart);
+				FM_Tune(Frequency, 1);
 #ifdef ENABLE_VOICE
 				gAnotherVoiceID = VOICE_ID_SCANNING_BEGIN;
 #endif
