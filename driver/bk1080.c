@@ -1,6 +1,9 @@
 /* Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
  *
+ * Copyright 2024 kamilsss655
+ * https://github.com/kamilsss655
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -151,9 +154,9 @@ void BK1080_TuneNext(bool direction)
 	// BK1080_WriteRegister(
 	// 	BK1080_REG_02_POWER_CONFIGURATION, (0u << 8)
 	// );
-	// seek bit 1
+	// seek bit 1, mute
 	BK1080_WriteRegister(
-		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (1u << 8))
+		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (1u << 8) | (1u << 14) )
 	);
 
 	// we likely need to mute here during seek, and use while and check interupt bit
@@ -171,15 +174,15 @@ void BK1080_TuneNext(bool direction)
 		BK1080_REG_03_CHANNEL, (0u << 15)
 	);
 
-	// seek bit 0
-	BK1080_WriteRegister(
-		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (0u << 8))
-	);
-	SYSTEM_DelayMs(20);
-
 	// tune to new freq
 	BK1080_WriteRegister(
 		BK1080_REG_03_CHANNEL, (reg_11 | 1u << 15)
+	);
+	SYSTEM_DelayMs(20);
+
+	// seek bit 0, unmute
+	BK1080_WriteRegister(
+		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (0u << 8) | (0u << 14) )
 	);
 	SYSTEM_DelayMs(20);
 
