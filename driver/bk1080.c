@@ -116,44 +116,18 @@ void BK1080_Mute(bool Mute)
 void BK1080_TuneNext(bool direction)
 {
 	(void)direction;
-	char String[20];
-
-	// uint8_t X = 10;
-	// unsigned mask = (1 << X) - 1;
 
 	uint16_t reg_11;
 	uint16_t reg_02;
-	uint16_t reg_03;
-	// uint16_t seekFreq;
 
 
 	reg_02 = BK1080_ReadRegister(BK1080_REG_02_POWER_CONFIGURATION);
-	reg_03 = BK1080_ReadRegister(BK1080_REG_03_CHANNEL);
 	reg_11 = BK1080_ReadRegister(BK1080_REG_11);
 
-	sprintf(String, "reg11:%u\n", (unsigned int)reg_11);
-	LogUart(String);
-	sprintf(String, "reg02:%u\n", (unsigned int)reg_02);
-	LogUart(String);
-	sprintf(String, "reg03:%u\n", (unsigned int)reg_03);
-	LogUart(String);
-
-	// seekFreq = reg_11 & mask;
-	// BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
-	// SYSTEM_DelayMs(10);
-	// BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
-	
 	// tune bit 0
-	BK1080_WriteRegister(
-		BK1080_REG_03_CHANNEL, (0u << 15)
-	);
-
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (0u << 15));
 	SYSTEM_DelayMs(10);
 
-	// seek bit 0
-	// BK1080_WriteRegister(
-	// 	BK1080_REG_02_POWER_CONFIGURATION, (0u << 8)
-	// );
 	// seek bit 1, mute
 	BK1080_WriteRegister(
 		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (1u << 8) | (1u << 14) )
@@ -164,51 +138,20 @@ void BK1080_TuneNext(bool direction)
 		SYSTEM_DelayMs(1);
 	}
 
-	//read seek freq
-
+	//read found freq
 	reg_11 = BK1080_ReadRegister(BK1080_REG_11);
-	// seekFreq = reg_11 & mask;
-
 
 	// tune bit 0
-	BK1080_WriteRegister(
-		BK1080_REG_03_CHANNEL, (0u << 15)
-	);
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (0u << 15));
 
 	// tune to new freq
-	BK1080_WriteRegister(
-		BK1080_REG_03_CHANNEL, (reg_11 | 1u << 15)
-	);
+	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (reg_11 | 1u << 15));
 	SYSTEM_DelayMs(20);
 
 	// seek bit 0, unmute
 	BK1080_WriteRegister(
 		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (0u << 8) | (0u << 14) )
 	);
-	SYSTEM_DelayMs(20);
-
-	reg_02 = BK1080_ReadRegister(BK1080_REG_02_POWER_CONFIGURATION);
-	reg_03 = BK1080_ReadRegister(BK1080_REG_03_CHANNEL);
-	reg_11 = BK1080_ReadRegister(BK1080_REG_11);
-
-	sprintf(String, "reg11:%u\n", (unsigned int)reg_11);
-	LogUart(String);
-	sprintf(String, "reg02:%u\n", (unsigned int)reg_02);
-	LogUart(String);
-	sprintf(String, "reg03:%u\n", (unsigned int)reg_03);
-	LogUart(String);
-
-	// might have to set tune bit as weel with and
-	// BK1080_WriteRegister(BK1080_REG_03_CHANNEL, seekFreq | (1u << 15));
-
-	// BK1080_WriteRegister(
-	// 	BK1080_REG_03_CHANNEL, (1u << 15)
-	// );
-
-	// BK1080_WriteRegister(
-	// 	BK1080_REG_05_SYSTEM_CONFIGURATION2, (0b1111 << 0)
-	// );
-	SYSTEM_DelayMs(10);
 }
 
 void BK1080_SetFrequency(uint16_t Frequency)
