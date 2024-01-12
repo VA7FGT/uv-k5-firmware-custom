@@ -167,6 +167,13 @@ void SETTINGS_SaveSettings(void)
 	State[7] = (State[7] & ~(3u << 6)) | ((gSetting_backlight_on_tx_rx & 3u) << 6);
 	 
 	EEPROM_WriteBuffer(0x0F40, State, true);
+
+	#ifdef ENABLE_FMRADIO
+		//0x0E88..0x0E8F
+		memset(State, 0xFF, sizeof(State));
+		memcpy(&State[0], &gEeprom.FM_FrequencyPlaying, 2);
+		EEPROM_WriteBuffer(0x0E88, State, true);
+	#endif
 }
 
 void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, uint8_t Mode)

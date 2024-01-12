@@ -189,6 +189,7 @@ static void Key_UP_DOWN(uint8_t state, bool direction)
 	BK1080_TuneNext(direction);
 	gEeprom.FM_FrequencyPlaying = BK1080_GetFrequency();
 	// save
+	gRequestSaveSettings = true;
 }
 
 void FM_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
