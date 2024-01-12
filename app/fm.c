@@ -131,9 +131,8 @@ static void Key_EXIT()
 	return;
 }
 
-static void Key_UP_DOWN(uint8_t state, bool direction)
+static void Key_UP_DOWN(bool direction)
 {
-	(void)state;
 	BK1080_TuneNext(direction);
 	gEeprom.FM_FrequencyPlaying = BK1080_GetFrequency();
 	// save
@@ -142,17 +141,13 @@ static void Key_UP_DOWN(uint8_t state, bool direction)
 
 void FM_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 {
-	uint8_t state = bKeyPressed + 2 * bKeyHeld;
-
-
-	
 	switch (Key)
 	{	
 		case KEY_UP:
-			Key_UP_DOWN(state, true);
+			Key_UP_DOWN(true);
 			break;
 		case KEY_DOWN:
-			Key_UP_DOWN(state, false);
+			Key_UP_DOWN(false);
 			break;;
 		case KEY_EXIT:
 			Key_EXIT();

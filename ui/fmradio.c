@@ -48,8 +48,7 @@ void UI_DisplayFM(void)
 	memset(String, 0, sizeof(String));
 
 	sprintf(String, "%3d.%d", gEeprom.FM_FrequencyPlaying / 10, gEeprom.FM_FrequencyPlaying % 10);
-	UI_DisplayFrequency(String, 32, 4, true);
-		
+	UI_DisplayFrequency(String, 32, 4, true);			
 
 	ST7565_BlitFullScreen();
 }
