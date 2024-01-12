@@ -159,9 +159,10 @@ void BK1080_TuneNext(bool direction)
 		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (1u << 8) | (1u << 14) )
 	);
 
-	// we likely need to mute here during seek, and use while and check interupt bit
-	SYSTEM_DelayMs(500);
-
+	// wait until we find the channel
+	while((BK1080_ReadRegister(BK1080_REG_10) >> 14) == 0){
+		SYSTEM_DelayMs(1);
+	}
 
 	//read seek freq
 
