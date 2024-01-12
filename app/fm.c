@@ -32,7 +32,6 @@
 #include "functions.h"
 #include "misc.h"
 #include "settings.h"
-#include "ui/inputbox.h"
 #include "ui/ui.h"
 
 #ifndef ARRAY_SIZE
@@ -126,61 +125,10 @@ void FM_PlayAndUpdate(void)
 	gEnableSpeaker   = true;
 }
 
-static void Key_EXIT(uint8_t state)
+static void Key_EXIT()
 {
-	if (state != BUTTON_EVENT_SHORT)
-		return;
-
-	gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
-
-	if (gFM_ScanState == FM_SCAN_OFF)
-	{
-		if (gInputBoxIndex == 0)
-		{
-			if (!gAskToSave && !gAskToDelete)
-			{
-				ACTION_FM();
-				return;
-			}
-
-			gAskToSave   = false;
-			gAskToDelete = false;
-		}
-		else
-		{
-			gInputBox[--gInputBoxIndex] = 10;
-
-			if (gInputBoxIndex)
-			{
-				if (gInputBoxIndex != 1)
-				{
-					gRequestDisplayScreen = DISPLAY_FM;
-					return;
-				}
-
-				if (gInputBox[0] != 0)
-				{
-					gRequestDisplayScreen = DISPLAY_FM;
-					return;
-				}
-			}
-
-			gInputBoxIndex = 0;
-		}
-
-		#ifdef ENABLE_VOICE
-			gAnotherVoiceID = VOICE_ID_CANCEL;
-		#endif
-	}
-	else
-	{
-		FM_PlayAndUpdate();
-		#ifdef ENABLE_VOICE
-			gAnotherVoiceID = VOICE_ID_SCANNING_STOP;
-		#endif
-	}
-
-	gRequestDisplayScreen = DISPLAY_FM;
+	ACTION_FM();
+	return;
 }
 
 static void Key_UP_DOWN(uint8_t state, bool direction)
@@ -207,7 +155,7 @@ void FM_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 			Key_UP_DOWN(state, false);
 			break;;
 		case KEY_EXIT:
-			Key_EXIT(state);
+			Key_EXIT();
 			break;
 		case KEY_F:
 			GENERIC_Key_F(bKeyPressed, bKeyHeld);
