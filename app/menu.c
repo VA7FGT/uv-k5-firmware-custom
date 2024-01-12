@@ -916,7 +916,8 @@ void MENU_ShowCurrentSetting(void)
 			break;
 
 		case MENU_MEM_CH:
-			gSubMenuSelection = RADIO_ValidMemoryChannelsCount(false, 0);
+			//todo: in vfo mode select last empty channel slot
+			gSubMenuSelection = gEeprom.MrChannel[gEeprom.TX_VFO];
 			break;
 
 		case MENU_MEM_NAME:
