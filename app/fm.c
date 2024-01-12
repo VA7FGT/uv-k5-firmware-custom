@@ -34,8 +34,6 @@ bool              gFmRadioMode;
 uint8_t           gFmRadioCountdown_500ms;
 volatile uint16_t gFmPlayCountdown_10ms;
 volatile int8_t   gFM_ScanState;
-uint8_t           gFM_ChannelPosition;
-bool              gFM_FoundFrequency;
 uint16_t          gFM_RestoreCountdown_10ms;
 
 
@@ -72,7 +70,6 @@ void FM_Tune(uint16_t Frequency, int8_t Step, bool bFlag)
 	gFmPlayCountdown_10ms = (gFM_ScanState == FM_SCAN_OFF) ? fm_play_countdown_noscan_10ms : fm_play_countdown_scan_10ms;
 
 	gScheduleFM                 = false;
-	gFM_FoundFrequency          = false;
 	gAskToSave                  = false;
 	gAskToDelete                = false;
 	gEeprom.FM_FrequencyPlaying = Frequency;

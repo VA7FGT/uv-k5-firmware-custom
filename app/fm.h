@@ -30,12 +30,9 @@ extern bool              gFmRadioMode;
 extern uint8_t           gFmRadioCountdown_500ms;
 extern volatile uint16_t gFmPlayCountdown_10ms;
 extern volatile int8_t   gFM_ScanState;
-extern bool              gFM_AutoScan;
 extern uint8_t           gFM_ChannelPosition;
 // Doubts about          whether this should be signed or not
 extern uint16_t          gFM_FrequencyDeviation;
-extern bool              gFM_FoundFrequency;
-extern bool              gFM_AutoScan;
 extern uint16_t          gFM_RestoreCountdown_10ms;
 
 void    FM_TurnOff(void);
