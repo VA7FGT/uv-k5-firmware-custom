@@ -110,9 +110,9 @@ void BK1080_Mute(bool Mute)
 	BK1080_WriteRegister(BK1080_REG_02_POWER_CONFIGURATION, Mute ? 0x4201 : 0x0201);
 }
 
-void BK1080_SetFrequency(uint16_t Frequency)
+void BK1080_TuneNext(bool direction)
 {
-	(void)Frequency;
+	(void)direction;
 	char String[20];
 
 	// uint8_t X = 10;
@@ -146,18 +146,18 @@ void BK1080_SetFrequency(uint16_t Frequency)
 	);
 
 	SYSTEM_DelayMs(10);
-	SYSTEM_DelayMs(10);
 
 	// seek bit 0
 	// BK1080_WriteRegister(
 	// 	BK1080_REG_02_POWER_CONFIGURATION, (0u << 8)
 	// );
-	SYSTEM_DelayMs(10);
 	// seek bit 1
 	BK1080_WriteRegister(
 		BK1080_REG_02_POWER_CONFIGURATION, (reg_02 | (1u << 8))
 	);
-	SYSTEM_DelayMs(3000);
+
+	// we likely need to mute here during seek, and use while and check interupt bit
+	SYSTEM_DelayMs(500);
 
 
 	//read seek freq
@@ -205,6 +205,14 @@ void BK1080_SetFrequency(uint16_t Frequency)
 	// 	BK1080_REG_05_SYSTEM_CONFIGURATION2, (0b1111 << 0)
 	// );
 	SYSTEM_DelayMs(10);
+}
+
+void BK1080_SetFrequency(uint16_t Frequency)
+{
+	(void)Frequency;
+	// BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
+	// SYSTEM_DelayMs(10);
+	// BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
 }
 
 void BK1080_GetFrequencyDeviation(uint16_t Frequency)
