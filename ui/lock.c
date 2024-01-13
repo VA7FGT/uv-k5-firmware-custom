@@ -155,13 +155,6 @@ void UI_DisplayLock(void)
 			gKeyReading0     = Key;
 		}
 
-		if (UART_IsCommandAvailable())
-		{
-			__disable_irq();
-			UART_HandleCommand();
-			__enable_irq();
-		}
-
 		if (gUpdateDisplay)
 		{
 			Render();
