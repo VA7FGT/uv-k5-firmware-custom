@@ -55,6 +55,7 @@ enum {
 enum {
 	PASSWORD_OFF = 10000u
 };
+#define PASSWORD_MAX_RETRIES 3
 #endif
 
 enum {

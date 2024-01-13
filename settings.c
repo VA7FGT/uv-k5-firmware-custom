@@ -98,7 +98,7 @@ void SETTINGS_SaveSettings(void)
 	EEPROM_ReadBuffer(0x0E98, State, 8);
 	#ifdef ENABLE_PWRON_PASSWORD
 		memcpy(&State[0], &gEeprom.POWER_ON_PASSWORD, 4);
-	#endif
+			#endif
 	memcpy(&State[4], &gEeprom.RX_OFFSET, 4);
 	EEPROM_WriteBuffer(0x0E98, State, true);
 
@@ -107,6 +107,7 @@ void SETTINGS_SaveSettings(void)
 		State[0] = gEeprom.VOX_DELAY;
 	#endif
 	State[1] = gEeprom.RX_AGC;
+	State[2] = gEeprom.PASSWORD_WRONG_ATTEMPTS;
 	EEPROM_WriteBuffer(0x0EA0, State, true);
 	
 	memset(State, 0xFF, sizeof(State));

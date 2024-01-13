@@ -28,6 +28,7 @@
 #include "ui/helper.h"
 #include "ui/inputbox.h"
 #include "ui/lock.h"
+#include "board.h"
 
 static void Render(void)
 {
@@ -66,7 +67,11 @@ void UI_DisplayLock(void)
 		gNextTimeslice = false;
 
 		Key = KEYBOARD_Poll();
-
+		if (gEeprom.PASSWORD_WRONG_ATTEMPTS >= PASSWORD_MAX_RETRIES)
+		{
+			BOARD_FactoryReset(true);
+			return;
+		}
 		if (gKeyReading0 == Key)
 		{
 			if (++gDebounceCounter == key_debounce_10ms)
@@ -108,8 +113,15 @@ void UI_DisplayLock(void)
 								{
 									AUDIO_PlayBeep(BEEP_1KHZ_60MS_OPTIONAL);
 									gIsLocked = false;
+									gEeprom.PASSWORD_WRONG_ATTEMPTS = 0;
 									return;
 								}
+								else
+								{
+									gEeprom.PASSWORD_WRONG_ATTEMPTS++;
+								}
+
+								SETTINGS_SaveSettings();
 
 								memset(gInputBox, 10, sizeof(gInputBox));
 

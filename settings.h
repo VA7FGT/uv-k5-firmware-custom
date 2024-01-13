@@ -243,7 +243,10 @@ typedef struct {
 	uint8_t               DAC_GAIN;
 
 	VFO_Info_t            VfoInfo[2];
+#ifdef ENABLE_PWRON_PASSWORD
 	uint32_t              POWER_ON_PASSWORD;
+	uint8_t				  PASSWORD_WRONG_ATTEMPTS;
+#endif
 	uint16_t              VOX1_THRESHOLD;
 	uint16_t              VOX0_THRESHOLD;
 
