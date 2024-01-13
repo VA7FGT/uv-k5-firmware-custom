@@ -30,21 +30,26 @@
 #include "ui/lock.h"
 #include "board.h"
 
-static void Render(void)
+static void Render(bool maxAttemptsReached)
 {
 	unsigned int i;
 	char         String[5];
 
 	memset(gStatusLine,  0, sizeof(gStatusLine));
 	memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
-
-	strcpy(String, "LOCK");
-	UI_PrintString(String, 0, 127, 1, 10);
-	for (i = 0; i < 4; i++)
-		String[i] = (gInputBox[i] == 10) ? '-' : '*';
-	String[6] = 0;
-	UI_PrintString(String, 0, 127, 3, 12);
-
+	if (maxAttemptsReached){
+		strcpy(String, "OK");
+		UI_PrintString(String, 0, 127, 2, 10);
+	}
+	else
+	{
+		strcpy(String, "LOCK");
+		UI_PrintString(String, 0, 127, 1, 10);
+		for (i = 0; i < 4; i++)
+			String[i] = (gInputBox[i] == 10) ? '-' : '*';
+		String[6] = 0;
+		UI_PrintString(String, 0, 127, 3, 12);
+	}
 	ST7565_BlitStatusLine();
 	ST7565_BlitFullScreen();
 }
@@ -69,7 +74,8 @@ void UI_DisplayLock(void)
 
 		Key = KEYBOARD_Poll();
 		if (gEeprom.PASSWORD_WRONG_ATTEMPTS >= PASSWORD_MAX_RETRIES)
-		{
+		{	
+			Render(true);
 			BOARD_FactoryReset(true);
 			return;
 		}
@@ -158,7 +164,7 @@ void UI_DisplayLock(void)
 
 		if (gUpdateDisplay)
 		{
-			Render();
+			Render(false);
 			gUpdateDisplay = false;
 		}
 	}
