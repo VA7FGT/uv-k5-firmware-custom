@@ -28,22 +28,28 @@
 #include "ui/helper.h"
 #include "ui/inputbox.h"
 #include "ui/lock.h"
+#include "board.h"
 
-static void Render(void)
+static void Render(bool maxAttemptsReached)
 {
 	unsigned int i;
-	char         String[7];
+	char         String[5];
 
 	memset(gStatusLine,  0, sizeof(gStatusLine));
 	memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
-
-	strcpy(String, "LOCK");
-	UI_PrintString(String, 0, 127, 1, 10);
-	for (i = 0; i < 6; i++)
-		String[i] = (gInputBox[i] == 10) ? '-' : '*';
-	String[6] = 0;
-	UI_PrintString(String, 0, 127, 3, 12);
-
+	if (maxAttemptsReached){
+		strcpy(String, "OK");
+		UI_PrintString(String, 0, 127, 2, 10);
+	}
+	else
+	{
+		strcpy(String, "LOCK");
+		UI_PrintString(String, 0, 127, 1, 10);
+		for (i = 0; i < 4; i++)
+			String[i] = (gInputBox[i] == 10) ? '-' : '*';
+		String[6] = 0;
+		UI_PrintString(String, 0, 127, 3, 12);
+	}
 	ST7565_BlitStatusLine();
 	ST7565_BlitFullScreen();
 }
@@ -51,6 +57,7 @@ static void Render(void)
 void UI_DisplayLock(void)
 {
 	KEY_Code_t  Key;
+	KEY_Code_t  gKeyReadingLocal;
 	BEEP_Type_t Beep;
 
 	gUpdateDisplay = true;
@@ -66,8 +73,13 @@ void UI_DisplayLock(void)
 		gNextTimeslice = false;
 
 		Key = KEYBOARD_Poll();
-
-		if (gKeyReading0 == Key)
+		if (gEeprom.PASSWORD_WRONG_ATTEMPTS >= PASSWORD_MAX_RETRIES)
+		{	
+			Render(true);
+			BOARD_FactoryReset(true);
+			return;
+		}
+		if (gKeyReadingLocal == Key)
 		{
 			if (++gDebounceCounter == key_debounce_10ms)
 			{
@@ -93,7 +105,7 @@ void UI_DisplayLock(void)
 						case KEY_9:
 							INPUTBOX_Append(Key - KEY_0);
 
-							if (gInputBoxIndex < 6)   // 6 frequency digits
+							if (gInputBoxIndex < 4)   // 4 frequency digits
 							{
 								Beep = BEEP_1KHZ_60MS_OPTIONAL;
 							}
@@ -107,8 +119,15 @@ void UI_DisplayLock(void)
 								if ((gEeprom.POWER_ON_PASSWORD) == Password)
 								{
 									AUDIO_PlayBeep(BEEP_1KHZ_60MS_OPTIONAL);
+									gEeprom.PASSWORD_WRONG_ATTEMPTS = 0;
 									return;
 								}
+								else
+								{
+									gEeprom.PASSWORD_WRONG_ATTEMPTS++;
+								}
+
+								SETTINGS_SaveSettings();
 
 								memset(gInputBox, 10, sizeof(gInputBox));
 
@@ -140,19 +159,12 @@ void UI_DisplayLock(void)
 		else
 		{
 			gDebounceCounter = 0;
-			gKeyReading0     = Key;
-		}
-
-		if (UART_IsCommandAvailable())
-		{
-			__disable_irq();
-			UART_HandleCommand();
-			__enable_irq();
+			gKeyReadingLocal     = Key;
 		}
 
 		if (gUpdateDisplay)
 		{
-			Render();
+			Render(false);
 			gUpdateDisplay = false;
 		}
 	}

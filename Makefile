@@ -18,7 +18,7 @@ ENABLE_VOICE                  := 0
 ENABLE_VOX                    := 1
 ENABLE_ALARM                  := 0
 ENABLE_TX1750                 := 0
-ENABLE_PWRON_PASSWORD         := 0
+ENABLE_PWRON_PASSWORD         := 1
 ENABLE_DTMF_CALLING           := 0
 
 #---- DEBUG ----
@@ -83,9 +83,6 @@ OBJS += external/printf/printf.o
 
 # Drivers
 OBJS += driver/adc.o
-ifeq ($(ENABLE_UART),1)
-	OBJS += driver/aes.o
-endif
 OBJS += driver/backlight.o
 ifeq ($(ENABLE_FMRADIO),1)
 	OBJS += driver/bk1080.o

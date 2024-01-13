@@ -45,6 +45,7 @@
 	#include "sram-overlay.h"
 #endif
 #include "ui/menu.h"
+#include "ARMCM0.h"
 
 static const uint32_t gDefaultFrequencyTable[] =
 {
@@ -579,8 +580,10 @@ void BOARD_EEPROM_Init(void)
 	gEeprom.POWER_ON_DISPLAY_MODE        = (Data[7] < 4)              ? Data[7] : POWER_ON_DISPLAY_MODE_VOLTAGE;
 
 	// 0E98..0E9F
-	EEPROM_ReadBuffer(0x0E98, Data, 8);
-	memmove(&gEeprom.POWER_ON_PASSWORD, Data, 4);
+	#ifdef ENABLE_PWRON_PASSWORD
+		EEPROM_ReadBuffer(0x0E98, Data, 8);
+		memmove(&gEeprom.POWER_ON_PASSWORD, Data, 4);
+	#endif
 
 	// 0EA0..0EA7
 	EEPROM_ReadBuffer(0x0EA0, Data, 8);
@@ -588,6 +591,9 @@ void BOARD_EEPROM_Init(void)
 		gEeprom.VOX_DELAY = (Data[0] < 11) ? Data[0] : 4;
 	#endif
 	gEeprom.RX_AGC = (Data[1] < RX_AGC_LEN) ? Data[1] : RX_AGC_SLOW;
+	#ifdef ENABLE_PWRON_PASSWORD
+		gEeprom.PASSWORD_WRONG_ATTEMPTS = (Data[2] > PASSWORD_MAX_RETRIES) ? PASSWORD_MAX_RETRIES : Data[2];
+	#endif
 
 	// 0EA8..0EAF
 	EEPROM_ReadBuffer(0x0EA8, Data, 8);
@@ -868,6 +874,9 @@ void BOARD_FactoryReset(bool bIsAll)
 	{
 		RADIO_InitInfo(gRxVfo, FREQ_CHANNEL_FIRST + BAND6_400MHz, 43350000);
 		gEeprom.RX_OFFSET = 0;
+		gEeprom.POWER_ON_PASSWORD = PASSWORD_OFF;
+		gEeprom.PASSWORD_WRONG_ATTEMPTS = 0;
+		SETTINGS_SaveSettings();
 		// set the first few memory channels
 		for (i = 0; i < ARRAY_SIZE(gDefaultFrequencyTable); i++)
 		{
@@ -877,5 +886,7 @@ void BOARD_FactoryReset(bool bIsAll)
 			gRxVfo->Band               = FREQUENCY_GetBand(Frequency);
 			SETTINGS_SaveChannel(MR_CHANNEL_FIRST + i, 0, gRxVfo, 2);
 		}
+		// reboot device
+		NVIC_SystemReset();
 	}
 }

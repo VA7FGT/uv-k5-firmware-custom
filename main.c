@@ -174,12 +174,14 @@ void Main(void)
 		}
 
 #ifdef ENABLE_PWRON_PASSWORD
-		if (gEeprom.POWER_ON_PASSWORD < 1000000)
+		if (gEeprom.POWER_ON_PASSWORD < PASSWORD_OFF)
 		{
 			bIsInLockScreen = true;
 			UI_DisplayLock();
 			bIsInLockScreen = false;
 		}
+		gEeprom.PASSWORD_WRONG_ATTEMPTS = 0;
+		gFlagSaveSettings = true;
 #endif
 
 		BOOT_ProcessMode(BootMode);

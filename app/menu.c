@@ -474,6 +474,13 @@ void MENU_AcceptSetting(void)
 			gUpdateStatus        = true;
 			break;
 
+		#ifdef ENABLE_PWRON_PASSWORD
+			case MENU_PASSWORD:
+				gEeprom.POWER_ON_PASSWORD = MIN(gSubMenuSelection, PASSWORD_OFF);
+				gUpdateStatus        = true;
+				break;
+		#endif
+
 		case MENU_W_N:
 			gTxVfo->CHANNEL_BANDWIDTH = gSubMenuSelection;
 			gRequestSaveChannel       = 1;
@@ -903,6 +910,12 @@ void MENU_ShowCurrentSetting(void)
     		gSubMenuSelection = gEeprom.RX_OFFSET;
 			break;
 
+		#ifdef ENABLE_PWRON_PASSWORD
+			case MENU_PASSWORD:
+				gSubMenuSelection = gEeprom.POWER_ON_PASSWORD;
+				break;
+	    #endif
+
 		case MENU_W_N:
 			gSubMenuSelection = gTxVfo->CHANNEL_BANDWIDTH;
 			break;
@@ -916,7 +929,8 @@ void MENU_ShowCurrentSetting(void)
 			break;
 
 		case MENU_MEM_CH:
-			gSubMenuSelection = RADIO_ValidMemoryChannelsCount(false, 0);
+			//todo: in vfo mode select last empty channel slot
+			gSubMenuSelection = gEeprom.MrChannel[gEeprom.TX_VFO];
 			break;
 
 		case MENU_MEM_NAME:
@@ -1258,6 +1272,17 @@ static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		gInputBoxIndex = 0;
 		return;
 	}
+	#ifdef ENABLE_PWRON_PASSWORD
+		if (UI_MENU_GetCurrentMenuId() == MENU_PASSWORD)
+		{
+			// get 4 digits
+			if (gInputBoxIndex < 4) { return; }
+
+			uint32_t Password;
+			Password = StrToUL(INPUTBOX_GetAscii());
+			gSubMenuSelection = Password;
+		}
+	#endif
 	
 	if (UI_MENU_GetCurrentMenuId() == MENU_MEM_CH || 
 		UI_MENU_GetCurrentMenuId() == MENU_DEL_CH || 
@@ -1650,6 +1675,13 @@ static void MENU_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 		gRequestDisplayScreen = DISPLAY_MENU;
 		return;
 	}
+	#ifdef ENABLE_PWRON_PASSWORD
+		if (UI_MENU_GetCurrentMenuId() == MENU_PASSWORD)
+		{
+			gSubMenuSelection     = PASSWORD_OFF;
+			gRequestDisplayScreen = DISPLAY_MENU;
+		}
+	#endif
 
 	VFO = 0;
 

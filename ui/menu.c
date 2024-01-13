@@ -109,6 +109,9 @@ const t_menu_item MenuList[] =
 #endif
 	{"BatVol", VOICE_ID_INVALID,                       MENU_VOL           }, // was "VOL"
 	{"RxMode", VOICE_ID_DUAL_STANDBY,                  MENU_TDR           },
+#ifdef ENABLE_PWRON_PASSWORD
+	{"Passwd", VOICE_ID_INVALID,                       MENU_PASSWORD      }, // power on password
+#endif
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
 	// hidden menu items from here on
 	// enabled if pressing both the PTT and upper side button at power-on
@@ -559,6 +562,28 @@ void UI_DisplayMenu(void)
 
 				already_printed = true;
 				break;
+			#ifdef ENABLE_PWRON_PASSWORD
+				case MENU_PASSWORD:
+					if (!gIsInSubMenu || gInputBoxIndex == 0)
+					{
+						if((unsigned int)gSubMenuSelection >= PASSWORD_OFF)
+						{
+							sprintf(String, "OFF");
+						}
+						else
+						{
+							sprintf(String, "****");
+						}
+					}
+					else
+					{
+						const char * ascii = INPUTBOX_GetAscii();
+						sprintf(String, "%.4s  ",ascii);
+					}
+					UI_PrintString(String, menu_item_x1, menu_item_x2, 1, 8);
+					already_printed = true;
+					break;
+			#endif
 
 			case MENU_W_N:
 				strcpy(String, bwNames[gSubMenuSelection]);

@@ -69,7 +69,8 @@ void BK1080_Init(uint16_t Frequency, bool bDoScan)
 			BK1080_WriteRegister(BK1080_REG_02_POWER_CONFIGURATION, 0x0201);
 		}
 
-		BK1080_WriteRegister(BK1080_REG_05_SYSTEM_CONFIGURATION2, 0x0A5F);
+		// Europe/USA configuration
+		BK1080_WriteRegister(BK1080_REG_05_SYSTEM_CONFIGURATION2, (0u << 8) | (0b00 << 6) | (0b01 << 4) | (0b1111 << 0));
 		BK1080_SetFrequency(Frequency);
 	}
 	else
@@ -78,8 +79,7 @@ void BK1080_Init(uint16_t Frequency, bool bDoScan)
 		GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_BK1080);
 	}
 
-	// Europe/USA configuration
-	BK1080_WriteRegister(BK1080_REG_05_SYSTEM_CONFIGURATION2, (0u << 8) | (0b00 << 6) | (0b01 << 4) | (0b1111 << 0));
+	
 }
 
 uint16_t BK1080_ReadRegister(BK1080_Register_t Register)
