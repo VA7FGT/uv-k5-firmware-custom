@@ -32,14 +32,14 @@
 static void Render(void)
 {
 	unsigned int i;
-	char         String[7];
+	char         String[5];
 
 	memset(gStatusLine,  0, sizeof(gStatusLine));
 	memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
 
 	strcpy(String, "LOCK");
 	UI_PrintString(String, 0, 127, 1, 10);
-	for (i = 0; i < 6; i++)
+	for (i = 0; i < 4; i++)
 		String[i] = (gInputBox[i] == 10) ? '-' : '*';
 	String[6] = 0;
 	UI_PrintString(String, 0, 127, 3, 12);
@@ -93,7 +93,7 @@ void UI_DisplayLock(void)
 						case KEY_9:
 							INPUTBOX_Append(Key - KEY_0);
 
-							if (gInputBoxIndex < 6)   // 6 frequency digits
+							if (gInputBoxIndex < 4)   // 4 frequency digits
 							{
 								Beep = BEEP_1KHZ_60MS_OPTIONAL;
 							}
