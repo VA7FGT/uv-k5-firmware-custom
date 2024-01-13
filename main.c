@@ -179,9 +179,9 @@ void Main(void)
 			bIsInLockScreen = true;
 			UI_DisplayLock();
 			bIsInLockScreen = false;
-			gEeprom.PASSWORD_WRONG_ATTEMPTS = 0;
-			gFlagSaveSettings = true;
 		}
+		gEeprom.PASSWORD_WRONG_ATTEMPTS = 0;
+		gFlagSaveSettings = true;
 #endif
 
 		BOOT_ProcessMode(BootMode);
