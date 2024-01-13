@@ -52,6 +52,7 @@ static void Render(void)
 void UI_DisplayLock(void)
 {
 	KEY_Code_t  Key;
+	KEY_Code_t  gKeyReadingLocal;
 	BEEP_Type_t Beep;
 
 	gUpdateDisplay = true;
@@ -72,7 +73,7 @@ void UI_DisplayLock(void)
 			BOARD_FactoryReset(true);
 			return;
 		}
-		if (gKeyReading0 == Key)
+		if (gKeyReadingLocal == Key)
 		{
 			if (++gDebounceCounter == key_debounce_10ms)
 			{
@@ -152,7 +153,7 @@ void UI_DisplayLock(void)
 		else
 		{
 			gDebounceCounter = 0;
-			gKeyReading0     = Key;
+			gKeyReadingLocal     = Key;
 		}
 
 		if (gUpdateDisplay)
