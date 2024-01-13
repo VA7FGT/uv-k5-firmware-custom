@@ -856,6 +856,8 @@ void BOARD_FactoryReset(bool bIsAll)
 	{
 		RADIO_InitInfo(gRxVfo, FREQ_CHANNEL_FIRST + BAND6_400MHz, 43350000);
 		gEeprom.RX_OFFSET = 0;
+		gEeprom.POWER_ON_PASSWORD = PASSWORD_OFF;
+		SETTINGS_SaveSettings();
 		// set the first few memory channels
 		for (i = 0; i < ARRAY_SIZE(gDefaultFrequencyTable); i++)
 		{
