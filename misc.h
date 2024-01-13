@@ -51,6 +51,12 @@ enum {
 	LAST_CHANNEL
 };
 
+#ifdef ENABLE_PWRON_PASSWORD
+enum {
+	PASSWORD_OFF = 10000u
+};
+#endif
+
 enum {
 	FLASHLIGHT_OFF = 0,
 	FLASHLIGHT_ON,
