@@ -45,6 +45,7 @@
 	#include "sram-overlay.h"
 #endif
 #include "ui/menu.h"
+#include "ARMCM0.h"
 
 static const uint32_t gDefaultFrequencyTable[] =
 {
@@ -885,5 +886,7 @@ void BOARD_FactoryReset(bool bIsAll)
 			gRxVfo->Band               = FREQUENCY_GetBand(Frequency);
 			SETTINGS_SaveChannel(MR_CHANNEL_FIRST + i, 0, gRxVfo, 2);
 		}
+		// reboot device
+		NVIC_SystemReset();
 	}
 }
