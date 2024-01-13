@@ -566,7 +566,7 @@ void UI_DisplayMenu(void)
 				case MENU_PASSWORD:
 					if (!gIsInSubMenu || gInputBoxIndex == 0)
 					{
-						if(gSubMenuSelection >= PASSWORD_OFF)
+						if((unsigned int)gSubMenuSelection >= PASSWORD_OFF)
 						{
 							sprintf(String, "OFF");
 						}
