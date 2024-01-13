@@ -112,7 +112,6 @@ void UI_DisplayLock(void)
 								if ((gEeprom.POWER_ON_PASSWORD) == Password)
 								{
 									AUDIO_PlayBeep(BEEP_1KHZ_60MS_OPTIONAL);
-									gIsLocked = false;
 									gEeprom.PASSWORD_WRONG_ATTEMPTS = 0;
 									return;
 								}
@@ -154,6 +153,13 @@ void UI_DisplayLock(void)
 		{
 			gDebounceCounter = 0;
 			gKeyReading0     = Key;
+		}
+
+		if (UART_IsCommandAvailable())
+		{
+			__disable_irq();
+			UART_HandleCommand();
+			__enable_irq();
 		}
 
 		if (gUpdateDisplay)

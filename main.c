@@ -177,7 +177,6 @@ void Main(void)
 		if (gEeprom.POWER_ON_PASSWORD < PASSWORD_OFF)
 		{
 			bIsInLockScreen = true;
-			gIsLocked = true;
 			UI_DisplayLock();
 			bIsInLockScreen = false;
 		}
