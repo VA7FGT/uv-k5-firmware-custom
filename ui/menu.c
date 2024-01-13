@@ -109,7 +109,7 @@ const t_menu_item MenuList[] =
 #endif
 	{"BatVol", VOICE_ID_INVALID,                       MENU_VOL           }, // was "VOL"
 	{"RxMode", VOICE_ID_DUAL_STANDBY,                  MENU_TDR           },
-	{"Passwd", VOICE_ID_DUAL_STANDBY,                  MENU_PASSWORD      }, // power on password
+	{"Passwd", VOICE_ID_INVALID,                       MENU_PASSWORD      }, // power on password
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
 	// hidden menu items from here on
 	// enabled if pressing both the PTT and upper side button at power-on
