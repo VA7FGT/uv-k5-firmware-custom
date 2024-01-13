@@ -172,7 +172,6 @@ extern bool                  gMonitor;
 
 extern const uint32_t        gDefaultAesKey[4];
 extern uint32_t              gCustomAesKey[4];
-extern bool                  bHasCustomAesKey;
 extern uint32_t              gChallenge[4];
 extern uint8_t               gTryCount;
 
@@ -353,7 +352,7 @@ extern volatile uint8_t      gVFOStateResumeCountdown_500ms;
 	extern volatile bool     gScheduleFM;
 #endif
 extern int16_t               gCurrentRSSI[2];   // now one per VFO
-extern uint8_t               gIsLocked;
+extern bool                  gIsLocked;
 extern volatile uint8_t      boot_counter_10ms;
 
 int32_t NUMBER_AddWithWraparound(int32_t Base, int32_t Add, int32_t LowerLimit, int32_t UpperLimit);

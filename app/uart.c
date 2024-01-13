@@ -191,7 +191,7 @@ static void SendVersion(void)
 	Reply.Header.ID = 0x0515;
 	Reply.Header.Size = sizeof(Reply.Data);
 	strcpy(Reply.Data.Version, Version);
-	Reply.Data.bHasCustomAesKey = bHasCustomAesKey;
+	Reply.Data.bHasCustomAesKey = false;
 	Reply.Data.bIsInLockScreen = bIsInLockScreen;
 	Reply.Data.Challenge[0] = gChallenge[0];
 	Reply.Data.Challenge[1] = gChallenge[1];
@@ -223,7 +223,6 @@ static void CMD_051B(const uint8_t *pBuffer)
 {
 	const CMD_051B_t *pCmd = (const CMD_051B_t *)pBuffer;
 	REPLY_051B_t      Reply;
-	bool              bLocked = false;
 
 	if (pCmd->Timestamp != Timestamp)
 		return;
@@ -240,11 +239,8 @@ static void CMD_051B(const uint8_t *pBuffer)
 	Reply.Data.Offset = pCmd->Offset;
 	Reply.Data.Size   = pCmd->Size;
 
-	if (bHasCustomAesKey)
-		bLocked = gIsLocked;
 
-	if (!bLocked)
-		EEPROM_ReadBuffer(pCmd->Offset, Reply.Data.Data, pCmd->Size);
+	EEPROM_ReadBuffer(pCmd->Offset, Reply.Data.Data, pCmd->Size);
 
 	SendReply(&Reply, pCmd->Size + 8);
 }
@@ -254,7 +250,6 @@ static void CMD_051D(const uint8_t *pBuffer)
 	const CMD_051D_t *pCmd = (const CMD_051D_t *)pBuffer;
 	REPLY_051D_t Reply;
 	bool bReloadEeprom;
-	bool bIsLocked;
 
 	if (pCmd->Timestamp != Timestamp)
 		return;
@@ -271,26 +266,22 @@ static void CMD_051D(const uint8_t *pBuffer)
 	Reply.Header.Size = sizeof(Reply.Data);
 	Reply.Data.Offset = pCmd->Offset;
 
-	bIsLocked = bHasCustomAesKey ? gIsLocked : bHasCustomAesKey;
 
-	if (!bIsLocked)
+	unsigned int i;
+	for (i = 0; i < (pCmd->Size / 8); i++)
 	{
-		unsigned int i;
-		for (i = 0; i < (pCmd->Size / 8); i++)
-		{
-			const uint16_t Offset = pCmd->Offset + (i * 8U);
+		const uint16_t Offset = pCmd->Offset + (i * 8U);
 
-			if (Offset >= 0x0F30 && Offset < 0x0F40)
-				if (!gIsLocked)
-					bReloadEeprom = true;
+		if (Offset >= 0x0F30 && Offset < 0x0F40)
+			bReloadEeprom = true;
 
-			if ((Offset < 0x0E98 || Offset >= 0x0EA0) || !bIsInLockScreen || pCmd->bAllowPassword)
-				EEPROM_WriteBuffer(Offset, &pCmd->Data[i * 8U], true);
-		}
-
-		if (bReloadEeprom)
-			BOARD_EEPROM_Init();
+		if ((Offset < 0x0E98 || Offset >= 0x0EA0) || !bIsInLockScreen || pCmd->bAllowPassword)
+			EEPROM_WriteBuffer(Offset, &pCmd->Data[i * 8U], true);
 	}
+
+	if (bReloadEeprom)
+		BOARD_EEPROM_Init();
+	
 
 	SendReply(&Reply, sizeof(Reply));
 }

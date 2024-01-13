@@ -97,7 +97,6 @@ uint8_t           gSetting_battery_text;
 bool              gMonitor = false;           // true opens the squelch
 
 uint32_t          gCustomAesKey[4];
-bool              bHasCustomAesKey;
 uint32_t          gChallenge[4];
 uint8_t           gTryCount;
 
@@ -249,7 +248,7 @@ volatile uint8_t  boot_counter_10ms;
 
 int16_t           gCurrentRSSI[2] = {0, 0};  // now one per VFO
 
-uint8_t           gIsLocked = 0xFF;
+bool              gIsLocked = false;
 
 
 
