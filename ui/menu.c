@@ -109,6 +109,7 @@ const t_menu_item MenuList[] =
 #endif
 	{"BatVol", VOICE_ID_INVALID,                       MENU_VOL           }, // was "VOL"
 	{"RxMode", VOICE_ID_DUAL_STANDBY,                  MENU_TDR           },
+	{"Passwd", VOICE_ID_DUAL_STANDBY,                  MENU_PASSWORD      }, // power on password
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
 	// hidden menu items from here on
 	// enabled if pressing both the PTT and upper side button at power-on
@@ -556,6 +557,22 @@ void UI_DisplayMenu(void)
 				}
 
 				UI_PrintString("MHz",  menu_item_x1, menu_item_x2, 3, 8);
+
+				already_printed = true;
+				break;
+			
+			case MENU_PASSWORD:
+				if (!gIsInSubMenu || gInputBoxIndex == 0)
+				{
+					sprintf(String, "%4d", gSubMenuSelection);
+					UI_PrintString(String, menu_item_x1, menu_item_x2, 1, 8);
+				}
+				else
+				{
+					const char * ascii = INPUTBOX_GetAscii();
+					sprintf(String, "%.4s  ",ascii);
+					UI_PrintString(String, menu_item_x1, menu_item_x2, 1, 8);
+				}
 
 				already_printed = true;
 				break;
