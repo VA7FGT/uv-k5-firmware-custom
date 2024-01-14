@@ -59,35 +59,39 @@ static void Key_EXIT()
 
 static void Key_UP_DOWN(bool direction)
 {
-	BK1080_TuneNext(direction);
+		BK1080_TuneNext(direction);
 	gEeprom.FM_FrequencyPlaying = BK1080_GetFrequency();
 	// save
 	gRequestSaveSettings = true;
 }
 
 void FM_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
-{
-	switch (Key)
-	{	
-		case KEY_UP:
-			Key_UP_DOWN(true);
-			break;
-		case KEY_DOWN:
-			Key_UP_DOWN(false);
-			break;;
-		case KEY_EXIT:
-			Key_EXIT();
-			break;
-		case KEY_F:
-			GENERIC_Key_F(bKeyPressed, bKeyHeld);
-			break;
-		case KEY_PTT:
-			GENERIC_Key_PTT(bKeyPressed);
-			break;
-		default:
-			if (!bKeyHeld && bKeyPressed)
-				gBeepToPlay = BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL;
-			break;
+{	
+	uint8_t state = bKeyPressed + 2 * bKeyHeld;
+
+	if (state == 0) {
+		switch (Key)
+		{	
+			case KEY_UP:
+				Key_UP_DOWN(true);
+				break;
+			case KEY_DOWN:
+				Key_UP_DOWN(false);
+				break;
+			case KEY_EXIT:
+				Key_EXIT();
+				break;
+			case KEY_F:
+				GENERIC_Key_F(bKeyPressed, bKeyHeld);
+				break;
+			case KEY_PTT:
+				GENERIC_Key_PTT(bKeyPressed);
+				break;
+			default:
+				if (!bKeyHeld && bKeyPressed)
+					gBeepToPlay = BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL;
+				break;
+		}
 	}
 }
 

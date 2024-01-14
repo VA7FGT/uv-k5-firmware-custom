@@ -49,7 +49,7 @@ void UI_DisplayWelcome(void)
 
 	if (gEeprom.POWER_ON_DISPLAY_MODE == POWER_ON_DISPLAY_MODE_NONE)
 	{
-		ST7565_FillScreen(0xFF);
+		ST7565_BlitFullScreen();
 	}
 	else
 	if (gEeprom.POWER_ON_DISPLAY_MODE == POWER_ON_DISPLAY_MODE_FULL_SCREEN)

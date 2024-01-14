@@ -128,11 +128,11 @@ void BK1080_TuneNext(bool direction)
 
 	// wait until we find the channel
 	while((BK1080_ReadRegister(BK1080_REG_10) >> 14) == 0){
-		SYSTEM_DelayMs(2);
+		SYSTEM_DelayMs(5);
 	}
 
 	//read found freq
-	reg_11 = BK1080_GetFrequency();
+	reg_11 = BK1080_ReadRegister(BK1080_REG_11);
 
 	// tune bit 0
 	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (0u << 15));

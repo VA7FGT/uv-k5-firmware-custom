@@ -568,11 +568,11 @@ void UI_DisplayMenu(void)
 					{
 						if((unsigned int)gSubMenuSelection >= PASSWORD_OFF)
 						{
-							sprintf(String, "OFF");
+							strcpy(String, "OFF");
 						}
 						else
 						{
-							sprintf(String, "****");
+							strcpy(String, "****");
 						}
 					}
 					else
@@ -580,8 +580,6 @@ void UI_DisplayMenu(void)
 						const char * ascii = INPUTBOX_GetAscii();
 						sprintf(String, "%.4s  ",ascii);
 					}
-					UI_PrintString(String, menu_item_x1, menu_item_x2, 1, 8);
-					already_printed = true;
 					break;
 			#endif
 

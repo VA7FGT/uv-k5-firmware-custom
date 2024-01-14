@@ -153,36 +153,30 @@ void Main(void)
 	}
 	else
 	{
-		UI_DisplayWelcome();
-
 		BACKLIGHT_TurnOn();
+
+		#ifdef ENABLE_PWRON_PASSWORD
+			if (gEeprom.POWER_ON_PASSWORD < PASSWORD_OFF)
+			{
+				bIsInLockScreen = true;
+				UI_DisplayLock();
+				bIsInLockScreen = false;
+			}
+			gEeprom.PASSWORD_WRONG_ATTEMPTS = 0;
+			gFlagSaveSettings = true;
+		#endif
+
+		UI_DisplayWelcome();
 
 		if (gEeprom.POWER_ON_DISPLAY_MODE != POWER_ON_DISPLAY_MODE_NONE)
 		{	// 2.55 second boot-up screen
-			while (boot_counter_10ms > 0)
-			{
-				if (KEYBOARD_Poll() != KEY_INVALID)
-				{	// halt boot beeps
-					boot_counter_10ms = 0;
-					break;
-				}
-#ifdef ENABLE_BOOT_BEEPS
-				if ((boot_counter_10ms % 25) == 0)
-					AUDIO_PlayBeep(BEEP_880HZ_40MS_OPTIONAL);
-#endif
-			}
+			SYSTEM_DelayMs(2550);
 		}
-
-#ifdef ENABLE_PWRON_PASSWORD
-		if (gEeprom.POWER_ON_PASSWORD < PASSWORD_OFF)
+		else
 		{
-			bIsInLockScreen = true;
-			UI_DisplayLock();
-			bIsInLockScreen = false;
+			//debounce keys
+			SYSTEM_DelayMs(300);
 		}
-		gEeprom.PASSWORD_WRONG_ATTEMPTS = 0;
-		gFlagSaveSettings = true;
-#endif
 
 		BOOT_ProcessMode(BootMode);
 
