@@ -178,6 +178,8 @@ void Main(void)
 		{
 			bIsInLockScreen = true;
 			UI_DisplayLock();
+			//debounce keys
+			SYSTEM_DelayMs(300);
 			bIsInLockScreen = false;
 		}
 		gEeprom.PASSWORD_WRONG_ATTEMPTS = 0;
