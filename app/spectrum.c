@@ -1437,7 +1437,6 @@ static void Tick() {
 
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
 void APP_RunSpectrum(Mode mode) {
-  BK4819_WriteRegister(0x77, 0xFFEF);
   appMode = mode;
 #elif
 void APP_RunSpectrum() {
