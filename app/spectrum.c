@@ -351,7 +351,8 @@ uint16_t GetRssi() {
   // SYSTICK_DelayUs(800);
   // testing autodelay based on Glitch value
 
-  while ((BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
+  // testing resolution to sticky squelch issue
+  while (!isListening && (BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
     SYSTICK_DelayUs(100);
   }
   rssi = BK4819_GetRSSI();
@@ -399,6 +400,7 @@ static void ToggleRX(bool on) {
   } else {
     if(appMode!=CHANNEL_MODE)
       BK4819_WriteRegister(0x43, GetBWRegValueForScan());
+    isListening = false;
   }
 }
 
@@ -1435,6 +1437,7 @@ static void Tick() {
 
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
 void APP_RunSpectrum(Mode mode) {
+  BK4819_WriteRegister(0x77, 0xFFEF);
   appMode = mode;
 #elif
 void APP_RunSpectrum() {
