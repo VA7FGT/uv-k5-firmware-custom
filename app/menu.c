@@ -1281,6 +1281,9 @@ static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 			uint32_t Password;
 			Password = StrToUL(INPUTBOX_GetAscii());
 			gSubMenuSelection = Password;
+
+			gInputBoxIndex = 0;
+			return;
 		}
 	#endif
 	
