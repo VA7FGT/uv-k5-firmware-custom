@@ -670,7 +670,7 @@ void BK4819_SetupSquelch(
 		// original (*)
 	(1u << 14) |                  //  1 ???
 	(5u << 11) |                  // *5  squelch = open  delay .. 0 ~ 7
-	(6u <<  9) |                  // *3  squelch = close delay .. 0 ~ 3
+	(3u <<  9) |                  // *3  squelch = close delay .. 0 ~ 3
 	SquelchOpenGlitchThresh);     //  0 ~ 255
 
 
