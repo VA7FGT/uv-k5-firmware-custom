@@ -729,8 +729,7 @@ void MENU_AcceptSetting(void)
 			gEeprom.SQL_TONE = gSubMenuSelection;
 			gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
 			gFlagResetVfos    = true;
-			RADIO_SetupRegisters(true);
-			return;
+			break;
 
 		#ifdef ENABLE_NOAA
 			case MENU_NOAA_S:
