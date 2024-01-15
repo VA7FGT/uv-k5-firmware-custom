@@ -263,6 +263,7 @@ typedef struct {
 	BATTERY_Type_t		  BATTERY_TYPE;
 	uint32_t              RX_OFFSET;
 	uint8_t				  RX_AGC;
+	uint16_t              SQL_TONE;
 } EEPROM_Config_t;
 
 extern EEPROM_Config_t gEeprom;

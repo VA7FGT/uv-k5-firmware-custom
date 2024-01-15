@@ -604,9 +604,9 @@ static void CheckRadioInterrupts(void)
 		// 1 = 120deg phase shift
 		// 2 = 180deg phase shift
 		// 3 = 240deg phase shift
-//		const uint8_t ctcss_shift = BK4819_GetCTCShift();
-//		if (ctcss_shift > 0)
-//			g_CTCSS_Lost = true;
+		const uint8_t ctcss_shift = BK4819_GetCTCShift();
+		if (ctcss_shift > 0)
+			g_CTCSS_Lost = true;
 
 		if (interrupt_status_bits & BK4819_REG_02_DTMF_5TONE_FOUND)
 		{	// save the RX'ed DTMF character

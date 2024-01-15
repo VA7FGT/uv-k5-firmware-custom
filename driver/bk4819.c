@@ -1294,7 +1294,7 @@ void BK4819_GenTail(uint8_t Tail)
 	// <12:0> = CDCSS baud rate frequency (134.4Hz) control word =
 	//                          freq(Hz) * 20.64888 for XTAL 13M/26M or
 	//                          freq(Hz)*20.97152 for XTAL 12.8M/19.2M/25.6M/38.4M
-
+	
 	switch (Tail)
 	{
 		case 0: // 134.4Hz CTCSS Tail
@@ -1309,8 +1309,9 @@ void BK4819_GenTail(uint8_t Tail)
 		case 3: // 240° phase shift
 			BK4819_WriteRegister(BK4819_REG_52, 0xE28F);   // 1 11 0 001010 001111
 			break;
-		case 4: // 55Hz tone freq
-			BK4819_WriteRegister(BK4819_REG_07, 0x046f);   // 0 00 0 010001 101111
+		case 4: // SQL_TONE freq
+			BK4819_SetCTCSSFrequency(CTCSS_Options[gEeprom.SQL_TONE]);
+			BK4819_SetTailDetection(CTCSS_Options[gEeprom.SQL_TONE]);
 			break;
 	}
 }
@@ -1323,13 +1324,10 @@ void BK4819_EnableCDCSS(void)
 
 void BK4819_EnableCTCSS(void)
 {
-	#ifdef ENABLE_CTCSS_TAIL_PHASE_SHIFT
 		//BK4819_GenTail(1);     // 120° phase shift
 		BK4819_GenTail(2);       // 180° phase shift
 		//BK4819_GenTail(3);     // 240° phase shift
-	#else
-		BK4819_GenTail(4);       // 55Hz tone freq
-	#endif
+		// BK4819_GenTail(4);    // SQL_TONE tone freq
 
 	// REG_51
 	//

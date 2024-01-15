@@ -199,6 +199,11 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			*pMax = ARRAY_SIZE(CTCSS_Options);
 			break;
 
+		case MENU_SQL_TONE:
+			*pMin = 0;
+			*pMax = ARRAY_SIZE(CTCSS_Options) - 1;
+			break;
+
 		case MENU_W_N:
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(bwNames) - 1;
@@ -725,6 +730,13 @@ void MENU_AcceptSetting(void)
 			gFlagResetVfos    = true;
 			break;
 
+		case MENU_SQL_TONE:
+			gEeprom.SQL_TONE = gSubMenuSelection;
+			gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
+			gFlagResetVfos    = true;
+			RADIO_SetupRegisters(true);
+			return;
+
 		#ifdef ENABLE_NOAA
 			case MENU_NOAA_S:
 				gEeprom.NOAA_AUTO_SCAN = gSubMenuSelection;
@@ -1082,6 +1094,10 @@ void MENU_ShowCurrentSetting(void)
 
 		case MENU_RX_AGC:
 			gSubMenuSelection = gEeprom.RX_AGC;
+			break;
+		
+		case MENU_SQL_TONE:
+			gSubMenuSelection = gEeprom.SQL_TONE;
 			break;
 
 		#ifdef ENABLE_NOAA
