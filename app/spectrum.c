@@ -353,8 +353,8 @@ uint16_t GetRssi() {
 
   // testing resolution to sticky squelch issue
   while (!isListening && (BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
-          SYSTICK_DelayUs(100);
-      }
+    SYSTICK_DelayUs(100);
+  }
   rssi = BK4819_GetRSSI();
  
   #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
