@@ -84,7 +84,6 @@ const t_menu_item MenuList[] =
 	{"Voice",  VOICE_ID_VOICE_PROMPT,                  MENU_VOICE         },
 #endif
 	{"Roger",  VOICE_ID_INVALID,                       MENU_ROGER         },
-	{"STE",    VOICE_ID_INVALID,                       MENU_STE           },
 	{"RP STE", VOICE_ID_INVALID,                       MENU_RP_STE        },
 	{"SqTone", VOICE_ID_INVALID,                       MENU_SQL_TONE      }, // squelch tail tone used for RX/TX
 	{"1 Call", VOICE_ID_INVALID,                       MENU_1_CALL        },
@@ -649,7 +648,6 @@ void UI_DisplayMenu(void)
 			case MENU_BEEP:
 			case MENU_S_ADD1:
 			case MENU_S_ADD2:
-			case MENU_STE:
 			case MENU_D_ST:
 	#ifdef ENABLE_DTMF_CALLING
 			case MENU_D_DCD:

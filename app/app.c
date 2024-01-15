@@ -338,7 +338,6 @@ static void HandleReceive(void)
 	if (!gEndOfRxDetectedMaybe         &&
 	     Mode == END_OF_RX_MODE_SKIP   &&
 	     gNextTimeslice40ms            &&
-	     gEeprom.TAIL_TONE_ELIMINATION &&
 	    (gCurrentCodeType == CODE_TYPE_DIGITAL || gCurrentCodeType == CODE_TYPE_REVERSE_DIGITAL) &&
 	     BK4819_GetCTCType() == 1)
 		Mode = END_OF_RX_MODE_TTE;
@@ -382,15 +381,12 @@ Skip:
 			break;
 
 		case END_OF_RX_MODE_TTE:
-			if (gEeprom.TAIL_TONE_ELIMINATION)
-			{
-				AUDIO_AudioPathOff();
+			AUDIO_AudioPathOff();
 
-				gTailNoteEliminationCountdown_10ms = 20;
-				gFlagTailNoteEliminationComplete   = false;
-				gEndOfRxDetectedMaybe = true;
-				gEnableSpeaker        = false;
-			}
+			gTailNoteEliminationCountdown_10ms = 20;
+			gFlagTailNoteEliminationComplete   = false;
+			gEndOfRxDetectedMaybe = true;
+			gEnableSpeaker        = false;
 			break;
 	}
 }

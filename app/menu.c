@@ -232,7 +232,6 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 		case MENU_AUTOLK:
 		case MENU_S_ADD1:
 		case MENU_S_ADD2:
-		case MENU_STE:
 		case MENU_D_ST:
 #ifdef ENABLE_DTMF_CALLING
 		case MENU_D_DCD:
@@ -622,10 +621,6 @@ void MENU_AcceptSetting(void)
 			gFlagResetVfos    = true;
 			return;
 
-		case MENU_STE:
-			gEeprom.TAIL_TONE_ELIMINATION = gSubMenuSelection;
-			break;
-
 		case MENU_RP_STE:
 			gEeprom.REPEATER_TAIL_TONE_ELIMINATION = gSubMenuSelection;
 			break;
@@ -1014,10 +1009,6 @@ void MENU_ShowCurrentSetting(void)
 
 		case MENU_S_ADD2:
 			gSubMenuSelection = gTxVfo->SCANLIST2_PARTICIPATION;
-			break;
-
-		case MENU_STE:
-			gSubMenuSelection = gEeprom.TAIL_TONE_ELIMINATION;
 			break;
 
 		case MENU_RP_STE:
