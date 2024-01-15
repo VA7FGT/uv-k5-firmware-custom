@@ -338,7 +338,6 @@ static void HandleReceive(void)
 	if (!gEndOfRxDetectedMaybe         &&
 	     Mode == END_OF_RX_MODE_SKIP   &&
 	     gNextTimeslice40ms            &&
-	     gEeprom.TAIL_TONE_ELIMINATION &&
 	    (gCurrentCodeType == CODE_TYPE_DIGITAL || gCurrentCodeType == CODE_TYPE_REVERSE_DIGITAL) &&
 	     BK4819_GetCTCType() == 1)
 		Mode = END_OF_RX_MODE_TTE;
@@ -382,15 +381,12 @@ Skip:
 			break;
 
 		case END_OF_RX_MODE_TTE:
-			if (gEeprom.TAIL_TONE_ELIMINATION)
-			{
-				AUDIO_AudioPathOff();
+			AUDIO_AudioPathOff();
 
-				gTailNoteEliminationCountdown_10ms = 20;
-				gFlagTailNoteEliminationComplete   = false;
-				gEndOfRxDetectedMaybe = true;
-				gEnableSpeaker        = false;
-			}
+			gTailNoteEliminationCountdown_10ms = 20;
+			gFlagTailNoteEliminationComplete   = false;
+			gEndOfRxDetectedMaybe = true;
+			gEnableSpeaker        = false;
 			break;
 	}
 }
@@ -604,9 +600,9 @@ static void CheckRadioInterrupts(void)
 		// 1 = 120deg phase shift
 		// 2 = 180deg phase shift
 		// 3 = 240deg phase shift
-//		const uint8_t ctcss_shift = BK4819_GetCTCShift();
-//		if (ctcss_shift > 0)
-//			g_CTCSS_Lost = true;
+		const uint8_t ctcss_shift = BK4819_GetCTCShift();
+		if (ctcss_shift > 0)
+			g_CTCSS_Lost = true;
 
 		if (interrupt_status_bits & BK4819_REG_02_DTMF_5TONE_FOUND)
 		{	// save the RX'ed DTMF character

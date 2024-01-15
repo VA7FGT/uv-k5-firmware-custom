@@ -199,6 +199,11 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			*pMax = ARRAY_SIZE(CTCSS_Options);
 			break;
 
+		case MENU_SQL_TONE:
+			*pMin = 0;
+			*pMax = ARRAY_SIZE(CTCSS_Options) - 1;
+			break;
+
 		case MENU_W_N:
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(bwNames) - 1;
@@ -227,7 +232,6 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 		case MENU_AUTOLK:
 		case MENU_S_ADD1:
 		case MENU_S_ADD2:
-		case MENU_STE:
 		case MENU_D_ST:
 #ifdef ENABLE_DTMF_CALLING
 		case MENU_D_DCD:
@@ -617,10 +621,6 @@ void MENU_AcceptSetting(void)
 			gFlagResetVfos    = true;
 			return;
 
-		case MENU_STE:
-			gEeprom.TAIL_TONE_ELIMINATION = gSubMenuSelection;
-			break;
-
 		case MENU_RP_STE:
 			gEeprom.REPEATER_TAIL_TONE_ELIMINATION = gSubMenuSelection;
 			break;
@@ -721,6 +721,12 @@ void MENU_AcceptSetting(void)
 
 		case MENU_RX_AGC:
 			gEeprom.RX_AGC    = gSubMenuSelection;
+			gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
+			gFlagResetVfos    = true;
+			break;
+
+		case MENU_SQL_TONE:
+			gEeprom.SQL_TONE = gSubMenuSelection;
 			gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
 			gFlagResetVfos    = true;
 			break;
@@ -1004,10 +1010,6 @@ void MENU_ShowCurrentSetting(void)
 			gSubMenuSelection = gTxVfo->SCANLIST2_PARTICIPATION;
 			break;
 
-		case MENU_STE:
-			gSubMenuSelection = gEeprom.TAIL_TONE_ELIMINATION;
-			break;
-
 		case MENU_RP_STE:
 			gSubMenuSelection = gEeprom.REPEATER_TAIL_TONE_ELIMINATION;
 			break;
@@ -1082,6 +1084,10 @@ void MENU_ShowCurrentSetting(void)
 
 		case MENU_RX_AGC:
 			gSubMenuSelection = gEeprom.RX_AGC;
+			break;
+		
+		case MENU_SQL_TONE:
+			gSubMenuSelection = gEeprom.SQL_TONE;
 			break;
 
 		#ifdef ENABLE_NOAA

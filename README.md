@@ -60,6 +60,7 @@ Anyway, have fun.
    * `ENABLE_SPECTRUM_CHANNEL_SCAN` this enables spectrum channel scan mode (enter by going into memory mode and press F+5, this allows SUPER fast channel scanning (4.5x faster than regular scanning), regular scan of 200 memory channels takes roughly 18 seconds, spectrum memory scan takes roughly 4 seconds, if you have less channels stored i.e 50 - the spectrum memory scan will take only **1 second**
    * `VOXSen` fixed and improved VOX sensitivity setting from menu. Added `VoxDel` - VOX delay setting allowing to set value to `0` for no VOX delay which might be useful for packet radio enthusiasts (APRS etc.).
    * Fixed AM AGC so **AM demodulation is crystal clear**, no audible clicks, no need for `AM_FIX`.
+   * `SqTone` configurable squelch tail tones and 180* phase shift tail when in CTCSS mode
 
  ## Keyboard shortcuts
 * In `VFO mode` long press `5` to enter `scan range mode`
@@ -129,7 +130,6 @@ ENABLE_KEEP_MEM_NAME               := 1       maintain channel name when (re)sav
 ENABLE_WIDE_RX                     := 1       full 18MHz to 1300MHz RX (though front-end/PA not designed for full range)
 ENABLE_TX_WHEN_AM                  := 0       allow TX (always FM) when RX is set to AM
 ENABLE_F_CAL_MENU                  := 0       enable the radios hidden frequency calibration menu
-ENABLE_CTCSS_TAIL_PHASE_SHIFT      := 0       standard CTCSS tail phase shift rather than QS's own 55Hz tone method, do not enable as it breaks STE functionality
 ENABLE_BOOT_BEEPS                  := 0       gives user audio feedback on volume knob position at boot-up
 ENABLE_SHOW_CHARGE_LEVEL           := 1       show the charge level when the radio is on charge
 ENABLE_REVERSE_BAT_SYMBOL          := 0       mirror the battery symbol on the status bar (+ pole on the right)

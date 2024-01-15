@@ -546,7 +546,6 @@ void BOARD_EEPROM_Init(void)
 	gEeprom.BATTERY_SAVE          = (Data[3] < 5) ? Data[3] : 4;
 	gEeprom.DUAL_WATCH            = (Data[4] < 3) ? Data[4] : DUAL_WATCH_CHAN_A;
 	gEeprom.BACKLIGHT_TIME        = (Data[5] < ARRAY_SIZE(gSubMenu_BACKLIGHT)) ? Data[5] : 3;
-	gEeprom.TAIL_TONE_ELIMINATION = (Data[6] < 2) ? Data[6] : false;
 	gEeprom.VFO_OPEN              = (Data[7] < 2) ? Data[7] : true;
 
 	// 0E80..0E87
@@ -604,7 +603,7 @@ void BOARD_EEPROM_Init(void)
 	gEeprom.REPEATER_TAIL_TONE_ELIMINATION = (Data[2] < 11) ? Data[2] : 0;
 	gEeprom.TX_VFO                         = (Data[3] <  2) ? Data[3] : 0;
 	gEeprom.BATTERY_TYPE                   = (Data[4] < BATTERY_TYPE_UNKNOWN) ? Data[4] : BATTERY_TYPE_1600_MAH;
-	
+	gEeprom.SQL_TONE                       = (Data[5] <  ARRAY_SIZE(CTCSS_Options)) ? Data[5] : 0;
 	// 0ED0..0ED7
 	EEPROM_ReadBuffer(0x0ED0, Data, 8);
 	gEeprom.DTMF_SIDE_TONE               = (Data[0] <   2) ? Data[0] : true;

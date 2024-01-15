@@ -653,30 +653,20 @@ void RADIO_SetupRegisters(bool switchToForeground)
 		{	// FM
 			uint8_t CodeType = gRxVfo->pRX->CodeType;
 			uint8_t Code     = gRxVfo->pRX->Code;
-
 			switch (CodeType)
 			{
 				default:
 				case CODE_TYPE_OFF:
-					BK4819_SetCTCSSFrequency(670);
-
-					//#ifndef ENABLE_CTCSS_TAIL_PHASE_SHIFT
-						BK4819_SetTailDetection(550);		// QS's 55Hz tone method
-					//#else
-					//	BK4819_SetTailDetection(670);       // 67Hz
-					//#endif
+					// this only works as a setup function for REG_51
+					BK4819_SetCTCSSFrequency(CTCSS_Options[gEeprom.SQL_TONE]);
+					// and REG_07 is overwritten by this function
+					BK4819_SetTailDetection(CTCSS_Options[gEeprom.SQL_TONE]);
 
 					InterruptMask = BK4819_REG_3F_CxCSS_TAIL | BK4819_REG_3F_SQUELCH_FOUND | BK4819_REG_3F_SQUELCH_LOST;
 					break;
 
 				case CODE_TYPE_CONTINUOUS_TONE:
 					BK4819_SetCTCSSFrequency(CTCSS_Options[Code]);
-
-					//#ifndef ENABLE_CTCSS_TAIL_PHASE_SHIFT
-						BK4819_SetTailDetection(550);		// QS's 55Hz tone method
-					//#else
-					//	BK4819_SetTailDetection(CTCSS_Options[Code]);
-					//#endif
 
 					InterruptMask = 0
 						| BK4819_REG_3F_CxCSS_TAIL

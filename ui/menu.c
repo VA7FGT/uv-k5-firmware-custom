@@ -84,8 +84,8 @@ const t_menu_item MenuList[] =
 	{"Voice",  VOICE_ID_VOICE_PROMPT,                  MENU_VOICE         },
 #endif
 	{"Roger",  VOICE_ID_INVALID,                       MENU_ROGER         },
-	{"STE",    VOICE_ID_INVALID,                       MENU_STE           },
 	{"RP STE", VOICE_ID_INVALID,                       MENU_RP_STE        },
+	{"SqTone", VOICE_ID_INVALID,                       MENU_SQL_TONE      }, // squelch tail tone used for RX/TX
 	{"1 Call", VOICE_ID_INVALID,                       MENU_1_CALL        },
 #ifdef ENABLE_ALARM
 	{"AlarmT", VOICE_ID_INVALID,                       MENU_AL_MOD        },
@@ -540,6 +540,10 @@ void UI_DisplayMenu(void)
 				break;
 			}
 
+			case MENU_SQL_TONE:
+				sprintf(String, "%u.%uHz", CTCSS_Options[gSubMenuSelection] / 10, CTCSS_Options[gSubMenuSelection] % 10);
+				break;
+
 			case MENU_SFT_D:
 				strcpy(String, gSubMenu_SFT_D[gSubMenuSelection]);
 				break;
@@ -644,7 +648,6 @@ void UI_DisplayMenu(void)
 			case MENU_BEEP:
 			case MENU_S_ADD1:
 			case MENU_S_ADD2:
-			case MENU_STE:
 			case MENU_D_ST:
 	#ifdef ENABLE_DTMF_CALLING
 			case MENU_D_DCD:
@@ -940,7 +943,8 @@ void UI_DisplayMenu(void)
 	if (UI_MENU_GetCurrentMenuId() == MENU_R_CTCS ||
 	    UI_MENU_GetCurrentMenuId() == MENU_T_CTCS ||
 	    UI_MENU_GetCurrentMenuId() == MENU_R_DCS  ||
-	    UI_MENU_GetCurrentMenuId() == MENU_T_DCS
+	    UI_MENU_GetCurrentMenuId() == MENU_T_DCS  ||
+		UI_MENU_GetCurrentMenuId() == MENU_SQL_TONE
 #ifdef ENABLE_DTMF_CALLING
 	    || UI_MENU_GetCurrentMenuId() == MENU_D_LIST
 #endif		

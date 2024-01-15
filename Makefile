@@ -31,7 +31,6 @@ ENABLE_KEEP_MEM_NAME                    := 1
 ENABLE_WIDE_RX                          := 1
 ENABLE_TX_WHEN_AM                       := 0
 ENABLE_F_CAL_MENU                       := 0
-ENABLE_CTCSS_TAIL_PHASE_SHIFT           := 0
 ENABLE_BOOT_BEEPS                       := 0
 ENABLE_SHOW_CHARGE_LEVEL                := 1
 ENABLE_REVERSE_BAT_SYMBOL               := 0
@@ -303,9 +302,6 @@ ifeq ($(ENABLE_TX_WHEN_AM),1)
 endif
 ifeq ($(ENABLE_F_CAL_MENU),1)
 	CFLAGS  += -DENABLE_F_CAL_MENU
-endif
-ifeq ($(ENABLE_CTCSS_TAIL_PHASE_SHIFT),1)
-	CFLAGS  += -DENABLE_CTCSS_TAIL_PHASE_SHIFT
 endif
 ifeq ($(ENABLE_BOOT_BEEPS),1)
 	CFLAGS  += -DENABLE_BOOT_BEEPS

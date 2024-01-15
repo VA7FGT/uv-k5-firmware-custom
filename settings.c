@@ -78,7 +78,6 @@ void SETTINGS_SaveSettings(void)
 	State[3] = gEeprom.BATTERY_SAVE;
 	State[4] = gEeprom.DUAL_WATCH;
 	State[5] = gEeprom.BACKLIGHT_TIME;
-	State[6] = gEeprom.TAIL_TONE_ELIMINATION;
 	State[7] = gEeprom.VFO_OPEN;
 	EEPROM_WriteBuffer(0x0E78, State, true);
 
@@ -120,6 +119,7 @@ void SETTINGS_SaveSettings(void)
 	State[2] = gEeprom.REPEATER_TAIL_TONE_ELIMINATION;
 	State[3] = gEeprom.TX_VFO;
 	State[4] = gEeprom.BATTERY_TYPE;
+	State[5] = gEeprom.SQL_TONE;
 	EEPROM_WriteBuffer(0x0EA8, State, true);
 
 	State[0] = gEeprom.DTMF_SIDE_TONE;

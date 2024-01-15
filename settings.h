@@ -173,7 +173,6 @@ typedef struct {
 	#endif
 	bool                  BEEP_CONTROL;
 	uint8_t               CHANNEL_DISPLAY_MODE;
-	bool                  TAIL_TONE_ELIMINATION;
 	bool                  VFO_OPEN;
 	uint8_t               DUAL_WATCH;
 	uint8_t               CROSS_BAND_RX_TX;
@@ -263,6 +262,7 @@ typedef struct {
 	BATTERY_Type_t		  BATTERY_TYPE;
 	uint32_t              RX_OFFSET;
 	uint8_t				  RX_AGC;
+	uint16_t              SQL_TONE;
 } EEPROM_Config_t;
 
 extern EEPROM_Config_t gEeprom;
