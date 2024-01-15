@@ -345,16 +345,16 @@ static void DeInitSpectrum() {
 uint8_t GetBWRegValueForScan() {
   return scanStepBWRegValues[settings.scanStepIndex];
 }
-
+  
 uint16_t GetRssi() {
   uint16_t rssi;
-  // SYSTICK_DelayUs(800);
+    // SYSTICK_DelayUs(800);
   // testing autodelay based on Glitch value
 
   // testing resolution to sticky squelch issue
   while (!isListening && (BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
-    SYSTICK_DelayUs(100);
-  }
+          SYSTICK_DelayUs(100);
+      }
   rssi = BK4819_GetRSSI();
  
   #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
@@ -383,7 +383,9 @@ static void ToggleAudio(bool on) {
 static void ToggleRX(bool on) {
   isListening = on;
 
-  BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, on);
+  // turn on green led only if screen brightness set to max
+  if(gEeprom.BACKLIGHT_MAX == 10)
+    BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, on);
 
   ToggleAudio(on);
   ToggleAFDAC(on);
