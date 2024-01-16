@@ -345,16 +345,33 @@ static void DeInitSpectrum() {
 uint8_t GetBWRegValueForScan() {
   return scanStepBWRegValues[settings.scanStepIndex];
 }
-  
+
+static void ResetRSSI() {
+  uint32_t Reg = BK4819_ReadRegister(BK4819_REG_30);
+  Reg &= ~1;
+  BK4819_WriteRegister(BK4819_REG_30, Reg);
+  Reg |= 1;
+  BK4819_WriteRegister(BK4819_REG_30, Reg);
+}
+  int glitch_reset_counter = 0;
 uint16_t GetRssi() {
   uint16_t rssi;
     // SYSTICK_DelayUs(800);
   // testing autodelay based on Glitch value
+  if(!isListening || glitch_reset_counter > 30){
+    ResetRSSI();
+    glitch_reset_counter=0;
+  }
+  else
+  {
+    glitch_reset_counter++;
+  }
 
   // testing resolution to sticky squelch issue
-  while (!isListening && (BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
-    SYSTICK_DelayUs(100);
-  }
+  // while (!isListening && (BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
+  //   SYSTICK_DelayUs(100);
+  // }
+  SYSTEM_DelayMs(7);
   rssi = BK4819_GetRSSI();
  
   #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
@@ -393,15 +410,15 @@ static void ToggleRX(bool on) {
 
   if (on) {
     listenT = SQUELCH_OFF_DELAY;
-    BK4819_SetFilterBandwidth(settings.listenBw, false);
+// BK4819_SetFilterBandwidth(settings.listenBw, false);
 
     gTailFound=false;
 
     // turn on CSS tail found interrupt
     BK4819_WriteRegister(BK4819_REG_3F, BK4819_REG_02_CxCSS_TAIL);
   } else {
-if(appMode!=CHANNEL_MODE)
-    BK4819_WriteRegister(0x43, GetBWRegValueForScan());
+    if(appMode!=CHANNEL_MODE)
+      BK4819_WriteRegister(0x43, GetBWRegValueForScan());
     isListening = false;
   }
 }
@@ -606,7 +623,7 @@ static void ToggleModulation() {
 
 static void ToggleListeningBW() {
   settings.listenBw = ACTION_NextBandwidth(settings.listenBw, false);
-  redrawScreen = true;
+    redrawScreen = true;
 }
 
 static void ToggleBacklight() {
@@ -1369,7 +1386,7 @@ static void UpdateListening() {
     if(appMode!=CHANNEL_MODE)
       BK4819_WriteRegister(0x43, GetBWRegValueForScan());
     Measure();
-    BK4819_SetFilterBandwidth(settings.listenBw, false);
+          BK4819_SetFilterBandwidth(settings.listenBw, false);
   } else {
     Measure();
   }
