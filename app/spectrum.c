@@ -415,7 +415,7 @@ static void ToggleRX(bool on) {
 
   if (on) {
     listenT = SQUELCH_OFF_DELAY;
-// BK4819_SetFilterBandwidth(settings.listenBw, false);
+    BK4819_SetFilterBandwidth(settings.listenBw, false);
 
     gTailFound=false;
 
@@ -628,7 +628,7 @@ static void ToggleModulation() {
 
 static void ToggleListeningBW() {
   settings.listenBw = ACTION_NextBandwidth(settings.listenBw, false);
-    redrawScreen = true;
+  redrawScreen = true;
 }
 
 static void ToggleBacklight() {
@@ -1391,7 +1391,7 @@ static void UpdateListening() {
     if(appMode!=CHANNEL_MODE)
       BK4819_WriteRegister(0x43, GetBWRegValueForScan());
     Measure();
-          BK4819_SetFilterBandwidth(settings.listenBw, false);
+    BK4819_SetFilterBandwidth(settings.listenBw, false);
   } else {
     Measure();
   }
