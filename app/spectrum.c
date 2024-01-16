@@ -383,8 +383,8 @@ static void ToggleAudio(bool on) {
 static void ToggleRX(bool on) {
   isListening = on;
 
-  // turn on green led only if screen brightness set to max
-  if(gEeprom.BACKLIGHT_MAX == 10)
+  // turn on green led only if screen brightness is over 7
+  if(gEeprom.BACKLIGHT_MAX > 7)
     BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, on);
 
   ToggleAudio(on);
@@ -400,8 +400,8 @@ static void ToggleRX(bool on) {
     // turn on CSS tail found interrupt
     BK4819_WriteRegister(BK4819_REG_3F, BK4819_REG_02_CxCSS_TAIL);
   } else {
-    if(appMode!=CHANNEL_MODE)
-      BK4819_WriteRegister(0x43, GetBWRegValueForScan());
+if(appMode!=CHANNEL_MODE)
+    BK4819_WriteRegister(0x43, GetBWRegValueForScan());
     isListening = false;
   }
 }
