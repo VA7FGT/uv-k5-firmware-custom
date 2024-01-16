@@ -572,7 +572,7 @@ void BK4819_EnableVox(uint16_t VoxEnableThreshold, uint16_t VoxDisableThreshold,
 // filter bandwidth lowers when signal is low
 const uint16_t listenBWRegDynamicValues[5] = {
 	0x3428, // 25
-	0x7B08, // 12.5
+	0x3448, // 12.5
 	0x4458,	// 8.33
 	0x1148, // 6.25
 	0x0058  // 5
@@ -581,7 +581,7 @@ const uint16_t listenBWRegDynamicValues[5] = {
 // filter bandwidth stays the same when signal is low
 const uint16_t listenBWRegValues[5] = {
 	0x3628, // 25
-	0x7F08, // 12.5
+	0x3648, // 12.5
 	0x4858,	// 8.33
 	0x1348, // 6.25
 	0x0058  // 5
