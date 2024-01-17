@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "[BUG]"
+title: "[BUG] Please use title that makes sense"
 labels: bug
 assignees: ''
 
@@ -22,6 +22,7 @@ A clear and concise description of what you expected to happen.
 
 **Pictures/video**
 If applicable, add pictures or video to help explain your problem.
+To insert a picture (.jpg), you can simply drag it to this window.
 
 **Details:**
 - Firmware version:
