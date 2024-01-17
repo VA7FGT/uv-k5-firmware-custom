@@ -1492,6 +1492,9 @@ void APP_RunSpectrum() {
 
   ResetInterrupts();
 
+  // turn of GREEN LED if spectrum was started during active RX
+  BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, false);
+
   isListening = true; // to turn off RX later
   redrawStatus = true;
   redrawScreen = true;

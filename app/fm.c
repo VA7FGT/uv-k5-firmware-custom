@@ -111,6 +111,9 @@ void FM_Start(void)
 
 	GUI_SelectNextDisplay(DISPLAY_FM);
 
+	// let the user see DW is not active
+	gDualWatchActive     = false;
+
 	gEnableSpeaker       = true;
 	gUpdateStatus        = true;
 }

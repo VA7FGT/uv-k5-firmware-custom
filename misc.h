@@ -207,9 +207,10 @@ extern ChannelAttributes_t   gMR_ChannelAttributes[207];
 
 typedef struct
 {
-	uint8_t      sLevel; // S-level value
-	uint8_t      over;   // over S9 value
-	int          dBmRssi;// RSSI in dBm
+	uint8_t      sLevel;      // S-level value
+	uint8_t      over;        // over S9 value
+	int          dBmRssi;     // RSSI in dBm
+	bool         overSquelch; // determines whether signal is over squelch open threshold
 }  __attribute__((packed))  sLevelAttributes;
 
 extern volatile uint16_t     gBatterySaveCountdown_10ms;

@@ -393,6 +393,14 @@ void SCANNER_TimeSlice10ms(void)
 		gScanDelay_10ms--;
 		return;
 	}
+	uint16_t rssi;
+	rssi = BK4819_GetRSSI();
+	sLevelAttributes signal = GetSLevelAttributes(rssi, gRxVfo->freq_config_RX.Frequency);
+
+	if(signal.overSquelch)
+		BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, true);
+	else
+		BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, false);
 
 	if (gScannerSaveState != SCAN_SAVE_NO_PROMPT) {
 		return;
@@ -477,7 +485,7 @@ void SCANNER_TimeSlice10ms(void)
 
 			if (gScanCssState < SCAN_CSS_STATE_FOUND) { // scanning or off
 				BK4819_SetScanFrequency(gScanFrequency);
-				gScanDelay_10ms = scan_delay_10ms;
+				gScanDelay_10ms = 1;
 				break;
 			}
 
