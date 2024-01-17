@@ -477,7 +477,7 @@ void SCANNER_TimeSlice10ms(void)
 
 			if (gScanCssState < SCAN_CSS_STATE_FOUND) { // scanning or off
 				BK4819_SetScanFrequency(gScanFrequency);
-				gScanDelay_10ms = scan_delay_10ms;
+				gScanDelay_10ms = 1;
 				break;
 			}
 
