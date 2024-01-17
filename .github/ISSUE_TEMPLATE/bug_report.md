@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "[BUG] Please use title that makes sense"
+title: "[BUG] Please use a title that makes sense"
 labels: bug
 assignees: ''
 
