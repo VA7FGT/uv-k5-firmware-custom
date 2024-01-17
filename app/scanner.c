@@ -462,18 +462,16 @@ void SCANNER_TimeSlice10ms(void)
 			else if (scanResult == BK4819_CSS_RESULT_CTCSS) {
 				const uint8_t Code = DCS_GetCtcssCode(ctcssFreq);
 				if (Code != 0xFF) {
-					if (Code == gScanCssResultCode && gScanCssResultType == CODE_TYPE_CONTINUOUS_TONE) {
-						if (++scanHitCount >= 2) {
-							gScanCssState     = SCAN_CSS_STATE_FOUND;
-							gScanUseCssResult = true;
-							gUpdateStatus     = true;
-						}
-					}
-					else
-						scanHitCount = 0;
-
+					
+					++scanHitCount;
+					gScanCssState      = SCAN_CSS_STATE_FOUND;
+					gScanUseCssResult  = true;
+					gUpdateStatus      = true;
 					gScanCssResultType = CODE_TYPE_CONTINUOUS_TONE;
 					gScanCssResultCode = Code;
+				}
+				else {
+					scanHitCount = 0;
 				}
 			}
 
