@@ -312,6 +312,8 @@ sLevelAttributes GetSLevelAttributes(const int16_t rssi, const uint32_t frequenc
 	att.dBmRssi = Rssi2DBm(rssi)+dBmCorrTable[FREQUENCY_GetBand(frequency)];
 	att.sLevel  = MIN(MAX((att.dBmRssi - s0_dBm) / 6, 0), 9);
 	att.over    = MIN(MAX(att.dBmRssi - (s0_dBm + 9*6), 0), 99);
+	//TODO: calculate based on the current squelch setting
+	att.overSquelch = att.sLevel > 5;
 
 	return att;
 }
