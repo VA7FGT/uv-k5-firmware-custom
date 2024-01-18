@@ -1501,8 +1501,8 @@ void APP_RunSpectrum() {
   #ifdef ENABLE_SPECTRUM_COPY_VFO
     RADIO_SetModulation(settings.modulationType = gTxVfo->Modulation);
     BK4819_SetFilterBandwidth(settings.listenBw = gTxVfo->CHANNEL_BANDWIDTH, false);
-          settings.scanStepIndex = GetScanStepFromStepFrequency(gTxVfo->StepFrequency);
-      #elif
+    settings.scanStepIndex = GetScanStepFromStepFrequency(gTxVfo->StepFrequency);
+  #elif
     RADIO_SetModulation(settings.modulationType = MODULATION_FM);
     BK4819_SetFilterBandwidth(settings.listenBw = BK4819_FILTER_BW_WIDE, false);
   #endif
