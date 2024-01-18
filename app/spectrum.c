@@ -305,26 +305,22 @@ static void TuneToPeak() {
 #ifdef ENABLE_SPECTRUM_COPY_VFO
 static void ExitAndCopyToVfo() {
   RestoreRegisters();
+  gTxVfo->Modulation = settings.modulationType;
+  gTxVfo->CHANNEL_BANDWIDTH = settings.listenBw;
+  gTxVfo->Band = FREQUENCY_GetBand(peak.f);
+
   if (appMode==CHANNEL_MODE)
-  // channel mode
   {
     gEeprom.MrChannel[gEeprom.TX_VFO]     = scanChannel[peak.i-1];
     gEeprom.ScreenChannel[gEeprom.TX_VFO] = scanChannel[peak.i-1];
-
-    gRequestSaveVFO   = true;
-    gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
   }
-  else
-  // frequency mode
+  else // frequency mode
   {
     gTxVfo->STEP_SETTING = FREQUENCY_GetStepIdxFromStepFrequency(GetScanStep());
-    gTxVfo->Modulation = settings.modulationType;
-    gTxVfo->CHANNEL_BANDWIDTH = settings.listenBw;
-
-    SETTINGS_SetVfoFrequency(peak.f);
-  
-    gRequestSaveChannel = 1;
   }
+
+  SETTINGS_SetVfoFrequency(peak.f);
+  gRequestSaveChannel = 1;
  
   // Additional delay to debounce keys
   SYSTEM_DelayMs(200);
@@ -1505,8 +1501,8 @@ void APP_RunSpectrum() {
   #ifdef ENABLE_SPECTRUM_COPY_VFO
     RADIO_SetModulation(settings.modulationType = gTxVfo->Modulation);
     BK4819_SetFilterBandwidth(settings.listenBw = gTxVfo->CHANNEL_BANDWIDTH, false);
-    settings.scanStepIndex = GetScanStepFromStepFrequency(gTxVfo->StepFrequency);
-  #elif
+          settings.scanStepIndex = GetScanStepFromStepFrequency(gTxVfo->StepFrequency);
+      #elif
     RADIO_SetModulation(settings.modulationType = MODULATION_FM);
     BK4819_SetFilterBandwidth(settings.listenBw = BK4819_FILTER_BW_WIDE, false);
   #endif
