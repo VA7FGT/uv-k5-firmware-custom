@@ -311,11 +311,11 @@ void RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure
 		{
 			const uint8_t d4 = data[4];
 			pVfo->FrequencyReverse  = !!((d4 >> 0) & 1u);
-			if(IS_MR_CHANNEL(channel)){
-				pVfo->CHANNEL_BANDWIDTH = !!((d4 >> 1) & 1u);
-			}
+			pVfo->CHANNEL_BANDWIDTH = !!((d4 >> 1) & 1u);
 			pVfo->OUTPUT_POWER      =   ((d4 >> 2) & 3u);
 			pVfo->BUSY_CHANNEL_LOCK = !!((d4 >> 4) & 1u);
+			if(pVfo->CHANNEL_BANDWIDTH != BK4819_FILTER_BW_WIDE)
+				pVfo->CHANNEL_BANDWIDTH = ((d4 >> 5) & 3u) + 1;
 		}	
 
 		if (data[5] == 0xFF)
@@ -473,23 +473,10 @@ void RADIO_ConfigureSquelchAndOutputPower(VFO_Info_t *pInfo)
 
 		#else
 			// more sensitive .. use when RX bandwidths are fixed (no weak signal auto adjust)
-			rssi_open   = (rssi_open   * 3) / 4;
-			noise_open  = (noise_open  * 4) / 3;
-			glitch_open = (glitch_open * 4) / 3;
+			rssi_open   = (rssi_open   * 5) / 8;
+			noise_open  = (noise_open  * 8) / 5;
+			glitch_open = (glitch_open * 8) / 5;
 		#endif
-
-		// make squelch more sensitive for HF bands
-		if(Band <= BAND1_50MHz) {
-			rssi_close   = (rssi_open   * 5) / 6;
-			noise_close  = (noise_open  * 6) / 5;
-			glitch_close = (glitch_open * 6) / 5;
-		}
-		else
-		{
-			rssi_close   = (rssi_open   *  9) / 10;
-			noise_close  = (noise_open  * 10) / 9;
-			glitch_close = (glitch_open * 10) / 9;
-		}
 
 		// ensure the 'close' threshold is lower than the 'open' threshold
 		if (rssi_close   == rssi_open   && rssi_close   >= 2)

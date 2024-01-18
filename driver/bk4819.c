@@ -313,7 +313,7 @@ void BK4819_InitAGC(const uint8_t agcType, ModulationMode_t modulation)
 				BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (50 << 7) | (15 << 0));
 				break;
 			case RX_AGC_FAST:
-				BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (50 << 7) | (25 << 0));
+				BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (47 << 7) | (22 << 0));
 				break;
 			default:
 				return;
@@ -338,7 +338,7 @@ void BK4819_InitAGC(const uint8_t agcType, ModulationMode_t modulation)
 	BK4819_WriteRegister(BK4819_REG_12, 0x0393);  // 0x037B / 000000 11 011 11 011 / -24dB
 	BK4819_WriteRegister(BK4819_REG_11, 0x01B5);  // 0x027B / 000000 10 011 11 011 / -43dB
 	BK4819_WriteRegister(BK4819_REG_10, 0x0145);  // 0x007A / 000000 00 011 11 010 / -58dB
-	BK4819_WriteRegister(BK4819_REG_14, 0x0141);  // 0x0019 / 000000 00 000 11 001 / -79dB
+	BK4819_WriteRegister(BK4819_REG_14, 0x0019);  // 0x0019 / 000000 00 000 11 001 / -84dB
 	//30, 10 - doesn't overload but sound low
 	//50, 10 - best so far
 	//50, 15, - SOFT - signal doesn't fall too low - works best for now
