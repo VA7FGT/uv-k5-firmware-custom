@@ -280,7 +280,8 @@ void ACTION_SwitchDemodul(void)
 	gTxVfo->Modulation++;
 	if(gTxVfo->Modulation == MODULATION_UKNOWN)
 		gTxVfo->Modulation = MODULATION_FM;
-	      gRequestSaveChannel = 1;
+	
+	gRequestSaveChannel = 1;
 }
 
 BK4819_FilterBandwidth_t ACTION_NextBandwidth(BK4819_FilterBandwidth_t currentBandwidth, const bool dynamic)
