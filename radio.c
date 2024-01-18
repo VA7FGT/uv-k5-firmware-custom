@@ -311,11 +311,11 @@ void RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure
 		{
 			const uint8_t d4 = data[4];
 			pVfo->FrequencyReverse  = !!((d4 >> 0) & 1u);
-			if(IS_MR_CHANNEL(channel)){
-				pVfo->CHANNEL_BANDWIDTH = !!((d4 >> 1) & 1u);
-			}
+			pVfo->CHANNEL_BANDWIDTH = !!((d4 >> 1) & 1u);
 			pVfo->OUTPUT_POWER      =   ((d4 >> 2) & 3u);
 			pVfo->BUSY_CHANNEL_LOCK = !!((d4 >> 4) & 1u);
+			if(pVfo->CHANNEL_BANDWIDTH != BK4819_FILTER_BW_WIDE)
+				pVfo->CHANNEL_BANDWIDTH = ((d4 >> 5) & 3u) + 1;
 		}	
 
 		if (data[5] == 0xFF)

@@ -21,6 +21,7 @@
 #endif
 #include "driver/eeprom.h"
 #include "driver/uart.h"
+#include "driver/bk4819.h"
 #include "misc.h"
 #include "settings.h"
 #include "board.h"
@@ -207,8 +208,10 @@ void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, 
 			State[4] = 0
 				| (pVFO->BUSY_CHANNEL_LOCK << 4)
 				| (pVFO->OUTPUT_POWER      << 2)
-				| (pVFO->CHANNEL_BANDWIDTH << 1)
+				| ((pVFO->CHANNEL_BANDWIDTH != BK4819_FILTER_BW_WIDE) << 1)
 				| (pVFO->FrequencyReverse  << 0);
+			if(pVFO->CHANNEL_BANDWIDTH != BK4819_FILTER_BW_WIDE)
+				State[4] |= ((pVFO->CHANNEL_BANDWIDTH - 1) << 5);
 			State[5] = ((pVFO->DTMF_PTT_ID_TX_MODE & 7u) << 1) 
 #ifdef ENABLE_DTMF_CALLING
 				| ((pVFO->DTMF_DECODING_ENABLE & 1u) << 0)
