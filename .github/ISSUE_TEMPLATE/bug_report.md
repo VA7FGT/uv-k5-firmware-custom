@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+**BEFORE YOU CREATE A BUG REPORT MAKE SURE TO READ THIS**:
+https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/80-%E2%80%90-Tips-&-Tricks-and-Known-Issues
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
