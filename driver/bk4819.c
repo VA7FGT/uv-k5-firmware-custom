@@ -313,7 +313,7 @@ void BK4819_InitAGC(const uint8_t agcType, ModulationMode_t modulation)
 				BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (50 << 7) | (15 << 0));
 				break;
 			case RX_AGC_FAST:
-				BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (47 << 7) | (22 << 0));
+				BK4819_WriteRegister(BK4819_REG_49, (0 << 14) | (50 << 7) | (25 << 0));
 				break;
 			default:
 				return;
