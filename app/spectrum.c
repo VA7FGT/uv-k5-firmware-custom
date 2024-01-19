@@ -41,7 +41,7 @@ bool gTailFound;
   Mode appMode;
   //Idea - make this user adjustable to compensate for different antennas, frontends, conditions
   #define UHF_NOISE_FLOOR 40
-  bool     scanPassComplete;
+  bool     normalizationApplied;
   uint16_t rssiNormalization[128];
   uint8_t scanChannel[MR_CHANNEL_LAST+3];
   uint8_t scanChannelsCount;
@@ -1363,12 +1363,6 @@ static void UpdateScan() {
     NextScanStep();
     return;
   }
-  #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-    else {
-      if(scanPassComplete == false)
-        scanPassComplete = true;
-    }
-  #endif
 
   if(scanInfo.measurementsCount < 128)
     memset(&rssiHistory[scanInfo.measurementsCount], 0, 
@@ -1601,14 +1595,14 @@ void APP_RunSpectrum() {
   void ToggleNormalizeRssi()
   {
     // we don't want to normalize when there is already active signal RX
-    if(IsPeakOverLevel())
+    if(IsPeakOverLevel() && !normalizationApplied)
       return;
 
     memset(rssiNormalization, 0, sizeof(rssiNormalization));
 
     // we should do a full scan without correction, and only then apply correction
-    if(scanPassComplete == false){
-      newScanStart = true;
+    if(normalizationApplied == true){
+      normalizationApplied = false;
       return;
     }
     else
@@ -1617,7 +1611,7 @@ void APP_RunSpectrum() {
       {
         rssiNormalization[i] = peak.rssi - rssiHistory[i];
       }
-      scanPassComplete = false;
+      normalizationApplied = true;
     }
   }
 #endif
