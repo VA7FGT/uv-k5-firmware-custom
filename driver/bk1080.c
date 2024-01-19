@@ -114,6 +114,7 @@ void BK1080_TuneNext(bool direction)
 {
 	uint16_t reg_11;
 	uint16_t reg_02;
+	uint8_t  scanCounter_100ms = 100; // timeouts after 10s
 
 	reg_02 = BK1080_ReadRegister(BK1080_REG_02_POWER_CONFIGURATION);
 	reg_11 = BK1080_ReadRegister(BK1080_REG_11);
@@ -128,7 +129,10 @@ void BK1080_TuneNext(bool direction)
 
 	// wait until we find the channel
 	while((BK1080_ReadRegister(BK1080_REG_10) >> 14) == 0){
-		SYSTEM_DelayMs(5);
+		if(scanCounter_100ms-- == 0)
+			break;
+
+		SYSTEM_DelayMs(100);
 	}
 
 	//read found freq

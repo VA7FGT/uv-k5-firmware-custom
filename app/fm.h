@@ -22,6 +22,9 @@
 
 #include "driver/keyboard.h"
 
+extern const uint16_t FM_RADIO_MAX_FREQ;
+extern const uint16_t FM_RADIO_MIN_FREQ;
+
 enum {
 	FM_SCAN_OFF = 0U,
 };
