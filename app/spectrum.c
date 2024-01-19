@@ -1612,6 +1612,7 @@ void APP_RunSpectrum() {
         rssiNormalization[i] = peak.rssi - rssiHistory[i];
       }
       normalizationApplied = true;
+      RelaunchScan();
     }
   }
 #endif
