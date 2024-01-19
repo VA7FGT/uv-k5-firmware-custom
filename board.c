@@ -564,6 +564,10 @@ void BOARD_EEPROM_Init(void)
 #ifdef ENABLE_FMRADIO
 	EEPROM_ReadBuffer(0x0E88, Data, 8);
 	memmove(&gEeprom.FM_FrequencyPlaying, Data, 2);
+	// validate that its within the supported range
+	if(gEeprom.FM_FrequencyPlaying < FM_RADIO_MIN_FREQ || gEeprom.FM_FrequencyPlaying > FM_RADIO_MAX_FREQ)
+		gEeprom.FM_FrequencyPlaying = FM_RADIO_MIN_FREQ;
+
 #endif
 
 	// 0E90..0E97
