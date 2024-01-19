@@ -41,10 +41,13 @@ bool gTailFound;
   Mode appMode;
   //Idea - make this user adjustable to compensate for different antennas, frontends, conditions
   #define UHF_NOISE_FLOOR 40
+  bool     scanPassComplete;
+  uint16_t rssiNormalization[128];
   uint8_t scanChannel[MR_CHANNEL_LAST+3];
   uint8_t scanChannelsCount;
   void ToggleScanList();
   void AutoAdjustResolution();
+  void ToggleNormalizeRssi();
 #endif
 
 const uint16_t RSSI_MAX_VALUE = 65535;
@@ -386,6 +389,9 @@ uint16_t GetRssi() {
       rssi+=UHF_NOISE_FLOOR;
     }
 
+    if (appMode==CHANNEL_MODE)
+      rssi+=rssiNormalization[scanInfo.i];
+
   #endif
   return rssi;
 }
@@ -461,6 +467,7 @@ static void ResetBlacklist() {
   if(appMode==CHANNEL_MODE){
       LoadValidMemoryChannels();
       AutoAdjustResolution();
+      memset(rssiNormalization, 0, sizeof(rssiNormalization));
   }
 
   RelaunchScan();
@@ -1022,7 +1029,16 @@ static void OnKeyDown(uint8_t key) {
     }
     break;
   case KEY_SIDE2:
-    ToggleBacklight();
+    #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+      if(appMode==CHANNEL_MODE){
+        ToggleNormalizeRssi();
+      }
+      else {
+        ToggleBacklight();
+      }
+    #elif
+      ToggleBacklight();
+    #endif
     break;
   case KEY_PTT:
     #ifdef ENABLE_SPECTRUM_COPY_VFO
@@ -1347,6 +1363,12 @@ static void UpdateScan() {
     NextScanStep();
     return;
   }
+  #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+    else {
+      if(scanPassComplete == false)
+        scanPassComplete = true;
+    }
+  #endif
 
   if(scanInfo.measurementsCount < 128)
     memset(&rssiHistory[scanInfo.measurementsCount], 0, 
@@ -1572,6 +1594,30 @@ void APP_RunSpectrum() {
     else
     {
       settings.stepsCount = STEPS_128;
+    }
+  }
+  // 2024 by kamilsss655  -> https://github.com/kamilsss655
+  // flattens spectrum by bringing all the rssi readings to the peak value
+  void ToggleNormalizeRssi()
+  {
+    // we don't want to normalize when there is already active signal RX
+    if(IsPeakOverLevel())
+      return;
+
+    memset(rssiNormalization, 0, sizeof(rssiNormalization));
+
+    // we should do a full scan without correction, and only then apply correction
+    if(scanPassComplete == false){
+      newScanStart = true;
+      return;
+    }
+    else
+    {
+      for(uint8_t i = 0; i < ARRAY_SIZE(rssiHistory); i++)
+      {
+        rssiNormalization[i] = peak.rssi - rssiHistory[i];
+      }
+      scanPassComplete = false;
     }
   }
 #endif
