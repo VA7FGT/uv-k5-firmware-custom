@@ -47,7 +47,7 @@ bool gTailFound;
   uint8_t scanChannelsCount;
   void ToggleScanList();
   void AutoAdjustResolution();
-  void ToggleNormalizeRssi();
+  void ToggleNormalizeRssi(bool on);
 #endif
 
 const uint16_t RSSI_MAX_VALUE = 65535;
@@ -467,7 +467,7 @@ static void ResetBlacklist() {
   if(appMode==CHANNEL_MODE){
       LoadValidMemoryChannels();
       AutoAdjustResolution();
-      memset(rssiNormalization, 0, sizeof(rssiNormalization));
+      ToggleNormalizeRssi(false);
   }
 
   RelaunchScan();
@@ -968,7 +968,12 @@ static void OnKeyDown(uint8_t key) {
     }
     break;
   case KEY_2:
-    UpdateFreqChangeStep(true);
+		if(appMode==CHANNEL_MODE){
+			ToggleNormalizeRssi(!normalizationApplied);
+		}
+		else {
+			UpdateFreqChangeStep(true);
+		}
     break;
   case KEY_8:
     UpdateFreqChangeStep(false);
@@ -1029,16 +1034,7 @@ static void OnKeyDown(uint8_t key) {
     }
     break;
   case KEY_SIDE2:
-    #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-      if(appMode==CHANNEL_MODE){
-        ToggleNormalizeRssi();
-      }
-      else {
-        ToggleBacklight();
-      }
-    #elif
-      ToggleBacklight();
-    #endif
+		ToggleBacklight();
     break;
   case KEY_PTT:
     #ifdef ENABLE_SPECTRUM_COPY_VFO
@@ -1592,27 +1588,23 @@ void APP_RunSpectrum() {
   }
   // 2024 by kamilsss655  -> https://github.com/kamilsss655
   // flattens spectrum by bringing all the rssi readings to the peak value
-  void ToggleNormalizeRssi()
+  void ToggleNormalizeRssi(bool on)
   {
     // we don't want to normalize when there is already active signal RX
-    if(IsPeakOverLevel() && !normalizationApplied)
+    if(IsPeakOverLevel() && on)
       return;
 
-    memset(rssiNormalization, 0, sizeof(rssiNormalization));
-
-    // we should do a full scan without correction, and only then apply correction
-    if(normalizationApplied == true){
-      normalizationApplied = false;
-      return;
-    }
-    else
-    {
-      for(uint8_t i = 0; i < ARRAY_SIZE(rssiHistory); i++)
+    if(on) {
+			for(uint8_t i = 0; i < ARRAY_SIZE(rssiHistory); i++)
       {
         rssiNormalization[i] = peak.rssi - rssiHistory[i];
       }
       normalizationApplied = true;
       RelaunchScan();
+    }
+    else {
+      memset(rssiNormalization, 0, sizeof(rssiNormalization));
+      normalizationApplied = false;
     }
   }
 #endif
