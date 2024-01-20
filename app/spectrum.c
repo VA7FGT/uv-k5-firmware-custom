@@ -41,13 +41,17 @@ bool gTailFound;
   Mode appMode;
   //Idea - make this user adjustable to compensate for different antennas, frontends, conditions
   #define UHF_NOISE_FLOOR 40
-  bool     normalizationApplied;
-  uint16_t rssiNormalization[128];
+  #define MAX_ATTENUATION 160
+  #define ATTENUATE_STEP  10
+  bool    normalizationApplied;
+  uint8_t  gainOffset[128];
+  uint8_t  attenuationOffset[128];
   uint8_t scanChannel[MR_CHANNEL_LAST+3];
   uint8_t scanChannelsCount;
   void ToggleScanList();
   void AutoAdjustResolution();
   void ToggleNormalizeRssi(bool on);
+  void Attenuate(uint8_t amount);
 #endif
 
 const uint16_t RSSI_MAX_VALUE = 65535;
@@ -389,8 +393,10 @@ uint16_t GetRssi() {
       rssi+=UHF_NOISE_FLOOR;
     }
 
-    if (appMode==CHANNEL_MODE)
-      rssi+=rssiNormalization[scanInfo.i];
+    if (appMode==CHANNEL_MODE) {
+      rssi+=gainOffset[scanInfo.i];
+      rssi-=attenuationOffset[scanInfo.i];
+    }
 
   #endif
   return rssi;
@@ -468,6 +474,7 @@ static void ResetBlacklist() {
       LoadValidMemoryChannels();
       AutoAdjustResolution();
       ToggleNormalizeRssi(false);
+      memset(attenuationOffset, 0, sizeof(attenuationOffset));
   }
 
   RelaunchScan();
@@ -490,8 +497,9 @@ static void UpdateScanInfo() {
     scanInfo.fPeak = scanInfo.f;
     scanInfo.iPeak = scanInfo.i;
   }
-
-  if (scanInfo.rssi < scanInfo.rssiMin) {
+  // add attenuation offset to prevent noise floor lowering when attenuated rx is over
+  // essentially we measure non-attenuated lowest rssi
+  if (scanInfo.rssi+attenuationOffset[scanInfo.i] < scanInfo.rssiMin) {
     scanInfo.rssiMin = scanInfo.rssi;
     settings.dbMin = Rssi2DBm(scanInfo.rssiMin);
     redrawStatus = true;
@@ -1040,7 +1048,13 @@ static void OnKeyDown(uint8_t key) {
     }
     break;
   case KEY_SIDE2:
-		ToggleBacklight();
+    if(appMode==CHANNEL_MODE) {
+      Attenuate(ATTENUATE_STEP);
+    }
+    else {
+      ToggleBacklight();
+    }
+
     break;
   case KEY_PTT:
     #ifdef ENABLE_SPECTRUM_COPY_VFO
@@ -1603,14 +1617,29 @@ void APP_RunSpectrum() {
     if(on) {
 			for(uint8_t i = 0; i < ARRAY_SIZE(rssiHistory); i++)
       {
-        rssiNormalization[i] = peak.rssi - rssiHistory[i];
+        gainOffset[i] = peak.rssi - rssiHistory[i];
       }
       normalizationApplied = true;
-      RelaunchScan();
     }
     else {
-      memset(rssiNormalization, 0, sizeof(rssiNormalization));
+      memset(gainOffset, 0, sizeof(gainOffset));
       normalizationApplied = false;
     }
+    RelaunchScan();
+  }
+
+  void Attenuate(uint8_t amount)
+  {
+    // we don't want to attenuate random scan measurments, only active rx measurment
+    if(!IsPeakOverLevel())
+      return;
+    // we don't want to lower the whole scan minimum rssi, otherwise the screen re-renders to show new lowest signal
+    if((GetRssi()-amount) <= scanInfo.rssiMin)
+      return;
+    // idea: consider amount to be 10% of rssiMax-rssiMin
+    if(attenuationOffset[scanInfo.i] < MAX_ATTENUATION){
+      attenuationOffset[scanInfo.i]+=amount;
+    }
+    
   }
 #endif
