@@ -857,8 +857,14 @@ static void DrawF(uint32_t f) {
 static void DrawNums() {
 
   if (currentState == SPECTRUM) {
-    sprintf(String, "%ux", GetStepsCount());
+    if(normalizationApplied){
+      sprintf(String, "N(%ux)", GetStepsCount());
+    }
+    else {
+      sprintf(String, "%ux", GetStepsCount());
+    }
     GUI_DisplaySmallest(String, 0, 1, false, true);
+
     if (appMode==CHANNEL_MODE)
     {
       sprintf(String, "%s", scanListOptions[settings.scanList]);
