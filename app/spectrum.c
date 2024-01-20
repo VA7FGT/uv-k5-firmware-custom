@@ -1634,7 +1634,7 @@ void APP_RunSpectrum() {
       return;
 
     if(on) {
-			for(uint8_t i = 0; i < ARRAY_SIZE(rssiHistory); i++)
+      for(uint8_t i = 0; i < ARRAY_SIZE(rssiHistory); i++)
       {
         gainOffset[i] = peak.rssi - rssiHistory[i];
       }
