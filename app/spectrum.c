@@ -34,6 +34,7 @@ struct FrequencyBandInfo {
 };
 
 bool gTailFound;
+bool isBlacklistApplied;
 
 #define F_MAX frequencyBandTable[ARRAY_SIZE(frequencyBandTable) - 1].upper
 
@@ -43,7 +44,8 @@ bool gTailFound;
   #define UHF_NOISE_FLOOR 40
   #define MAX_ATTENUATION 160
   #define ATTENUATE_STEP  10
-  bool    normalizationApplied;
+  bool    isNormalizationApplied;
+  bool    isAttenuationApplied;
   uint8_t  gainOffset[128];
   uint8_t  attenuationOffset[128];
   uint8_t scanChannel[MR_CHANNEL_LAST+3];
@@ -475,8 +477,9 @@ static void ResetBlacklist() {
       AutoAdjustResolution();
       ToggleNormalizeRssi(false);
       memset(attenuationOffset, 0, sizeof(attenuationOffset));
+      isAttenuationApplied = false;
   }
-
+  isBlacklistApplied = false;
   RelaunchScan();
 }
 
@@ -735,6 +738,7 @@ static void Blacklist() {
   rssiHistory[ScanRangeidx()] = RSSI_MAX_VALUE;
 #endif
   rssiHistory[peak.i] = RSSI_MAX_VALUE;
+  isBlacklistApplied = true;
   ResetPeak();
   ToggleRX(false);
   ResetScanStats();
@@ -865,7 +869,7 @@ static void DrawF(uint32_t f) {
 static void DrawNums() {
 
   if (currentState == SPECTRUM) {
-    if(normalizationApplied){
+    if(isNormalizationApplied){
       sprintf(String, "N(%ux)", GetStepsCount());
     }
     else {
@@ -896,6 +900,16 @@ static void DrawNums() {
     {
       sprintf(String, "M:%d", scanChannel[0]+1);
       GUI_DisplaySmallest(String, 0, 49, false, true);
+
+      if(isAttenuationApplied){
+        sprintf(String, "ATT");
+        GUI_DisplaySmallest(String, 48, 49, false, true);
+      }
+
+      if(isBlacklistApplied){
+        sprintf(String, "BL");
+        GUI_DisplaySmallest(String, 63, 49, false, true);
+      }
 
       sprintf(String, "M:%d", scanChannel[GetStepsCount()-1]+1);
       GUI_DisplaySmallest(String, 108, 49, false, true);
@@ -983,14 +997,19 @@ static void OnKeyDown(uint8_t key) {
     break;
   case KEY_2:
 		if(appMode==CHANNEL_MODE){
-			ToggleNormalizeRssi(!normalizationApplied);
+			ToggleNormalizeRssi(!isNormalizationApplied);
 		}
 		else {
 			UpdateFreqChangeStep(true);
 		}
     break;
   case KEY_8:
-    UpdateFreqChangeStep(false);
+    if(appMode==CHANNEL_MODE){
+      ToggleBacklight();
+    }
+    else{
+      UpdateFreqChangeStep(false);
+    }
     break;
   case KEY_UP:
 #ifdef ENABLE_SCAN_RANGES
@@ -1619,11 +1638,11 @@ void APP_RunSpectrum() {
       {
         gainOffset[i] = peak.rssi - rssiHistory[i];
       }
-      normalizationApplied = true;
+      isNormalizationApplied = true;
     }
     else {
       memset(gainOffset, 0, sizeof(gainOffset));
-      normalizationApplied = false;
+      isNormalizationApplied = false;
     }
     RelaunchScan();
   }
@@ -1639,6 +1658,7 @@ void APP_RunSpectrum() {
     // idea: consider amount to be 10% of rssiMax-rssiMin
     if(attenuationOffset[scanInfo.i] < MAX_ATTENUATION){
       attenuationOffset[scanInfo.i]+=amount;
+      isAttenuationApplied = true;
     }
     
   }
