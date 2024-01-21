@@ -20,7 +20,6 @@ Anyway, have fun.
 * [Building](#building)
 * [Credits](#credits)
 * [License](#license)
-* [Example changes/updates](#example-changesupdates)
 
 ## Main features:
 * many of OneOfEleven mods:
@@ -73,15 +72,19 @@ Anyway, have fun.
 
  ## Manual
 
-* [Radio operation](https://github.com/egzumer/uv-k5-firmware-custom/wiki/Radio-operation)
+ Please check out Wiki section for instructions, tips and more:
 
-* [Menu](https://github.com/egzumer/uv-k5-firmware-custom/wiki/Menu)
+* [Wiki](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki)
 
-* [Button functions](https://github.com/egzumer/uv-k5-firmware-custom/wiki/Button-functions)
+* [Radio operation](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/Radio-operation)
 
-* [Spectrum analyzer](https://github.com/egzumer/uv-k5-firmware-custom/wiki/Spectrum-analyzer)
+* [Menu](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/Menu)
 
-* [Flashing the firmware](https://github.com/egzumer/uv-k5-firmware-custom/wiki/Flashing-the-firmware)
+* [Button functions](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/Button-functions)
+
+* [Spectrum analyzer](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/Spectrum-analyzer)
+
+* [Flashing the firmware](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/Flashing-the-firmware)
 
 ## Radio performance
 
@@ -228,5 +231,3 @@ You may obtain a copy of the License at
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
-## Example changes/updates
