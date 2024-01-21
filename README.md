@@ -1,7 +1,7 @@
 # Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
 
 
-<img src="images/radio_picture.jpg" width=300 align="left" margin=10/>
+<!-- <img src="images/radio_picture.jpg" width=300 align="left" margin=10/> -->
 
 This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-firmware-custom) plus my changes.
 
@@ -29,6 +29,8 @@ Anyway, have fun.
 https://github.com/kamilsss655/uv-k5-firmware-custom/raw/main/images/am_reception_0.mp4
 
 <video src="https://github.com/kamilsss655/uv-k5-firmware-custom/raw/main/images/am_reception_0.mp4"></video>
+<video src="/images/am_reception_0.mp4"></video>
+
 
 ## Main features:
 * many of OneOfEleven mods:
