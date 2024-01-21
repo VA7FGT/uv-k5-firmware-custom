@@ -1,6 +1,6 @@
 # Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
 
-<img src="images/radio_picture.jpg" width=300 align="left" margin=10/>
+<img src="images/radio_picture.jpg" width=300 align="left" padding=10/>
 
 This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-firmware-custom) plus my changes:
 
