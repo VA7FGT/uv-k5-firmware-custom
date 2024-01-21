@@ -10,8 +10,10 @@ This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-
 > Use this firmware at your own risk (entirely). There is absolutely no guarantee that it will work in any way shape or form on your radio(s), it may even brick your radio(s), in which case, you'd need to buy another radio.
 Anyway, have fun.
 
-## Table of Contents
+---
 
+## Table of Contents
+* [Videos](#videos)
 * [Main Features](#main-features)
 * [Manual](#manual)
 * [Radio Performance](#radio-performance)
@@ -22,6 +24,11 @@ Anyway, have fun.
 * [License](#license)
 
 ---
+## Videos:
+
+<video src="/images/am_reception_0.mp4"></video>
+
+<video src="/images/am_reception_1.mp4"></video>
 
 ## Main features:
 * many of OneOfEleven mods:
