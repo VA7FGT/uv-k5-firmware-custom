@@ -26,8 +26,8 @@ Anyway, have fun.
 ---
 ## Videos:
 
-<video src="https://github.com/kamilsss655/uv-k5-firmware-custom/raw/main/images/am_reception_0.mp4"></video>
-<video src="/images/am_reception_0.mp4"></video>
+<video src="https://github.com/kamilsss655/uv-k5-firmware-custom/raw/main/images/am_reception_1.mp4"></video>
+<video src="/images/am_reception_1.mp4"></video>
 
 
 ## Main features:
@@ -240,5 +240,5 @@ You may obtain a copy of the License at
     limitations under the License.
 
 
-<video src="https://github.com/kamilsss655/uv-k5-firmware-custom/raw/main/images/am_reception_0.mp4"></video>
-<video src="/images/am_reception_0.mp4"></video>
+<video src="https://github.com/kamilsss655/uv-k5-firmware-custom/raw/main/images/am_reception_1.mp4"></video>
+<video src="/images/am_reception_1.mp4"></video>
