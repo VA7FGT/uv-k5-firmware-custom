@@ -1150,12 +1150,6 @@ void APP_TimeSlice10ms(void)
 		keyTickCounter++;
 	#endif
 
-	#ifdef ENABLE_BOOT_BEEPS
-		if (boot_counter_10ms > 0)
-			if ((boot_counter_10ms % 25) == 0)
-				AUDIO_PlayBeep(BEEP_880HZ_40MS_OPTIONAL);
-	#endif
-
 	if (UART_IsCommandAvailable())
 	{
 		__disable_irq();

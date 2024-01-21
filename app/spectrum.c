@@ -59,12 +59,6 @@ bool isBlacklistApplied;
 const uint16_t RSSI_MAX_VALUE = 65535;
 
 #define SQUELCH_OFF_DELAY 10
-// val x 100uS
-// determines how often rssi gets reset during active RX
-// too high value will cause audio clipping
-// too low will cause longer sticky squelch issue
-#define GLITCH_RESET_DELAY 50
-uint8_t glitchResetCounter = 0;
 
 static uint16_t R30, R37, R3D, R43, R47, R48, R7E, R02, R3F;
 static uint32_t initialFreq;
@@ -360,29 +354,13 @@ static void DeInitSpectrum() {
 uint8_t GetBWRegValueForScan() {
   return scanStepBWRegValues[settings.scanStepIndex];
 }
-
-static void ResetRSSI() {
-  uint32_t Reg = BK4819_ReadRegister(BK4819_REG_30);
-  Reg &= ~1;
-  BK4819_WriteRegister(BK4819_REG_30, Reg);
-  Reg |= 1;
-  BK4819_WriteRegister(BK4819_REG_30, Reg);
-}
   
 uint16_t GetRssi() {
   uint16_t rssi;
-  // SYSTICK_DelayUs(800);
+    // SYSTICK_DelayUs(800);
   // testing autodelay based on Glitch value
-  if(!isListening || glitchResetCounter > GLITCH_RESET_DELAY)
-  {
-    ResetRSSI();
-    glitchResetCounter=0;
-  }
-  else
-  {
-    glitchResetCounter++;
-  }
 
+  // testing resolution to sticky squelch issue
   while ((BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
     SYSTICK_DelayUs(100);
   }
@@ -427,7 +405,8 @@ static void ToggleRX(bool on) {
   ToggleAFDAC(on);
   ToggleAFBit(on);
 
-  if (on) {
+  if (on)
+  {
     listenT = SQUELCH_OFF_DELAY;
     BK4819_SetFilterBandwidth(settings.listenBw, false);
 
@@ -435,10 +414,10 @@ static void ToggleRX(bool on) {
 
     // turn on CSS tail found interrupt
     BK4819_WriteRegister(BK4819_REG_3F, BK4819_REG_02_CxCSS_TAIL);
-  } else {
+  } else
+  {
     if(appMode!=CHANNEL_MODE)
       BK4819_WriteRegister(0x43, GetBWRegValueForScan());
-    isListening = false;
   }
 }
 
