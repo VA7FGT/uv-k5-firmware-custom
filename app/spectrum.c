@@ -59,12 +59,6 @@ bool isBlacklistApplied;
 const uint16_t RSSI_MAX_VALUE = 65535;
 
 #define SQUELCH_OFF_DELAY 10
-// val x 100uS
-// determines how often rssi gets reset during active RX
-// too high value will cause audio clipping
-// too low will cause longer sticky squelch issue
-#define GLITCH_RESET_DELAY 50
-uint8_t glitchResetCounter = 0;
 
 static uint16_t R30, R37, R3D, R43, R47, R48, R7E, R02, R3F;
 static uint32_t initialFreq;
@@ -368,24 +362,25 @@ static void ResetRSSI() {
   Reg |= 1;
   BK4819_WriteRegister(BK4819_REG_30, Reg);
 }
-  
+  int glitch_reset_counter = 0;
 uint16_t GetRssi() {
   uint16_t rssi;
-  // SYSTICK_DelayUs(800);
+    // SYSTICK_DelayUs(800);
   // testing autodelay based on Glitch value
-  if(!isListening || glitchResetCounter > GLITCH_RESET_DELAY)
-  {
+  if(!isListening || glitch_reset_counter > 30){
     ResetRSSI();
-    glitchResetCounter=0;
+    glitch_reset_counter=0;
   }
   else
   {
-    glitchResetCounter++;
+    glitch_reset_counter++;
   }
 
-  while ((BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
-    SYSTICK_DelayUs(100);
-  }
+  // testing resolution to sticky squelch issue
+  // while (!isListening && (BK4819_ReadRegister(0x63) & 0b11111111) >= 255) {
+  //   SYSTICK_DelayUs(100);
+  // }
+  SYSTEM_DelayMs(7);
   rssi = BK4819_GetRSSI();
  
   #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
