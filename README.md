@@ -228,7 +228,21 @@ You may obtain a copy of the License at
     limitations under the License.
 
 ## Example changes/updates
+<style>
+img {
+    float: left;
+    margin-right: 10px;
+    clear:both;
+}
+p {
+    margin-left: 0px;
+    overflow:auto;
+    display:block;
 
-<p float="left">
+}
+</style>
+
+<p>
   <img src="images/radio_picture.jpg" width=300 />
+  text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here 
 </p>
