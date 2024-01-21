@@ -230,5 +230,5 @@ You may obtain a copy of the License at
 ## Example changes/updates
 
 <p float="left">
-  <img src="/images/radio_picture.png" width=300 />
+  <img src="images/radio_picture.jpg" width=300 />
 </p>
