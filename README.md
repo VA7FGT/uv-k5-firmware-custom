@@ -1,5 +1,9 @@
 # Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
 
+https://github.com/kamilsss655/uv-k5-firmware-custom/assets/8842065/bdf39546-807e-46d2-940c-6532a6416a09
+
+
+
 
 <!-- <img src="images/radio_picture.jpg" width=300 align="left" margin=10/> -->
 
