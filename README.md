@@ -229,7 +229,7 @@ You may obtain a copy of the License at
 
 ## Example changes/updates
 
-<p style="margin-left:0px;overflow:auto;display:block;">
-  <img src="images/radio_picture.jpg" width=300 height=700 style="float:left;margin-right:10px;clear:both;"/>
+<p style="">
+  <img src="images/radio_picture.jpg" width=300 height=700 style="float:left;"/>
   text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here 
 </p>
