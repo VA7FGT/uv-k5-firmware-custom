@@ -72,19 +72,26 @@ Anyway, have fun.
 
  ## Manual
 
- Please check out Wiki section for instructions, tips and more:
+ Please check out [Wiki](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki) section for instructions, tips and more:
 
-* [Wiki](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki)
+* [Radio operation](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/10-%E2%80%90-Radio-operation)
 
-* [Radio operation](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/Radio-operation)
+* [Menu](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/20-%E2%80%90-Menu)
 
-* [Menu](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/Menu)
+* [Button functions](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/30-%E2%80%90-Button-functions)
 
-* [Button functions](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/Button-functions)
+* [Spectrum analyzer](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/40-%E2%80%90-Spectrum-analyzer)
 
-* [Spectrum analyzer](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/Spectrum-analyzer)
+* [Messenger](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/42--%E2%80%90-Messenger)
 
-* [Flashing the firmware](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/Flashing-the-firmware)
+* [FM broadcast radio receiver](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/50-%E2%80%90--FM-broadcast-radio-receiver)
+
+* [Flashing the firmware](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/60-%E2%80%90-Flashing-the-firmware)
+
+* [Differences from egzumer firmware](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/70-%E2%80%90-Differences-from-egzumer-firmware)
+
+* [Tips & Tricks and Known Issues](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/80-%E2%80%90-Tips-&-Tricks-and-Known-Issues)
+
 
 ## Radio performance
 
