@@ -417,7 +417,7 @@ static void ToggleRX(bool on) {
   } else
   {
     if(appMode!=CHANNEL_MODE)
-        BK4819_WriteRegister(0x43, GetBWRegValueForScan());
+      BK4819_WriteRegister(0x43, GetBWRegValueForScan());
   }
 }
 
