@@ -1,6 +1,6 @@
 # Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
-<p padding=10>
-<img src="images/radio_picture.jpg" width=300 align="left" padding=10/>
+
+<img src="images/radio_picture.jpg" width=300 align="right"/>
 
 This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-firmware-custom) plus my changes:
 
@@ -13,7 +13,6 @@ This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-
 * `VOXSen` fixed and improved VOX sensitivity setting from menu. Added `VoxDel` - VOX delay setting allowing to set value to `0` for no VOX delay which might be useful for packet radio enthusiasts (APRS etc.).
 * Fixed AM AGC so **AM demodulation is crystal clear**, no audible clicks, no need for `AM_FIX`.
 * `SqTone` configurable squelch tail tones and 180* phase shift tail when in CTCSS mode
-</p>
 
 > [!WARNING]  
 > Use this firmware at your own risk (entirely). There is absolutely no guarantee that it will work in any way shape or form on your radio(s), it may even brick your radio(s), in which case, you'd need to buy another radio.
