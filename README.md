@@ -72,7 +72,7 @@ Anyway, have fun.
 
  ## Manual
 
- Please check out [Wiki](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki) section for instructions, tips and more:
+ Please take a look at the [Wiki](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki) section for instructions, tips and more:
 
 * [Radio operation](https://github.com/kamilsss655/uv-k5-firmware-custom/wiki/10-%E2%80%90-Radio-operation)
 
