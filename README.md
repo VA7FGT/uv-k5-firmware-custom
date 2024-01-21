@@ -26,9 +26,9 @@ Anyway, have fun.
 ---
 ## Videos:
 
-<video src="/images/am_reception_0.mp4"></video>
+<video src="images/am_reception_0.mp4"></video>
 
-<video src="/images/am_reception_1.mp4"></video>
+<video src="images/am_reception_1.mp4"></video>
 
 ## Main features:
 * many of OneOfEleven mods:
