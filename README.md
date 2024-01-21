@@ -1,7 +1,7 @@
 # Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
 
 
-<img src="images/radio_picture.jpg" width=300 align="left"/>
+<img src="images/radio_picture.jpg" width=300 align="left" margin=10/>
 
 This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-firmware-custom) plus my changes.
 
@@ -20,6 +20,8 @@ Anyway, have fun.
 * [Building](#building)
 * [Credits](#credits)
 * [License](#license)
+
+---
 
 ## Main features:
 * many of OneOfEleven mods:
@@ -60,15 +62,6 @@ Anyway, have fun.
    * `VOXSen` fixed and improved VOX sensitivity setting from menu. Added `VoxDel` - VOX delay setting allowing to set value to `0` for no VOX delay which might be useful for packet radio enthusiasts (APRS etc.).
    * Fixed AM AGC so **AM demodulation is crystal clear**, no audible clicks, no need for `AM_FIX`.
    * `SqTone` configurable squelch tail tones and 180* phase shift tail when in CTCSS mode
-
- ## Keyboard shortcuts
-* In `VFO mode` long press `5` to enter `scan range mode`
-* In `VFO mode` long press `5` then press `F+5` to enter `spectrum scan range mode`
-* In `Memory Channel mode` press `F+5` to enter **SUPER FAST** `spectrum channel mode`
-* Press `F+5` to enter `spectrum mode`
-* While in `spectrum mode` press `MENU` to enter `fine tuning mode`
-* While in `spectrum mode` or `fine tuning mode` short press `PTT` to copy current modulation, step, frequency, bw and enter `VFO mode`
-* While in `spectrum channel mode` press `4` to toggle scan lists.
 
  ## Manual
 
