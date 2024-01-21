@@ -28,7 +28,7 @@ Anyway, have fun.
 
 https://github.com/kamilsss655/uv-k5-firmware-custom/raw/main/images/am_reception_0.mp4
 
-<video src="images/am_reception_1.mp4"></video>
+<video src="https://github.com/kamilsss655/uv-k5-firmware-custom/raw/main/images/am_reception_0.mp4"></video>
 
 ## Main features:
 * many of OneOfEleven mods:
