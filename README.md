@@ -1,14 +1,12 @@
 # Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
 
-This repository is a merge of [OneOfEleven custom firmware](https://github.com/OneOfEleven/uv-k5-firmware-custom) with [fagci spectrum analizer](https://github.com/fagci/uv-k5-firmware-fagci-mod/tree/refactor) plus my few changes.
-
-All is a cloned and customized version of DualTachyon's open firmware found here ..
-
-https://github.com/DualTachyon/uv-k5-firmware .. a cool achievement !
+This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-firmware-custom) plus my changes.
 
 > [!WARNING]  
 > Use this firmware at your own risk (entirely). There is absolutely no guarantee that it will work in any way shape or form on your radio(s), it may even brick your radio(s), in which case, you'd need to buy another radio.
 Anyway, have fun.
+
+<img src="images/radio_picture.jpg" width=300 />
 
 ## Table of Contents
 
@@ -82,8 +80,6 @@ Anyway, have fun.
 * [Spectrum analyzer](https://github.com/egzumer/uv-k5-firmware-custom/wiki/Spectrum-analyzer)
 
 * [Flashing the firmware](https://github.com/egzumer/uv-k5-firmware-custom/wiki/Flashing-the-firmware)
-
-<img src="images/main.jpg" width=300 /><img src="images/spectrum.jpg" width=300 /><img src="images/audiobar.jpg" width=300 /><img src="images/rssibar.jpg" width=300 />
 
 ## Radio performance
 
@@ -198,22 +194,26 @@ Many thanks to various people on Telegram for putting up with me during this eff
 
 * [OneOfEleven](https://github.com/OneOfEleven)
 * [DualTachyon](https://github.com/DualTachyon)
+* [Egzumer](https://github.com/egzumer)
+* [Joaquimorg](https://github.com/joaquimorg)
 * [Mikhail](https://github.com/fagci)
 * [Andrej](https://github.com/Tunas1337)
 * [Manuel](https://github.com/manujedi)
 * @wagner
 * @Lohtse Shar
-* [@Matoz](https://github.com/spm81)
 * @Davide
 * @Ismo OH2FTG
-* [OneOfEleven](https://github.com/OneOfEleven)
 * @d1ced95
+* [@Matoz](https://github.com/spm81)
 * and others I forget
 
 ## License
 
 Copyright 2023 Dual Tachyon
 https://github.com/DualTachyon
+
+Copyright 2024 kamilsss655
+https://github.com/kamilsss655
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -230,7 +230,5 @@ You may obtain a copy of the License at
 ## Example changes/updates
 
 <p float="left">
-  <img src="/images/image1.png" width=300 />
-  <img src="/images/image2.png" width=300 />
-  <img src="/images/image3.png" width=300 />
+  <img src="/images/radio_picture.png" width=300 />
 </p>
