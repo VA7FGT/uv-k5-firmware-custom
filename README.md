@@ -1,14 +1,8 @@
 # Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
 
-https://github.com/kamilsss655/uv-k5-firmware-custom/assets/8842065/bdf39546-807e-46d2-940c-6532a6416a09
-
-
-
-
-<!-- <img src="images/radio_picture.jpg" width=300 align="left" margin=10/> -->
+<img src="images/radio_picture.jpg" width=300 align="left" margin=10/>
 
 This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-firmware-custom) plus my changes.
-
 
 > [!WARNING]  
 > Use this firmware at your own risk (entirely). There is absolutely no guarantee that it will work in any way shape or form on your radio(s), it may even brick your radio(s), in which case, you'd need to buy another radio.
@@ -30,9 +24,7 @@ Anyway, have fun.
 ---
 ## Videos:
 
-<video src="https://github.com/kamilsss655/uv-k5-firmware-custom/raw/main/images/am_reception_1.mp4"></video>
-<video src="/images/am_reception_1.mp4"></video>
-
+https://github.com/kamilsss655/uv-k5-firmware-custom/assets/8842065/bdf39546-807e-46d2-940c-6532a6416a09
 
 ## Main features:
 * many of OneOfEleven mods:
@@ -242,7 +234,3 @@ You may obtain a copy of the License at
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
-
-<video src="https://github.com/kamilsss655/uv-k5-firmware-custom/raw/main/images/am_reception_1.mp4"></video>
-<video src="/images/am_reception_1.mp4"></video>
