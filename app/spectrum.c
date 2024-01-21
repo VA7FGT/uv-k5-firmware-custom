@@ -414,8 +414,9 @@ static void ToggleRX(bool on) {
     // turn on CSS tail found interrupt
     BK4819_WriteRegister(BK4819_REG_3F, BK4819_REG_02_CxCSS_TAIL);
   } else {
-if(appMode!=CHANNEL_MODE)
-    BK4819_WriteRegister(0x43, GetBWRegValueForScan());
+  if(appMode!=CHANNEL_MODE)
+      BK4819_WriteRegister(0x43, GetBWRegValueForScan());
+
     isListening = false;
   }
 }
