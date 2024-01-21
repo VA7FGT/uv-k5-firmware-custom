@@ -228,6 +228,7 @@ You may obtain a copy of the License at
     limitations under the License.
 
 ## Example changes/updates
+<foreignObject>
 <style>
 img {
     float: left;
@@ -241,6 +242,7 @@ p {
 
 }
 </style>
+</<foreignObject>
 
 <p>
   <img src="images/radio_picture.jpg" width=300 />
