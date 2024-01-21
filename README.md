@@ -1,12 +1,14 @@
 # Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
 
-This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-firmware-custom) plus my changes.
+<p>
+  <img src="images/radio_picture.jpg" width=300 align="left"/>
 
-> [!WARNING]  
-> Use this firmware at your own risk (entirely). There is absolutely no guarantee that it will work in any way shape or form on your radio(s), it may even brick your radio(s), in which case, you'd need to buy another radio.
-Anyway, have fun.
+    This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-firmware-custom) plus my changes.
 
-<img src="images/radio_picture.jpg" width=300 />
+    > [!WARNING]  
+    > Use this firmware at your own risk (entirely). There is absolutely no guarantee that it will work in any way shape or form on your radio(s), it may even brick your radio(s), in which case, you'd need to buy another radio.
+    Anyway, have fun.
+</p>
 
 ## Table of Contents
 
@@ -228,8 +230,3 @@ You may obtain a copy of the License at
     limitations under the License.
 
 ## Example changes/updates
-
-<p>
-  <img src="images/radio_picture.jpg" width=300 align="left"/>
-  text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here text here 
-</p>
