@@ -15,6 +15,9 @@
 #include "driver/system.h"
 #include "app/messenger.h"
 #include "ui/ui.h"
+#ifdef ENABLE_ENCRYPTION
+	#include "external/chacha/chacha.h"
+#endif
 
 #if defined(ENABLE_UART) && defined(ENABLE_UART_DEBUG)
     #include "driver/uart.h"

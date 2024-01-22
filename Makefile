@@ -51,6 +51,7 @@ ENABLE_MESSENGER                        := 1
 ENABLE_MESSENGER_DELIVERY_NOTIFICATION  := 1
 ENABLE_MESSENGER_NOTIFICATION           := 1
 ENABLE_MESSENGER_UART                   := 0
+ENABLE_ENCRYPTION                       := 1
 
 #############################################################
 
@@ -162,6 +163,9 @@ OBJS += main.o
 ifeq ($(ENABLE_MESSENGER),1)
 	OBJS += app/messenger.o
 	OBJS += ui/messenger.o
+endif
+ifeq ($(ENABLE_ENCRYPTION),1)
+	OBJS += external/chacha/chacha.o
 endif
 
 ifeq ($(OS), Windows_NT)
@@ -373,6 +377,9 @@ ifeq ($(ENABLE_MESSENGER_NOTIFICATION),1)
 endif
 ifeq ($(ENABLE_MESSENGER_UART),1)
 	CFLAGS  += -DENABLE_MESSENGER_UART
+endif
+ifeq ($(ENABLE_ENCRYPTION),1)
+	CFLAGS  += -DENABLE_ENCRYPTION
 endif
 
 LDFLAGS =
