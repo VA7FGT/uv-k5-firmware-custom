@@ -146,9 +146,8 @@ static void processFKeyFunction(const KEY_Code_t Key, const bool beep)
 						RADIO_ApplyTxOffset(gRxVfo);
 						RADIO_ConfigureSquelchAndOutputPower(gRxVfo);
 						RADIO_SetupRegisters(true);
-
-						//SETTINGS_SaveChannel(channel, gEeprom.RX_VFO, gRxVfo, 1);
-
+						
+						gRequestSaveChannel = 1;
 						gUpdateDisplay = true;
 					}
 				}
