@@ -39,7 +39,8 @@ typedef enum MsgStatus {
 typedef enum PacketType {
     MESSAGE_PACKET,
     ENCRYPTED_MESSAGE_PACKET,
-	ACK_PACKET
+	ACK_PACKET,
+	INVALID_PACKET
 } PacketType;
 
 enum {
@@ -59,7 +60,7 @@ union DataPacket
   
   struct{
     uint8_t header;
-    uint8_t payload[PAYLOAD_LENGTH];
+    char payload[PAYLOAD_LENGTH];
     // uint8_t signature[SIGNATURE_LENGTH];
   } unencrypted;
   // header + payload + nonce
@@ -72,6 +73,7 @@ void MSG_StorePacket(const uint16_t interrupt_bits);
 void MSG_Init();
 void MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 void MSG_Send(char txMessage[TX_MSG_LENGTH], bool bServiceMessage);
+void MSG_SendPacket(union DataPacket packet);
 
 #endif
 

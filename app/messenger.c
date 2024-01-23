@@ -547,6 +547,71 @@ void moveUP(char (*rxMessages)[MAX_RX_MSG_LENGTH + 2]) {
 	memset(rxMessages[3], 0, sizeof(rxMessages[3]));
 }
 
+void MSG_SendPacket(union DataPacket packet) {
+
+	if ( msgStatus != READY ) return;
+
+	if ( strlen(packet.unencrypted.payload) > 0 && (TX_freq_check(gCurrentVfo->pTX->Frequency) == 0) ) {
+
+		msgStatus = SENDING;
+
+		RADIO_SetVfoState(VFO_STATE_NORMAL);
+		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, true);
+
+		memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));
+
+		// later refactor to not use global state but pass dataPacket type everywhere
+		dataPacket = packet;
+
+		if(packet.unencrypted.header == ENCRYPTED_MESSAGE_PACKET){
+			// char encryptedTxMessage[TX_MSG_LENGTH];
+	
+			// memset(encryptedTxMessage, 0, sizeof(encryptedTxMessage));
+
+			CRYPTO_Crypt(packet.encrypted.ciphertext, TX_MSG_LENGTH, dataPacket.encrypted.ciphertext, nonce, key, 256);
+		}
+
+		BK4819_DisableDTMF();
+
+		RADIO_SetTxParameters();
+		FUNCTION_Select(FUNCTION_TRANSMIT);
+		SYSTEM_DelayMs(500);
+		// BK4819_PlayRogerNormal(98);
+        // BK4819_PlayRogerMDC();
+		SYSTEM_DelayMs(100);
+
+		BK4819_ExitTxMute();
+		
+		MSG_FSKSendData();
+
+		SYSTEM_DelayMs(100);
+
+        APP_EndTransmission();
+		// this must be run after end of TX, otherwise radio will still TX transmit without even RED LED on
+		FUNCTION_Select(FUNCTION_FOREGROUND);
+
+		RADIO_SetVfoState(VFO_STATE_NORMAL);
+
+		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, false);
+
+		MSG_EnableRX(true);
+		if (packet.unencrypted.header != ACK_PACKET) {
+			moveUP(rxMessage);
+			sprintf(rxMessage[3], "> %s", packet.encrypted.ciphertext);
+			memset(lastcMessage, 0, sizeof(lastcMessage));
+			memcpy(lastcMessage, packet.encrypted.ciphertext, TX_MSG_LENGTH);
+			cIndex = 0;
+			prevKey = 0;
+			prevLetter = 0;
+			memset(cMessage, 0, sizeof(cMessage));
+		}
+		msgStatus = READY;
+
+	} else {
+		AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
+	}
+}
+
 void MSG_Send(char txMessage[TX_MSG_LENGTH], bool bServiceMessage) {
 
 	if ( msgStatus != READY ) return;
@@ -670,7 +735,7 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 			#endif
 			} else {
 				moveUP(rxMessage);
-				if (dataPacket.unencrypted.header != MESSAGE_PACKET) {
+				if (dataPacket.unencrypted.header >= INVALID_PACKET) {
 					snprintf(rxMessage[3], TX_MSG_LENGTH + 2, "? unknown msg format!");
 				}
 				else
@@ -703,7 +768,9 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 		gFSKWriteIndex = 0;
 		// Transmit a message to the sender that we have received the message (Unless it's a service message)
 		if (dataPacket.unencrypted.header!=ACK_PACKET) {
-			MSG_Send("\x1b\x1b\x1bRCVD                       ", true);
+			dataPacket.unencrypted.header=ACK_PACKET;
+			MSG_SendPacket(dataPacket);
+			// MSG_Send("\x1b\x1b\x1bRCVD                       ", true);
 		}
 	}
 }
@@ -818,7 +885,11 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 				break;*/
 			case KEY_MENU:
 				// Send message
-				MSG_Send(cMessage, false);
+				// MSG_Send(cMessage, false);
+				memset(dataPacket.serializedArray,0,sizeof(dataPacket.serializedArray));
+				dataPacket.unencrypted.header=ENCRYPTED_MESSAGE_PACKET;
+				memcpy(dataPacket.unencrypted.payload, cMessage, sizeof(dataPacket.unencrypted.payload));
+				MSG_SendPacket(dataPacket);
 				break;
 			case KEY_EXIT:
 				gRequestDisplayScreen = DISPLAY_MAIN;
