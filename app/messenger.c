@@ -18,6 +18,7 @@
 #ifdef ENABLE_ENCRYPTION
 	#include "external/chacha/chacha.h"
 #endif
+#include "debugging.h"
 
 #if defined(ENABLE_UART) && defined(ENABLE_UART_DEBUG)
     #include "driver/uart.h"
@@ -63,6 +64,23 @@ uint16_t gErrorsDuringMSG;
 uint8_t hasNewMessage = 0;
 
 uint8_t keyTickCounter = 0;
+
+struct chacha_ctx ctx;
+
+  unsigned char key[32] = {
+        0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
+        0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
+    };
+
+	unsigned char nonce[12] = {
+		0x07, 0x00, 0x00, 0x00,
+		0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47
+	};
+
+	// unsigned char pt[114];
+
+	// unsigned char ct[114];
+
 
 // -----------------------------------------------------
 
@@ -559,10 +577,48 @@ void MSG_Send(const char txMessage[TX_MSG_LENGTH], bool bServiceMessage) {
 		// first 20 byte sync, msg type and ID
 		msgFSKBuffer[0] = 'M';
 		msgFSKBuffer[1] = 'S';
+	
+		char encryptedTxMessage[TX_MSG_LENGTH];
+		//
+		unsigned char keystream[CHACHA_BLOCKLEN];
+		// const unsigned char one[4] = { 1, 0, 0, 0 };
+
+		// init
+		memset(&ctx, 0, sizeof(ctx));
+		memset(encryptedTxMessage, 0, sizeof(encryptedTxMessage));
+		chacha_keysetup(&ctx, key, 256);
+
+		/* initialize keystream and generate poly1305 key */
+		memset(keystream, 0, sizeof(keystream));
+		chacha_ivsetup(&ctx, nonce, NULL);
+		chacha_encrypt_bytes(&ctx, keystream, keystream,sizeof(keystream));
+
+		/* crypt data */
+		// // consider crypt-short version
+		// chacha_ivsetup(&ctx, nonce, one);
+		// chacha_encrypt_bytes(&ctx, (unsigned char *)pt,
+		//                      (unsigned char *)ct, 114);
+
+		uint8_t i;
+		/* crypt data short*/
+		//  <--- use this as we have message short enough and this makes code much smaller
+
+			// char String[40];
+		for (i = 0; i < TX_MSG_LENGTH; i++) {
+			// sprintf(String, "i:%dc:%d\n", i, (u_int8_t)txMessage[i]);
+			// LogUart(String);
+			((unsigned char *)encryptedTxMessage)[i] =
+				((unsigned char *)txMessage)[i] ^ keystream[32 + i];
+			// sprintf(String, "enc-> i:%dc:%d\n", i, (u_int8_t)encryptedTxMessage[i]);
+			// LogUart(String);
+		}
+
+		
+		// chacha_ivsetup(struct chacha_ctx *x, const unsigned char *iv, const unsigned char *counter)
 
 		// next 20 for msg
-		memcpy(msgFSKBuffer + 2, txMessage, TX_MSG_LENGTH);
-
+		memcpy(msgFSKBuffer + 2, encryptedTxMessage, TX_MSG_LENGTH);
+		
 		// CRC ? ToDo
 
 		msgFSKBuffer[MAX_RX_MSG_LENGTH - 1] = '\0';
@@ -642,9 +698,9 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 		for (uint16_t i = 0; i < count; i++) {
 			const uint16_t word = BK4819_ReadRegister(BK4819_REG_5F);
 			if (gFSKWriteIndex < sizeof(msgFSKBuffer))
-				msgFSKBuffer[gFSKWriteIndex++] = validate_char((word >> 0) & 0xff);
+				msgFSKBuffer[gFSKWriteIndex++] = (word >> 0) & 0xff;
 			if (gFSKWriteIndex < sizeof(msgFSKBuffer))
-				msgFSKBuffer[gFSKWriteIndex++] = validate_char((word >> 8) & 0xff);
+				msgFSKBuffer[gFSKWriteIndex++] = (word >> 8) & 0xff;
 		}
 
 		SYSTEM_DelayMs(10);
@@ -681,7 +737,45 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 				}
 				else
 				{
-					snprintf(rxMessage[3], TX_MSG_LENGTH + 2, "< %s", &msgFSKBuffer[2]);
+				unsigned char keystream[CHACHA_BLOCKLEN];
+				char dencryptedTxMessage[TX_MSG_LENGTH];
+
+				// const unsigned char one[4] = { 1, 0, 0, 0 };
+
+				// init
+				memset(&ctx, 0, sizeof(ctx));
+				chacha_keysetup(&ctx, key, 256);
+
+				/* initialize keystream and generate poly1305 key */
+				memset(keystream, 0, sizeof(keystream));
+				chacha_ivsetup(&ctx, nonce, NULL);
+				chacha_encrypt_bytes(&ctx, keystream, keystream,sizeof(keystream));
+
+				/* crypt data */
+				// // consider crypt-short version
+				// chacha_ivsetup(&ctx, nonce, one);
+				// chacha_encrypt_bytes(&ctx, (unsigned char *)pt,
+				//                      (unsigned char *)ct, 114);
+
+				uint8_t i;
+				/* crypt data short*/
+				//  <--- use this as we have message short enough and this makes code much smaller
+				// char String[40];
+				for (i = 0; i < TX_MSG_LENGTH; i++) {
+					// sprintf(String, "enc rec-> i:%dc:%d\n", i, (u_int8_t)msgFSKBuffer[i+2]);
+					// LogUart(String);
+					((unsigned char *)dencryptedTxMessage)[i] =
+						((unsigned char *)msgFSKBuffer)[i+2] ^ keystream[32 + i];
+					// sprintf(String, "dec rec-> i:%dc:%d\n", i, (u_int8_t)dencryptedTxMessage[i]);
+					// LogUart(String);
+				}
+
+				// chacha_ivsetup(struct chacha_ctx *x, const unsigned char *iv, const unsigned char *counter)
+
+
+
+					snprintf(rxMessage[3], TX_MSG_LENGTH + 2, "< %s", dencryptedTxMessage);
+					// sprintf(rxMessage[3], "< %s", dencryptedTxMessage);
 				}
 
 			#ifdef ENABLE_MESSENGER_UART
