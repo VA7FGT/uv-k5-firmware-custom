@@ -222,6 +222,8 @@ Many thanks to various people on Telegram for putting up with me during this eff
 * [@Matoz](https://github.com/spm81)
 * and others I forget
 
+* [![](https://opencollective.com/html-react-parser/contributors.svg?width=890&button=false)](https://github.com/remarkablemark/html-react-parser/graphs/contributors)
+
 ## License
 
 Copyright 2023 Dual Tachyon
