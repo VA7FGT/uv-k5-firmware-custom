@@ -14,5 +14,9 @@
  *     limitations under the License.
  */
 
+#include <stdint.h>
+
 // Used for both encryption and decryption
 void CRYPTO_Crypt(void *input, int input_len, void *output, void *nonce, const void *key, int key_len);
+void CRYPTO_Random(void *output, int len);
+uint8_t CRYPTO_RandomByte();
