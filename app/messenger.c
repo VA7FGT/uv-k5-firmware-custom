@@ -23,12 +23,6 @@
     #include "driver/uart.h"
 #endif
 
-typedef enum MsgStatus {
-    READY,
-    SENDING,
-    RECEIVING,
-} MsgStatus;
-
 const uint8_t MSG_BUTTON_STATE_HELD = 1 << 1;
 
 const uint8_t MSG_BUTTON_EVENT_SHORT =  0;
@@ -56,7 +50,9 @@ KeyboardType keyboardType = UPPERCASE;
 
 MsgStatus msgStatus = READY;
 
-uint8_t msgFSKBuffer[MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH];
+// uint8_t msgFSKBuffer[MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH];
+
+union DataPacket dataPacket;
 
 uint16_t gErrorsDuringMSG;
 
@@ -280,9 +276,8 @@ void MSG_FSKSendData() {
 	SYSTEM_DelayMs(100);
 
 	{	// load the entire packet data into the TX FIFO buffer
-		const uint16_t len_buff = (MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH);
-		for (size_t i = 0, j = 0; i < len_buff; i += 2, j++) {
-        	BK4819_WriteRegister(BK4819_REG_5F, (msgFSKBuffer[i + 1] << 8) | msgFSKBuffer[i]);
+		for (size_t i = 0, j = 0; i < sizeof(dataPacket.serializedArray); i += 2, j++) {
+        	BK4819_WriteRegister(BK4819_REG_5F, (dataPacket.serializedArray[i + 1] << 8) | dataPacket.serializedArray[i]);
     	}
 	}
 
@@ -563,29 +558,15 @@ void MSG_Send(char txMessage[TX_MSG_LENGTH], bool bServiceMessage) {
 		RADIO_SetVfoState(VFO_STATE_NORMAL);
 		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, true);
 
-		memset(msgFSKBuffer, 0, sizeof(msgFSKBuffer));
+		memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));
 
-		// ? ToDo
-		// first 20 byte sync, msg type and ID
-		msgFSKBuffer[0] = 'M';
-		msgFSKBuffer[1] = 'S';
-	
+		dataPacket.unencrypted.header = MESSAGE_PACKET;
+
 		char encryptedTxMessage[TX_MSG_LENGTH];
 	
 		memset(encryptedTxMessage, 0, sizeof(encryptedTxMessage));
 
-		CRYPTO_Crypt(txMessage, TX_MSG_LENGTH, encryptedTxMessage, nonce, key, 256);
-
-		// next 20 for msg
-		memcpy(msgFSKBuffer + 2, encryptedTxMessage, TX_MSG_LENGTH);
-		
-		// CRC ? ToDo
-
-		msgFSKBuffer[MAX_RX_MSG_LENGTH - 1] = '\0';
-		msgFSKBuffer[MAX_RX_MSG_LENGTH + 0] = 'I';
-		msgFSKBuffer[MAX_RX_MSG_LENGTH + 1] = 'D';
-		msgFSKBuffer[MAX_RX_MSG_LENGTH + 2] = '0';
-		msgFSKBuffer[(MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH) - 1] = '#';
+		CRYPTO_Crypt(txMessage, TX_MSG_LENGTH, dataPacket.encrypted.ciphertext, nonce, key, 256);
 
 		BK4819_DisableDTMF();
 
@@ -648,7 +629,7 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 
 	if (rx_sync) {
 		gFSKWriteIndex = 0;
-		memset(msgFSKBuffer, 0, sizeof(msgFSKBuffer));
+		memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));
 		msgStatus = RECEIVING;
 	}
 
@@ -657,10 +638,10 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 		const uint16_t count = BK4819_ReadRegister(BK4819_REG_5E) & (7u << 0);  // almost full threshold
 		for (uint16_t i = 0; i < count; i++) {
 			const uint16_t word = BK4819_ReadRegister(BK4819_REG_5F);
-			if (gFSKWriteIndex < sizeof(msgFSKBuffer))
-				msgFSKBuffer[gFSKWriteIndex++] = (word >> 0) & 0xff;
-			if (gFSKWriteIndex < sizeof(msgFSKBuffer))
-				msgFSKBuffer[gFSKWriteIndex++] = (word >> 8) & 0xff;
+			if (gFSKWriteIndex < sizeof(dataPacket.serializedArray))
+				dataPacket.serializedArray[gFSKWriteIndex++] = (word >> 0) & 0xff;
+			if (gFSKWriteIndex < sizeof(dataPacket.serializedArray))
+				dataPacket.serializedArray[gFSKWriteIndex++] = (word >> 8) & 0xff;
 		}
 
 		SYSTEM_DelayMs(10);
@@ -678,34 +659,31 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 		if (gFSKWriteIndex > 2) {
 
 			// If there's three 0x1b bytes, then it's a service message
-			if (msgFSKBuffer[2] == 0x1b && msgFSKBuffer[3] == 0x1b && msgFSKBuffer[4] == 0x1b) {
+			if (dataPacket.unencrypted.header == ACK_PACKET) {
 			#ifdef ENABLE_MESSENGER_DELIVERY_NOTIFICATION
-				// If the next 4 bytes are "RCVD", then it's a delivery notification
-				if (msgFSKBuffer[5] == 'R' && msgFSKBuffer[6] == 'C' && msgFSKBuffer[7] == 'V' && msgFSKBuffer[8] == 'D') {
-					#ifdef ENABLE_MESSENGER_UART
-                        UART_printf("SVC<RCPT\r\n");
-                    #endif
-					rxMessage[3][strlen(rxMessage[3])] = '+';
-					gUpdateStatus = true;
-					gUpdateDisplay = true;
-				}
+				#ifdef ENABLE_MESSENGER_UART
+					UART_printf("SVC<RCPT\r\n");
+				#endif
+				rxMessage[3][strlen(rxMessage[3])] = '+';
+				gUpdateStatus = true;
+				gUpdateDisplay = true;
 			#endif
 			} else {
 				moveUP(rxMessage);
-				if (msgFSKBuffer[0] != 'M' || msgFSKBuffer[1] != 'S') {
+				if (dataPacket.unencrypted.header != MESSAGE_PACKET) {
 					snprintf(rxMessage[3], TX_MSG_LENGTH + 2, "? unknown msg format!");
 				}
 				else
 				{
 					char dencryptedTxMessage[TX_MSG_LENGTH];
 
-					CRYPTO_Crypt(&msgFSKBuffer[2], TX_MSG_LENGTH, dencryptedTxMessage, nonce, key, 256);
+					CRYPTO_Crypt(dataPacket.encrypted.ciphertext, TX_MSG_LENGTH, dencryptedTxMessage, nonce, key, 256);
 
 					snprintf(rxMessage[3], TX_MSG_LENGTH + 2, "< %s", dencryptedTxMessage);
 				}
 
 			#ifdef ENABLE_MESSENGER_UART
-				UART_printf("SMS<%s\r\n", &msgFSKBuffer[2]);
+				UART_printf("SMS<%s\r\n", dencryptedTxMessage);
 			#endif
 
 				if ( gScreenToDisplay != DISPLAY_MSG ) {
@@ -724,7 +702,7 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 
 		gFSKWriteIndex = 0;
 		// Transmit a message to the sender that we have received the message (Unless it's a service message)
-		if (msgFSKBuffer[0] == 'M' && msgFSKBuffer[1] == 'S' && msgFSKBuffer[2] != 0x1b) {
+		if (dataPacket.unencrypted.header!=ACK_PACKET) {
 			MSG_Send("\x1b\x1b\x1bRCVD                       ", true);
 		}
 	}

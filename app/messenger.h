@@ -30,6 +30,43 @@ extern char rxMessage[4][MAX_RX_MSG_LENGTH + 2];
 extern uint8_t hasNewMessage;
 extern uint8_t keyTickCounter;
 
+typedef enum MsgStatus {
+    READY,
+    SENDING,
+    RECEIVING,
+} MsgStatus;
+
+typedef enum PacketType {
+    MESSAGE_PACKET,
+    ENCRYPTED_MESSAGE_PACKET,
+	ACK_PACKET
+} PacketType;
+
+enum {
+	NONCE_LENGTH = 10,
+	PAYLOAD_LENGTH = 19
+};
+
+// Data Packet definition                            // 2024 kamilsss655
+union DataPacket
+{ 
+  struct{
+	uint8_t header;
+    uint8_t ciphertext[PAYLOAD_LENGTH];
+    uint8_t nonce[NONCE_LENGTH];
+    // uint8_t signature[SIGNATURE_LENGTH];
+  } encrypted;
+  
+  struct{
+    uint8_t header;
+    uint8_t payload[PAYLOAD_LENGTH];
+    // uint8_t signature[SIGNATURE_LENGTH];
+  } unencrypted;
+  // header + payload + nonce
+  uint8_t serializedArray[1+PAYLOAD_LENGTH+NONCE_LENGTH];
+};
+
+
 void MSG_EnableRX(const bool enable);
 void MSG_StorePacket(const uint16_t interrupt_bits);
 void MSG_Init();

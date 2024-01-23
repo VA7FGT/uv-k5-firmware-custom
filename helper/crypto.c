@@ -21,8 +21,8 @@
 void CRYPTO_Crypt(void *input, int input_len, void *output, void *nonce, const void *key, int key_len)
 {
 	struct chacha_ctx ctx;
+
 	unsigned char keystream[CHACHA_BLOCKLEN];
-	char String[40];
 
 	memset(&ctx, 0, sizeof(ctx));
 	chacha_keysetup(&ctx, key, key_len);
