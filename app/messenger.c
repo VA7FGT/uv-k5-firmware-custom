@@ -566,6 +566,7 @@ void MSG_SendPacket(union DataPacket packet) {
 
 		if(packet.unencrypted.header == ENCRYPTED_MESSAGE_PACKET){
 			CRYPTO_Crypt(packet.encrypted.ciphertext, PAYLOAD_LENGTH, dataPacket.encrypted.ciphertext, nonce, key, 256);
+			memcpy(dataPacket.encrypted.nonce, nonce, sizeof(dataPacket.encrypted.nonce));
 		}
 
 		BK4819_DisableDTMF();
@@ -678,7 +679,12 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 					// memset(dencryptedTxMessage,0,sizeof(dencryptedTxMessage));
 
 					if(dataPacket.unencrypted.header == ENCRYPTED_MESSAGE_PACKET)
-						CRYPTO_Crypt(dataPacket.encrypted.ciphertext, PAYLOAD_LENGTH, dencryptedTxMessage, nonce, key, 256);
+						CRYPTO_Crypt(dataPacket.encrypted.ciphertext,
+							PAYLOAD_LENGTH,
+							dencryptedTxMessage,
+							dataPacket.encrypted.nonce,
+							key,
+							256);
 
 					snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dencryptedTxMessage);
 				}

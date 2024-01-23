@@ -9,8 +9,8 @@
 #include "driver/keyboard.h"
 
 enum {
-	NONCE_LENGTH = 5,
-	PAYLOAD_LENGTH = 20
+	NONCE_LENGTH = 13,
+	PAYLOAD_LENGTH = 30
 };
 
 typedef enum KeyboardType {
@@ -55,7 +55,7 @@ union DataPacket
     char payload[PAYLOAD_LENGTH];
     // uint8_t signature[SIGNATURE_LENGTH];
   } unencrypted;
-  // header + payload + nonce
+  // header + payload + nonce = must be an even number
   uint8_t serializedArray[1+PAYLOAD_LENGTH+NONCE_LENGTH];
 };
 
