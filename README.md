@@ -222,7 +222,9 @@ Many thanks to various people on Telegram for putting up with me during this eff
 * [@Matoz](https://github.com/spm81)
 * and others I forget
 
-* [![](https://opencollective.com/html-react-parser/contributors.svg?width=890&button=false)](https://github.com/remarkablemark/html-react-parser/graphs/contributors)
+<a href="https://github.com/kamilsss655/uv-k5-firmware-custom/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=kamilsss655/uv-k5-firmware-custom" />
+</a>
 
 ## License
 
