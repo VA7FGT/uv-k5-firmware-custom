@@ -8,6 +8,11 @@
 #include <string.h>
 #include "driver/keyboard.h"
 
+enum {
+	NONCE_LENGTH = 5,
+	PAYLOAD_LENGTH = 20
+};
+
 typedef enum KeyboardType {
 	UPPERCASE,
   	LOWERCASE,
@@ -15,18 +20,10 @@ typedef enum KeyboardType {
   	END_TYPE_KBRD
 } KeyboardType;
 
-enum { 
-	TX_MSG_LENGTH = 30,
-	MSG_HEADER_LENGTH = 20,
-	MAX_RX_MSG_LENGTH = TX_MSG_LENGTH + 2
-};
-//const uint8_t TX_MSG_LENGTH = 30;
-//const uint8_t MAX_RX_MSG_LENGTH = TX_MSG_LENGTH + 2;
-
 extern KeyboardType keyboardType;
 extern uint16_t gErrorsDuringMSG;
-extern char cMessage[TX_MSG_LENGTH];
-extern char rxMessage[4][MAX_RX_MSG_LENGTH + 2];
+extern char cMessage[PAYLOAD_LENGTH];
+extern char rxMessage[4][PAYLOAD_LENGTH + 2];
 extern uint8_t hasNewMessage;
 extern uint8_t keyTickCounter;
 
@@ -42,11 +39,6 @@ typedef enum PacketType {
 	ACK_PACKET,
 	INVALID_PACKET
 } PacketType;
-
-enum {
-	NONCE_LENGTH = 10,
-	PAYLOAD_LENGTH = 19
-};
 
 // Data Packet definition                            // 2024 kamilsss655
 union DataPacket

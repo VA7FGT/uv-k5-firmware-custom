@@ -28,7 +28,7 @@ const uint8_t MSG_BUTTON_STATE_HELD = 1 << 1;
 const uint8_t MSG_BUTTON_EVENT_SHORT =  0;
 const uint8_t MSG_BUTTON_EVENT_LONG =  MSG_BUTTON_STATE_HELD;
 
-const uint8_t MAX_MSG_LENGTH = TX_MSG_LENGTH - 1;
+const uint8_t MAX_MSG_LENGTH = PAYLOAD_LENGTH - 1;
 
 const uint16_t TONE2_FREQ = 0x3065; // 0x2854
 
@@ -41,9 +41,9 @@ unsigned char numberOfLettersAssignedToKey[9] = { 4, 3, 3, 3, 3, 3, 4, 3, 4 };
 char T9TableNum[9][4] = { {'1', '\0', '\0', '\0'}, {'2', '\0', '\0', '\0'}, {'3', '\0', '\0', '\0'}, {'4', '\0', '\0', '\0'}, {'5', '\0', '\0', '\0'}, {'6', '\0', '\0', '\0'}, {'7', '\0', '\0', '\0'}, {'8', '\0', '\0', '\0'}, {'9', '\0', '\0', '\0'} };
 unsigned char numberOfNumsAssignedToKey[9] = { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
-char cMessage[TX_MSG_LENGTH];
-char lastcMessage[TX_MSG_LENGTH];
-char rxMessage[4][MAX_RX_MSG_LENGTH + 2];
+char cMessage[PAYLOAD_LENGTH];
+char lastcMessage[PAYLOAD_LENGTH];
+char rxMessage[4][PAYLOAD_LENGTH + 2];
 unsigned char cIndex = 0;
 unsigned char prevKey = 0, prevLetter = 0;
 KeyboardType keyboardType = UPPERCASE;
@@ -234,7 +234,7 @@ void MSG_FSKSendData() {
 				(0u <<  0);    // 0 ~ 7   ???
 
 	// Set packet length (not including pre-amble and sync bytes that we can't seem to disable)
-	BK4819_WriteRegister(BK4819_REG_5D, ((MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH) << 8));
+	BK4819_WriteRegister(BK4819_REG_5D, ((sizeof(dataPacket.serializedArray)) << 8));
 
 	// REG_5A
 	//
@@ -278,6 +278,9 @@ void MSG_FSKSendData() {
         	BK4819_WriteRegister(BK4819_REG_5F, (dataPacket.serializedArray[i + 1] << 8) | dataPacket.serializedArray[i]);
     	}
 	}
+
+	// clear dataPacket
+	memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));;
 
 	// enable FSK TX
 	BK4819_WriteRegister(BK4819_REG_59, (1u << 11) | fsk_reg59);
@@ -514,7 +517,7 @@ void MSG_EnableRX(const bool enable) {
 
 		{	// packet size .. sync + 14 bytes - size of a single packet
 
-			uint16_t size = (MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH);
+			uint16_t size = sizeof(dataPacket.serializedArray);
 			// size -= (fsk_reg59 & (1u << 3)) ? 4 : 2;
 			size = (((size + 1) / 2) * 2) + 2;             // round up to even, else FSK RX doesn't work
 			BK4819_WriteRegister(BK4819_REG_5D, (size << 8));
@@ -535,7 +538,7 @@ void MSG_EnableRX(const bool enable) {
 
 // -----------------------------------------------------
 
-void moveUP(char (*rxMessages)[MAX_RX_MSG_LENGTH + 2]) {
+void moveUP(char (*rxMessages)[PAYLOAD_LENGTH + 2]) {
     // Shift existing lines up
     strcpy(rxMessages[0], rxMessages[1]);
 	strcpy(rxMessages[1], rxMessages[2]);
@@ -562,11 +565,7 @@ void MSG_SendPacket(union DataPacket packet) {
 		dataPacket = packet;
 
 		if(packet.unencrypted.header == ENCRYPTED_MESSAGE_PACKET){
-			// char encryptedTxMessage[TX_MSG_LENGTH];
-	
-			// memset(encryptedTxMessage, 0, sizeof(encryptedTxMessage));
-			
-			CRYPTO_Crypt(packet.encrypted.ciphertext, TX_MSG_LENGTH, dataPacket.encrypted.ciphertext, nonce, key, 256);
+			CRYPTO_Crypt(packet.encrypted.ciphertext, PAYLOAD_LENGTH, dataPacket.encrypted.ciphertext, nonce, key, 256);
 		}
 
 		BK4819_DisableDTMF();
@@ -597,7 +596,7 @@ void MSG_SendPacket(union DataPacket packet) {
 			moveUP(rxMessage);
 			sprintf(rxMessage[3], "> %s", packet.encrypted.ciphertext);
 			memset(lastcMessage, 0, sizeof(lastcMessage));
-			memcpy(lastcMessage, packet.encrypted.ciphertext, TX_MSG_LENGTH);
+			memcpy(lastcMessage, packet.encrypted.ciphertext, PAYLOAD_LENGTH);
 			cIndex = 0;
 			prevKey = 0;
 			prevLetter = 0;
@@ -671,17 +670,17 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 			} else {
 				moveUP(rxMessage);
 				if (dataPacket.unencrypted.header >= INVALID_PACKET) {
-					snprintf(rxMessage[3], TX_MSG_LENGTH + 2, "? unknown msg format!");
+					snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "ERROR: INVALID PACKET.");
 				}
 				else
 				{
-					char dencryptedTxMessage[TX_MSG_LENGTH];
+					char dencryptedTxMessage[PAYLOAD_LENGTH];
 					// memset(dencryptedTxMessage,0,sizeof(dencryptedTxMessage));
 
 					if(dataPacket.unencrypted.header == ENCRYPTED_MESSAGE_PACKET)
-						CRYPTO_Crypt(dataPacket.encrypted.ciphertext, TX_MSG_LENGTH, dencryptedTxMessage, nonce, key, 256);
+						CRYPTO_Crypt(dataPacket.encrypted.ciphertext, PAYLOAD_LENGTH, dencryptedTxMessage, nonce, key, 256);
 
-					snprintf(rxMessage[3], TX_MSG_LENGTH + 2, "< %s", dencryptedTxMessage);
+					snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dencryptedTxMessage);
 				}
 
 			#ifdef ENABLE_MESSENGER_UART
@@ -815,7 +814,7 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 				break;
 			case KEY_UP:
 				memset(cMessage, 0, sizeof(cMessage));
-				memcpy(cMessage, lastcMessage, TX_MSG_LENGTH);
+				memcpy(cMessage, lastcMessage, PAYLOAD_LENGTH);
 				cIndex = strlen(cMessage);
 				break;
 			/*case KEY_DOWN:
