@@ -38,6 +38,10 @@ Video showing AM reception in spectrum channel mode:
 
 https://github.com/kamilsss655/uv-k5-firmware-custom/assets/8842065/638a9985-b808-4cbf-9b98-628df64dba46
 
+Video showing AM reception in VFO mode:
+
+[![Video showing AM reception in VFO mode](https://img.youtube.com/vi/GOZYdKd8wng/0.jpg)](https://www.youtube.com/shorts/GOZYdKd8wng)
+
 ## Main features:
 * many of OneOfEleven mods:
    * AM fix, huge improvement in reception quality
