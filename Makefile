@@ -166,6 +166,7 @@ ifeq ($(ENABLE_MESSENGER),1)
 endif
 ifeq ($(ENABLE_ENCRYPTION),1)
 	OBJS += external/chacha/chacha.o
+	OBJS += helper/crypto.o
 endif
 
 ifeq ($(OS), Windows_NT)
