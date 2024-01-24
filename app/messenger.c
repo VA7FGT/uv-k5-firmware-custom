@@ -561,7 +561,8 @@ void MSG_SendPacket(union DataPacket packet) {
 
 		if(packet.unencrypted.header == ENCRYPTED_MESSAGE_PACKET){
 			char nonce[NONCE_LENGTH];
-			CRYPTO_Random(nonce, NONCE_LENGTH-1);
+
+			CRYPTO_Random(nonce, NONCE_LENGTH);
 			// this is wat happens when we have global state
 			memcpy(packet.encrypted.nonce, nonce, NONCE_LENGTH);
 
