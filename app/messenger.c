@@ -558,25 +558,26 @@ void MSG_SendPacket(union DataPacket packet) {
 
 		// later refactor to not use global state but pass dataPacket type everywhere
 		dataPacket = packet;
+		#ifdef ENABLE_ENCRYPTION
+			if(packet.unencrypted.header == ENCRYPTED_MESSAGE_PACKET){
+				char nonce[NONCE_LENGTH];
 
-		if(packet.unencrypted.header == ENCRYPTED_MESSAGE_PACKET){
-			char nonce[NONCE_LENGTH];
+				CRYPTO_Random(nonce, NONCE_LENGTH);
+				// this is wat happens when we have global state
+				memcpy(packet.encrypted.nonce, nonce, NONCE_LENGTH);
 
-			CRYPTO_Random(nonce, NONCE_LENGTH);
-			// this is wat happens when we have global state
-			memcpy(packet.encrypted.nonce, nonce, NONCE_LENGTH);
-
-			CRYPTO_Crypt(
-				packet.encrypted.ciphertext,
-				PAYLOAD_LENGTH,
-				dataPacket.encrypted.ciphertext,
-				&packet.encrypted.nonce,
-				key,
-				256
-			);
-		
-			memcpy(dataPacket.encrypted.nonce, nonce, sizeof(dataPacket.encrypted.nonce));
-		}
+				CRYPTO_Crypt(
+					packet.encrypted.ciphertext,
+					PAYLOAD_LENGTH,
+					dataPacket.encrypted.ciphertext,
+					&packet.encrypted.nonce,
+					key,
+					256
+				);
+			
+				memcpy(dataPacket.encrypted.nonce, nonce, sizeof(dataPacket.encrypted.nonce));
+			}
+		#endif
 
 		BK4819_DisableDTMF();
 
@@ -684,18 +685,22 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 				}
 				else
 				{
-					char dencryptedTxMessage[PAYLOAD_LENGTH];
-					// memset(dencryptedTxMessage,0,sizeof(dencryptedTxMessage));
+					#ifdef ENABLE_ENCRYPTION
+						char dencryptedTxMessage[PAYLOAD_LENGTH];
+						// memset(dencryptedTxMessage,0,sizeof(dencryptedTxMessage));
 
-					if(dataPacket.unencrypted.header == ENCRYPTED_MESSAGE_PACKET)
-						CRYPTO_Crypt(dataPacket.encrypted.ciphertext,
-							PAYLOAD_LENGTH,
-							dencryptedTxMessage,
-							&dataPacket.encrypted.nonce,
-							key,
-							256);
+						if(dataPacket.unencrypted.header == ENCRYPTED_MESSAGE_PACKET)
+							CRYPTO_Crypt(dataPacket.encrypted.ciphertext,
+								PAYLOAD_LENGTH,
+								dencryptedTxMessage,
+								&dataPacket.encrypted.nonce,
+								key,
+								256);
 
-					snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dencryptedTxMessage);
+						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dencryptedTxMessage);
+					#else
+						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.unencrypted.payload);
+					#endif
 				}
 
 			#ifdef ENABLE_MESSENGER_UART
