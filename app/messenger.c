@@ -63,11 +63,6 @@ unsigned char key[32] = {
 	0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
 };
 
-unsigned char nonce[12] = {
-	0x07, 0x00, 0x00, 0x00,
-	0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47
-};
-
 // -----------------------------------------------------
 
 void MSG_FSKSendData() {
@@ -565,7 +560,20 @@ void MSG_SendPacket(union DataPacket packet) {
 		dataPacket = packet;
 
 		if(packet.unencrypted.header == ENCRYPTED_MESSAGE_PACKET){
-			CRYPTO_Crypt(packet.encrypted.ciphertext, PAYLOAD_LENGTH, dataPacket.encrypted.ciphertext, nonce, key, 256);
+			char nonce[NONCE_LENGTH];
+			CRYPTO_Random(nonce, NONCE_LENGTH-1);
+			// this is wat happens when we have global state
+			memcpy(packet.encrypted.nonce, nonce, NONCE_LENGTH);
+
+			CRYPTO_Crypt(
+				packet.encrypted.ciphertext,
+				PAYLOAD_LENGTH,
+				dataPacket.encrypted.ciphertext,
+				&packet.encrypted.nonce,
+				key,
+				256
+			);
+		
 			memcpy(dataPacket.encrypted.nonce, nonce, sizeof(dataPacket.encrypted.nonce));
 		}
 
@@ -682,7 +690,7 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 						CRYPTO_Crypt(dataPacket.encrypted.ciphertext,
 							PAYLOAD_LENGTH,
 							dencryptedTxMessage,
-							dataPacket.encrypted.nonce,
+							&dataPacket.encrypted.nonce,
 							key,
 							256);
 

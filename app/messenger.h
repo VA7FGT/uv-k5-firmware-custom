@@ -46,7 +46,7 @@ union DataPacket
   struct{
 	uint8_t header;
     uint8_t ciphertext[PAYLOAD_LENGTH];
-    uint8_t nonce[NONCE_LENGTH];
+    unsigned char nonce[NONCE_LENGTH];
     // uint8_t signature[SIGNATURE_LENGTH];
   } encrypted;
   
