@@ -855,7 +855,7 @@ void BOARD_FactoryReset(bool bIsAll)
 	{
 		if (
 			!(i >= 0x0EE0 && i < 0x0F18) &&         // ANI ID + DTMF codes
-			!(i >= 0x0F30 && i < 0x0F50) &&         // AES KEY + F LOCK + Scramble Enable
+			!(i >= 0x0F30 && i < 0x0F50) &&         // ENCRYPTION KEY + F LOCK + Scramble Enable
 			!(i >= 0x1C00 && i < 0x1E00) &&         // DTMF contacts
 			!(i >= 0x0EB0 && i < 0x0ED0) &&         // Welcome strings
 			!(i >= 0x0EA0 && i < 0x0EA8) &&         // Voice Prompt
