@@ -112,6 +112,9 @@ const t_menu_item MenuList[] =
 #ifdef ENABLE_PWRON_PASSWORD
 	{"Passwd", VOICE_ID_INVALID,                       MENU_PASSWORD      }, // power on password
 #endif
+#ifdef ENABLE_ENCRYPTION
+	{"EncKey", VOICE_ID_INVALID,                       MENU_ENC_KEY      }, // encryption key
+#endif
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
 	// hidden menu items from here on
 	// enabled if pressing both the PTT and upper side button at power-on
@@ -721,6 +724,26 @@ void UI_DisplayMenu(void)
 				already_printed = true;
 				break;
 			}
+			#ifdef ENABLE_ENCRYPTION
+				case MENU_ENC_KEY:
+				{
+					if (!gIsInSubMenu)
+					{	// show the key
+						strcpy(String, "****");
+						UI_PrintString(String, menu_item_x1, menu_item_x2, 2, 8);
+					}
+					else
+					{	// show the key being edited
+						sprintf(String, "%s", gEeprom.ENC_KEY);
+						UI_PrintString(edit, (menu_item_x1 -2), 0, 2, 8);
+						if (edit_index != -1 && edit_index < 10)
+							UI_PrintString(     "^", (menu_item_x1 -2) + (8 * edit_index), 0, 4, 8);  // show the cursor
+					}
+
+					already_printed = true;
+					break;
+				}
+			#endif
 
 			case MENU_SAVE:
 				strcpy(String, gSubMenu_SAVE[gSubMenuSelection]);
