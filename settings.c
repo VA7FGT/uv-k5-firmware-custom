@@ -271,7 +271,6 @@ void SETTINGS_SaveChannelName(uint8_t channel, const char * name)
 #ifdef ENABLE_ENCRYPTION
 void SETTINGS_SaveEncryptionKey()
 {	
-	// TODO: this should probably autoadjust to sizeof(gEeprom.ENC_KEY)
 	EEPROM_WriteBuffer(0x0F30, gEeprom.ENC_KEY, true);
 	EEPROM_WriteBuffer(0x0F38, gEeprom.ENC_KEY + 8, true);
 }
