@@ -1002,7 +1002,7 @@ void UI_DisplayMenu(void)
 
 void MENU_PrintNotAllowed()
 {
-	char String[7];
+	char String[8];
 	strcpy(String, "NOT");
 	UI_PrintString(String, menu_item_x1, menu_item_x2, 0, 8);
 	strcpy(String, "ALLOWED");
