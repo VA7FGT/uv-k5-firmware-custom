@@ -26,6 +26,10 @@
 #include "settings.h"
 #include "board.h"
 
+#ifdef ENABLE_ENCRYPTION
+	#include "helper/crypto.h"
+#endif
+
 EEPROM_Config_t gEeprom;
 
 void SETTINGS_SaveVfoIndices(void)
@@ -273,6 +277,8 @@ void SETTINGS_SaveEncryptionKey()
 {	
 	EEPROM_WriteBuffer(0x0F30, gEeprom.ENC_KEY, true);
 	EEPROM_WriteBuffer(0x0F38, gEeprom.ENC_KEY + 8, true);
+
+	CRYPTO_Generate256BitKey(gEeprom.ENC_KEY, gEncryptionKey, sizeof(gEeprom.ENC_KEY));
 }
 #endif
 

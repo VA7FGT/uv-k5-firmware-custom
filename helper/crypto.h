@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 
+extern uint8_t gEncryptionKey[32];
 static const uint8_t encryptionSalt[4][8];
 static const uint8_t displaySalt[32];
 

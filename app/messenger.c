@@ -58,11 +58,6 @@ uint8_t hasNewMessage = 0;
 
 uint8_t keyTickCounter = 0;
 
-// unsigned char key[32] = {
-// 	0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
-// 	0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
-// };
-
 // -----------------------------------------------------
 
 void MSG_FSKSendData() {
@@ -571,7 +566,7 @@ void MSG_SendPacket(union DataPacket packet) {
 					PAYLOAD_LENGTH,
 					dataPacket.encrypted.ciphertext,
 					&packet.encrypted.nonce,
-					&gEeprom.ENC_KEY,
+					gEncryptionKey,
 					256
 				);
 			
@@ -694,7 +689,7 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 								PAYLOAD_LENGTH,
 								dencryptedTxMessage,
 								&dataPacket.encrypted.nonce,
-								&gEeprom.ENC_KEY,
+								gEncryptionKey,
 								256);
 
 						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dencryptedTxMessage);
