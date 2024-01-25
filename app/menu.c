@@ -1476,7 +1476,6 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 			if (edit_index < 0)
 			{	// enter encryption key edit mode
 				// pad the encryption key out with '_'
-				// TODO: Extract to shared function - common with MENU_MEM_NAME below
 				edit_index = strlen(edit);
 				while (edit_index < 10)
 					edit[edit_index++] = '_';
