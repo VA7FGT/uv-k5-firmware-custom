@@ -35,6 +35,9 @@
 #include "ui/inputbox.h"
 #include "ui/menu.h"
 #include "ui/ui.h"
+#ifdef ENABLE_ENCRYPTION
+	#include "helper/crypto.h"
+#endif
 
 const t_menu_item MenuList[] =
 {
@@ -729,8 +732,7 @@ void UI_DisplayMenu(void)
 				{
 					if (!gIsInSubMenu)
 					{	// show placeholder in main menu
-						// strcpy(String, "****");
-						sprintf(String, "%s", gEeprom.ENC_KEY);
+						strcpy(String, "****");
 						UI_PrintString(String, menu_item_x1, menu_item_x2, 2, 8);
 					}
 					else
@@ -742,7 +744,12 @@ void UI_DisplayMenu(void)
 								UI_PrintString(     "^", (menu_item_x1 -2) + (8 * edit_index), 0, 4, 8);  
 						}
 						else{
-							strcpy(String, "hash");
+							strcpy(String, "hashed value");
+							UI_PrintStringSmall(String, 20, 0, 5);
+
+							memset(String, 0, sizeof(String));
+							
+							CRYPTO_DisplayHash(gEeprom.ENC_KEY, String, sizeof(gEeprom.ENC_KEY));
 							UI_PrintString(String, (menu_item_x1 -2), 0, 2, 8);
 						}			
 					}
