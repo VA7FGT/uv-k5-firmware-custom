@@ -952,10 +952,6 @@ void MENU_ShowCurrentSetting(void)
 			gSubMenuSelection = gEeprom.MrChannel[gEeprom.TX_VFO];
 			break;
 
-		// case MENU_ENC_KEY:
-		// 	gSubMenuSelection = 1;
-		// 	break;
-
 		case MENU_SAVE:
 			gSubMenuSelection = gEeprom.BATTERY_SAVE;
 			break;
