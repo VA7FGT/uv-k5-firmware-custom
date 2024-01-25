@@ -1500,7 +1500,7 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 		if (edit_index < 0)
 		{	// enter channel name edit mode
 			if (!RADIO_CheckValidChannel(gSubMenuSelection, false, 0))
-						return;
+				return;
 		
 			SETTINGS_FetchChannelName(edit, gSubMenuSelection);
 			
