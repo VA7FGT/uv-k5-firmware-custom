@@ -19,6 +19,20 @@
 #include "driver/bk4819.h"
 #include "driver/systick.h"
 
+// salt used for hashing encryption key from eeprom used for sending packets
+// we never actually use the key stored in eeprom directly
+// actually salt should be [16] + key [16] and then we hash it and get encryption key [32]
+static const uint8_t encryptionSalt[32] = {
+	0xEF, 0x58, 0x0A, 0xC6, 0x12, 0x4A, 0xFA, 0x4F, 0xAE, 0x6F, 0x9D, 0x3C, 0xBB, 0x80, 0xAC, 0x4A,
+	0xF3, 0x5E, 0x11, 0x69, 0xC7, 0x97, 0xFB, 0xC6, 0x27, 0x4F, 0xB7, 0x1A, 0xA7, 0xE5, 0x77, 0x9C
+};
+
+// salt used to display encryption key hash in menu
+static const uint8_t displaySalt[32] = {
+	0x22, 0xA1, 0xDA, 0x49, 0xA8, 0x22, 0x79, 0xBF, 0x2D, 0x98, 0xDE, 0xA8, 0x4F, 0xC3, 0x23, 0xF3,
+	0x65, 0xB9, 0x69, 0x22, 0xB3, 0x6F, 0xB4, 0x59, 0xC7, 0x90, 0x10, 0x70, 0xFA, 0x51, 0xA0, 0x19
+};
+
 // Used for both encryption and decryption
 void CRYPTO_Crypt(void *input, int input_len, void *output, void *nonce, const void *key, int key_len)
 {
@@ -61,5 +75,54 @@ void CRYPTO_Random(void *output, int len)
 		((unsigned char *)output)[i] = CRYPTO_RandomByte();
 	}
 }
+
+
+// Generate salted hash
+// output is always 8 bytes (64 bits), 
+// input can be upto 255 bytes
+void CRYPTO_HashSalted(const void *input, void *output, const void *salt, int input_len, int salt_len)
+{
+	// FNV offset basis
+	union eight_bytes hash;
+	
+	hash.u64 = 0xcbf29ce484222325;
+	// FNV prime
+	const uint64_t fnvPrime = 0x100000001b3;
+
+	// hash input
+	for(int i=0; i<input_len; i++){
+		hash.u64 = hash.u64 * fnvPrime;
+		hash.u64 = hash.u64 ^ ((unsigned char *)input)[i];
+	}
+	// hash salt
+	for(int i=0; i<salt_len; i++){
+		hash.u64 = hash.u64 * fnvPrime;
+		hash.u64 = hash.u64 ^ ((unsigned char *)salt)[i];
+	}
+	// set output
+	for(int j=0; j<8; j++){
+		((uint8_t *)output)[j] = hash.b8[j];
+	}
+		
+}
+
+// Generate short 8 ASCII chars hash which can be safely displayed
+// two devices can then compare this hash to determine if they have matching keys
+// it is not used for an actual encryption
+void CRYPTO_DisplayHash(void *input, void *output, int input_len)
+{
+	(void)encryptionSalt;
+	// char stringHash[10];
+	CRYPTO_HashSalted(input, output, displaySalt, input_len, sizeof(displaySalt));
+
+	for(int i=0; i<8; i++){
+		((uint8_t *)output)[i]=(((uint8_t *)output)[i] % 91) + 32;
+	}
+}
+// so to generate the 256bit key we need 4 hash operations
+// void CRYPTO_EncryptionKeyHash(void *input, void *output, int input_len)
+// {
+
+// }
 
 			   
