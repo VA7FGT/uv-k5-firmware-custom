@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 
-static const uint8_t encryptionSalt[32];
+static const uint8_t encryptionSalt[4][8];
 static const uint8_t displaySalt[32];
 
 union eight_bytes {
@@ -29,5 +29,5 @@ void CRYPTO_Crypt(void *input, int input_len, void *output, void *nonce, const v
 void CRYPTO_Random(void *output, int len);
 uint8_t CRYPTO_RandomByte();
 void CRYPTO_DisplayHash(void *input, void *output, int input_len);
-// void CRYPTO_EncryptionKeyHash(void *input, void *output, int input_len);
+void CRYPTO_Generate256BitKey(void *input, void *output, int input_len);
 void CRYPTO_HashSalted(const void *input, void *output, const void *salt, int input_len, int salt_len);
