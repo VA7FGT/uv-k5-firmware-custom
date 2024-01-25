@@ -728,16 +728,23 @@ void UI_DisplayMenu(void)
 				case MENU_ENC_KEY:
 				{
 					if (!gIsInSubMenu)
-					{	// show the key
-						strcpy(String, "****");
+					{	// show placeholder in main menu
+						// strcpy(String, "****");
+						sprintf(String, "%s", gEeprom.ENC_KEY);
 						UI_PrintString(String, menu_item_x1, menu_item_x2, 2, 8);
 					}
 					else
 					{	// show the key being edited
-						sprintf(String, "%s", gEeprom.ENC_KEY);
-						UI_PrintString(edit, (menu_item_x1 -2), 0, 2, 8);
-						if (edit_index != -1 && edit_index < 10)
-							UI_PrintString(     "^", (menu_item_x1 -2) + (8 * edit_index), 0, 4, 8);  // show the cursor
+						if (edit_index != -1 || gAskForConfirmation) {
+							UI_PrintString(edit, (menu_item_x1 -2), 0, 2, 8);
+							// show the cursor
+							if(edit_index < 10)
+								UI_PrintString(     "^", (menu_item_x1 -2) + (8 * edit_index), 0, 4, 8);  
+						}
+						else{
+							strcpy(String, "hash");
+							UI_PrintString(String, (menu_item_x1 -2), 0, 2, 8);
+						}			
 					}
 
 					already_printed = true;
@@ -980,6 +987,9 @@ void UI_DisplayMenu(void)
 
 	if ((UI_MENU_GetCurrentMenuId() == MENU_RESET    ||
 	     UI_MENU_GetCurrentMenuId() == MENU_MEM_CH   ||
+		 #ifdef ENABLE_ENCRYPTION
+			UI_MENU_GetCurrentMenuId() == MENU_ENC_KEY  ||
+		 #endif
 	     UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME ||
 	     UI_MENU_GetCurrentMenuId() == MENU_DEL_CH) && gAskForConfirmation)
 	{	// display confirmation

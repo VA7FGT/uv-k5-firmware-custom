@@ -176,6 +176,10 @@ void SETTINGS_SaveSettings(void)
 		memcpy(&State[0], &gEeprom.FM_FrequencyPlaying, 2);
 		EEPROM_WriteBuffer(0x0E88, State, true);
 	#endif
+
+	#ifdef ENABLE_ENCRYPTION
+		SETTINGS_SaveEncryptionKey();
+	#endif
 }
 
 void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, uint8_t Mode)
@@ -263,6 +267,15 @@ void SETTINGS_SaveChannelName(uint8_t channel, const char * name)
 	EEPROM_WriteBuffer(0x0F50 + offset, buf, true);
 	EEPROM_WriteBuffer(0x0F58 + offset, buf + 8, true);
 }
+
+#ifdef ENABLE_ENCRYPTION
+void SETTINGS_SaveEncryptionKey()
+{	
+	// TODO: this should probably autoadjust to sizeof(gEeprom.ENC_KEY)
+	EEPROM_WriteBuffer(0x0F30, &gEeprom.ENC_KEY, true);
+	EEPROM_WriteBuffer(0x0F38, &gEeprom.ENC_KEY + 8, true);
+}
+#endif
 
 void SETTINGS_FetchChannelName(char *s, const int channel)
 {

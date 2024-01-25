@@ -485,6 +485,13 @@ void MENU_AcceptSetting(void)
 				break;
 		#endif
 
+		#ifdef ENABLE_ENCRYPTION
+			case MENU_ENC_KEY:
+				memmove(gEeprom.ENC_KEY, edit, sizeof(gEeprom.ENC_KEY));
+				gUpdateStatus        = true;
+				break;
+		#endif
+
 		case MENU_W_N:
 			gTxVfo->CHANNEL_BANDWIDTH = gSubMenuSelection;
 			gRequestSaveChannel       = 1;
@@ -942,6 +949,10 @@ void MENU_ShowCurrentSetting(void)
 		case MENU_MEM_NAME:
 			gSubMenuSelection = gEeprom.MrChannel[gEeprom.TX_VFO];
 			break;
+
+		// case MENU_ENC_KEY:
+		// 	gSubMenuSelection = 1;
+		// 	break;
 
 		case MENU_SAVE:
 			gSubMenuSelection = gEeprom.BATTERY_SAVE;
@@ -1446,7 +1457,7 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 		#if 1
 			if (UI_MENU_GetCurrentMenuId() == MENU_DEL_CH || UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME)
 				if (!RADIO_CheckValidChannel(gSubMenuSelection, false, 0))
-					return;  // invalid channel
+				return;  // invalid channel
 		#endif
 
 		gAskForConfirmation = 0;
@@ -1483,7 +1494,6 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 					return;	// next char
 
 				// exit, save encryption key
-				memcpy(gEeprom.ENC_KEY, edit, sizeof(gEeprom.ENC_KEY));
 			}
 		}
 	#endif
@@ -1538,6 +1548,9 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 		if (UI_MENU_GetCurrentMenuId() == MENU_RESET  ||
 			UI_MENU_GetCurrentMenuId() == MENU_MEM_CH ||
 			UI_MENU_GetCurrentMenuId() == MENU_DEL_CH ||
+			#ifdef ENABLE_ENCRYPTION
+				UI_MENU_GetCurrentMenuId() == MENU_ENC_KEY ||
+			#endif
 			UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME)
 		{
 			switch (gAskForConfirmation)

@@ -731,17 +731,8 @@ void BOARD_EEPROM_Init(void)
 		}	
 	}
 
-	// 0F30..0F3F
-	EEPROM_ReadBuffer(0x0F30, gCustomAesKey, sizeof(gCustomAesKey));
-	bHasCustomAesKey = false;
-	for (i = 0; i < ARRAY_SIZE(gCustomAesKey); i++)
-	{
-		if (gCustomAesKey[i] != 0xFFFFFFFFu)
-		{
-			bHasCustomAesKey = true;
-			return;
-		}
-	}
+	// 0F30..0F3F - load encryption key
+	EEPROM_ReadBuffer(0x0F30, gEeprom.ENC_KEY, sizeof(gEeprom.ENC_KEY));
 
 	#ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
 		BOARD_gMR_LoadChannels();

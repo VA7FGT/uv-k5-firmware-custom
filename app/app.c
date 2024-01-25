@@ -1963,6 +1963,7 @@ Skip:
 			SETTINGS_SaveSettings();
 		else
 			gFlagSaveSettings = 1;
+
 		gRequestSaveSettings = false;
 		gUpdateStatus        = true;
 	}
