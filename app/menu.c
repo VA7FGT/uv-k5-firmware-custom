@@ -1455,7 +1455,7 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 		#if 1
 			if (UI_MENU_GetCurrentMenuId() == MENU_DEL_CH || UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME)
 				if (!RADIO_CheckValidChannel(gSubMenuSelection, false, 0))
-				return;  // invalid channel
+					return;  // invalid channel
 		#endif
 
 		gAskForConfirmation = 0;
