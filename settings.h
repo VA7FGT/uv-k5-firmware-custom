@@ -247,7 +247,7 @@ typedef struct {
 	uint8_t				  PASSWORD_WRONG_ATTEMPTS;
 #endif
 #ifdef ENABLE_ENCRYPTION
-	char                  ENC_KEY[16];
+	char                  ENC_KEY[32];
 #endif
 	uint16_t              VOX1_THRESHOLD;
 	uint16_t              VOX0_THRESHOLD;
