@@ -1419,9 +1419,9 @@ void APP_TimeSlice500ms(void)
 
 	if (gReducedService)
 	{
-		BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage, &gBatteryCurrent);
+		BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage);
 
-		if (gBatteryCurrent > 500 || gBatteryCalibration[3] < gBatteryCurrentVoltage)
+		if (gBatteryCalibration[3] < gBatteryCurrentVoltage)
 		{
 			#ifdef ENABLE_OVERLAY
 				overlay_FLASH_RebootToBootloader();
@@ -1442,7 +1442,7 @@ void APP_TimeSlice500ms(void)
 
 		if ((gBatteryCheckCounter & 1) == 0)
 		{
-			BOARD_ADC_GetBatteryInfo(&gBatteryVoltages[gBatteryVoltageIndex++], &gBatteryCurrent);
+			BOARD_ADC_GetBatteryInfo(&gBatteryVoltages[gBatteryVoltageIndex++]);
 			if (gBatteryVoltageIndex > 3)
 				gBatteryVoltageIndex = 0;
 			BATTERY_GetReadings(true);
@@ -1452,12 +1452,8 @@ void APP_TimeSlice500ms(void)
 	// regular display updates (once every 2 sec) - if need be
 	if ((gBatteryCheckCounter & 3) == 0)
 	{
-		if (gChargingWithTypeC || gSetting_battery_text > 0)
+		if (gSetting_battery_text > 0)
 			gUpdateStatus = true;
-		#ifdef ENABLE_SHOW_CHARGE_LEVEL
-			if (gChargingWithTypeC)
-				gUpdateDisplay = true;
-		#endif
 	}
 
 	#ifdef ENABLE_FMRADIO

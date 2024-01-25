@@ -105,19 +105,6 @@ const uint8_t BITMAP_BatteryLevel[2] =
 	};
 #endif
 
-const uint8_t BITMAP_USB_C[9] =
-{	// USB symbol
-	0b00000000,
-	0b00011100,
-	0b00100111,
-	0b01000100,
-	0b01000100,
-	0b01000100,
-	0b01000100,
-	0b00100111,
-	0b00011100
-};
-
 const uint8_t BITMAP_KeyLock[6] =
 {	// teeny padlock symbol
 	0b00000000,

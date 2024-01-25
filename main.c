@@ -79,7 +79,7 @@ void Main(void)
 	memset(gDTMF_String, '-', sizeof(gDTMF_String));
 	gDTMF_String[sizeof(gDTMF_String) - 1] = 0;
 
-	BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage, &gBatteryCurrent);
+	BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage);
 
 	BOARD_EEPROM_Init();
 
@@ -98,7 +98,7 @@ void Main(void)
 	BK4819_SetAGC(gEeprom.RX_AGC!=RX_AGC_OFF);
 
 	for (i = 0; i < ARRAY_SIZE(gBatteryVoltages); i++)
-		BOARD_ADC_GetBatteryInfo(&gBatteryVoltages[i], &gBatteryCurrent);
+		BOARD_ADC_GetBatteryInfo(&gBatteryVoltages[i]);
 
 	BATTERY_GetReadings(false);
 
@@ -140,7 +140,7 @@ void Main(void)
 		gDebounceCounter = 0;
 	}
 
-	if (!gChargingWithTypeC && gBatteryDisplayLevel == 0)
+	if (gBatteryDisplayLevel == 0)
 	{
 		FUNCTION_Select(FUNCTION_POWER_SAVE);
 

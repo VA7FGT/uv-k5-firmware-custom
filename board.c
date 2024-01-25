@@ -491,12 +491,11 @@ void BOARD_ADC_Init(void)
 	ADC_SoftReset();
 }
 
-void BOARD_ADC_GetBatteryInfo(uint16_t *pVoltage, uint16_t *pCurrent)
+void BOARD_ADC_GetBatteryInfo(uint16_t *pVoltage)
 {
 	ADC_Start();
 	while (!ADC_CheckEndOfConversion(ADC_CH9)) {}
 	*pVoltage = ADC_GetValue(ADC_CH4);
-	*pCurrent = ADC_GetValue(ADC_CH9);
 }
 
 void BOARD_Init(void)
