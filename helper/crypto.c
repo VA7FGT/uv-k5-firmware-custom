@@ -23,7 +23,7 @@ u_int8_t gEncryptionKey[32];
 
 // salt used for hashing encryption key from eeprom used for sending packets
 // we never actually use the key stored in eeprom directly
-// actually salt should be [16] + key [16] and then we hash it and get encryption key [32]
+// 4 salts for each 8 bytes chunks of the encryption key
 static const uint8_t encryptionSalt[4][8] = {
 	{0xEF, 0x58, 0x0A, 0xC6, 0x12, 0x4A, 0xFA, 0x4F},
 	{0xAE, 0x6F, 0x9D, 0x3C, 0xBB, 0x80, 0xAC, 0x4A},
