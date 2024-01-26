@@ -708,25 +708,6 @@ void UI_DisplayMain(void)
 					UI_PrintStringSmall(String, 2, 0, 3);
 				}
 			#endif
-
-#ifdef ENABLE_SHOW_CHARGE_LEVEL
-			else if (gChargingWithTypeC)
-			{	// charging .. show the battery state
-				if (gScreenToDisplay != DISPLAY_MAIN
-#ifdef ENABLE_DTMF_CALLING
-					|| gDTMF_CallState != DTMF_CALL_STATE_NONE
-#endif
-					)
-					return;
-						
-				center_line = CENTER_LINE_CHARGE_DATA;
-					
-				sprintf(String, "Charge %u.%02uV %u%%",
-					gBatteryVoltageAverage / 100, gBatteryVoltageAverage % 100,
-					BATTERY_VoltsToPercent(gBatteryVoltageAverage));
-				UI_PrintStringSmall(String, 2, 0, 3);
-			}
-#endif
 		}
 	}
 

@@ -51,6 +51,7 @@ ENABLE_MESSENGER                        := 1
 ENABLE_MESSENGER_DELIVERY_NOTIFICATION  := 1
 ENABLE_MESSENGER_NOTIFICATION           := 1
 ENABLE_MESSENGER_UART                   := 0
+ENABLE_ENCRYPTION                       := 1
 
 #############################################################
 
@@ -163,6 +164,10 @@ ifeq ($(ENABLE_MESSENGER),1)
 	OBJS += app/messenger.o
 	OBJS += ui/messenger.o
 endif
+ifeq ($(ENABLE_ENCRYPTION),1)
+	OBJS += external/chacha/chacha.o
+	OBJS += helper/crypto.o
+endif
 
 ifeq ($(OS), Windows_NT)
 	TOP := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -222,7 +227,10 @@ endif
 
 CFLAGS =
 ifeq ($(ENABLE_CLANG),0)
-	CFLAGS += -Os -Wall -Werror -mcpu=cortex-m0 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=c11 -MMD
+	# Highest optimization settings (possible breaking changes):
+	CFLAGS += -Oz -mcpu=cortex-m0 -fno-delete-null-pointer-checks -std=c11 -MMD
+	# Standard settings:
+	#CFLAGS += -Os -Wall -Werror -mcpu=cortex-m0 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=c11 -MMD
 	#CFLAGS += -Os -Wall -Werror -mcpu=cortex-m0 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=c99 -MMD
 	#CFLAGS += -Os -Wall -Werror -mcpu=cortex-m0 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=gnu99 -MMD
 	#CFLAGS += -Os -Wall -Werror -mcpu=cortex-m0 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=gnu11 -MMD
@@ -373,6 +381,9 @@ ifeq ($(ENABLE_MESSENGER_NOTIFICATION),1)
 endif
 ifeq ($(ENABLE_MESSENGER_UART),1)
 	CFLAGS  += -DENABLE_MESSENGER_UART
+endif
+ifeq ($(ENABLE_ENCRYPTION),1)
+	CFLAGS  += -DENABLE_ENCRYPTION
 endif
 
 LDFLAGS =

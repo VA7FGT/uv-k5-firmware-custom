@@ -22,11 +22,9 @@
 
 extern uint16_t          gBatteryCalibration[6];
 extern uint16_t          gBatteryCurrentVoltage;
-extern uint16_t          gBatteryCurrent;
 extern uint16_t          gBatteryVoltages[4];
 extern uint16_t          gBatteryVoltageAverage;
 extern uint8_t           gBatteryDisplayLevel;
-extern bool              gChargingWithTypeC;
 extern bool              gLowBatteryBlink;
 extern bool              gLowBattery;
 extern bool              gLowBatteryConfirmed;

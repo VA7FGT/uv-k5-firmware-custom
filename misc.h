@@ -280,9 +280,6 @@ extern bool                  gFlagResetVfos;
 extern bool                  gRequestSaveVFO;
 extern uint8_t               gRequestSaveChannel;
 extern bool                  gRequestSaveSettings;
-#ifdef ENABLE_FMRADIO
-	extern bool              gRequestSaveFM;
-#endif
 extern uint8_t               gKeypadLocked;
 extern bool                  gFlagPrepareTX;
 
@@ -292,9 +289,6 @@ extern bool                  gFlagRefreshSetting;  // refresh menu display
 extern bool                  gFlagSaveVfo;
 extern bool                  gFlagSaveSettings;
 extern bool                  gFlagSaveChannel;
-#ifdef ENABLE_FMRADIO
-	extern bool              gFlagSaveFM;
-#endif
 extern bool                  g_CDCSS_Lost;
 extern uint8_t               gCDCSSCodeType;
 extern bool                  g_CTCSS_Lost;
@@ -335,9 +329,6 @@ extern uint8_t               gFSKWriteIndex;
 extern volatile bool         gNextTimeslice;
 extern bool                  gUpdateDisplay;
 extern bool                  gF_LOCK;
-#ifdef ENABLE_FMRADIO
-	extern uint8_t           gFM_ChannelPosition;
-#endif
 extern uint8_t               gShowChPrefix;
 extern volatile uint8_t      gFoundCDCSSCountdown_10ms;
 extern volatile uint8_t      gFoundCTCSSCountdown_10ms;

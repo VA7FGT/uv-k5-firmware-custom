@@ -99,10 +99,10 @@ void SystickHandler(void)
 		DECREMENT_AND_TRIGGER(gCountdownToPlayNextVoice_10ms, gFlagPlayQueuedVoice);
 	#endif
 	
-	#ifdef ENABLE_FMRADIO
-		if (gFM_ScanState != FM_SCAN_OFF && gCurrentFunction != FUNCTION_MONITOR)
-			if (gCurrentFunction != FUNCTION_TRANSMIT && gCurrentFunction != FUNCTION_RECEIVE)
-				DECREMENT_AND_TRIGGER(gFmPlayCountdown_10ms, gScheduleFM);
+	#ifdef ENABLE_FMRADIO //gFM_ScanState is never different than FM_SCAN_OFF
+		// if (gFM_ScanState != FM_SCAN_OFF && gCurrentFunction != FUNCTION_MONITOR)
+		// 	if (gCurrentFunction != FUNCTION_TRANSMIT && gCurrentFunction != FUNCTION_RECEIVE)
+		// 		DECREMENT_AND_TRIGGER(gFmPlayStandardCountdown_10ms, gScheduleFM);
 	#endif
 
 	#ifdef ENABLE_VOX

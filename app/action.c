@@ -102,42 +102,12 @@ void ACTION_Monitor(void)
 
 	RADIO_SetupRegisters(true);
 
-#ifdef ENABLE_FMRADIO
-	if (gFmRadioMode) {
-		FM_Start();
-		gRequestDisplayScreen = DISPLAY_FM;
-	}
-	else
-#endif
 	gRequestDisplayScreen = gScreenToDisplay;
 }
 
 void ACTION_Scan(bool bRestart)
 {
 	(void)bRestart;
-#ifdef ENABLE_FMRADIO
-	if (gFmRadioMode)
-	{
-		if (gCurrentFunction != FUNCTION_RECEIVE &&
-			gCurrentFunction != FUNCTION_MONITOR &&
-			gCurrentFunction != FUNCTION_TRANSMIT)
-		{
-			GUI_SelectNextDisplay(DISPLAY_FM);
-
-			gMonitor = false;
-
-			if (gFM_ScanState != FM_SCAN_OFF)
-			{
-				FM_Start();
-
-#ifdef ENABLE_VOICE
-				gAnotherVoiceID = VOICE_ID_SCANNING_STOP;
-#endif
-			}
-		}
-		return;
-	}
-#endif
 
 	if (!SCANNER_IsScanning())
 	{	// not scanning

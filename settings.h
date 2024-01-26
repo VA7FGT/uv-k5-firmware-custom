@@ -154,12 +154,7 @@ typedef struct {
 	uint8_t               field8_0xb;
 
 	#ifdef ENABLE_FMRADIO
-		uint16_t          FM_SelectedFrequency;
-		uint8_t           FM_SelectedChannel;
-		bool              FM_IsMrMode;
 		uint16_t          FM_FrequencyPlaying;
-		uint16_t          FM_LowerLimit;
-		uint16_t          FM_UpperLimit;
 	#endif
 
 	uint8_t               SQUELCH_LEVEL;
@@ -246,6 +241,9 @@ typedef struct {
 	uint32_t              POWER_ON_PASSWORD;
 	uint8_t				  PASSWORD_WRONG_ATTEMPTS;
 #endif
+#ifdef ENABLE_ENCRYPTION
+	char                  ENC_KEY[16];
+#endif
 	uint16_t              VOX1_THRESHOLD;
 	uint16_t              VOX0_THRESHOLD;
 
@@ -279,4 +277,7 @@ void SETTINGS_FetchChannelName(char *s, const int channel);
 void SETTINGS_SaveBatteryCalibration(const uint16_t * batteryCalibration);
 void SETTINGS_UpdateChannel(uint8_t channel, const VFO_Info_t *pVFO, bool keep);
 void SETTINGS_SetVfoFrequency(uint32_t frequency);
+#ifdef ENABLE_ENCRYPTION
+	void SETTINGS_SaveEncryptionKey();
+#endif
 #endif

@@ -485,6 +485,15 @@ void MENU_AcceptSetting(void)
 				break;
 		#endif
 
+		#ifdef ENABLE_ENCRYPTION
+			case MENU_ENC_KEY:
+				memset(gEeprom.ENC_KEY, 0, sizeof(gEeprom.ENC_KEY));
+				memmove(gEeprom.ENC_KEY, edit, sizeof(edit));
+				memset(edit, 0, sizeof(edit));
+				gUpdateStatus        = true;
+				break;
+		#endif
+
 		case MENU_W_N:
 			gTxVfo->CHANNEL_BANDWIDTH = gSubMenuSelection;
 			gRequestSaveChannel       = 1;
@@ -1183,7 +1192,13 @@ static void MENU_Key_0_to_9(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 
 	gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
 
-	if (UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME && edit_index >= 0)
+	if (edit_index >= 0 && (
+		UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME
+		#ifdef ENABLE_ENCRYPTION
+			|| UI_MENU_GetCurrentMenuId() == MENU_ENC_KEY
+		#endif
+	))
+		
 	{	// currently editing the channel name
 
 		if (edit_index < 10)
@@ -1455,15 +1470,40 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 		return;
 	}
 
+	#ifdef ENABLE_ENCRYPTION
+		if (UI_MENU_GetCurrentMenuId() == MENU_ENC_KEY)
+		{
+			if (edit_index < 0)
+			{	// enter encryption key edit mode
+				// pad the encryption key out with '_'
+				edit_index = strlen(edit);
+				while (edit_index < 10)
+					edit[edit_index++] = '_';
+				edit[edit_index] = 0;
+				edit_index = 0;  // 'edit_index' is going to be used as the cursor position
+
+				return;
+			}
+			else if (edit_index >= 0 && edit_index < 10)
+			{	// editing the encryption key characters
+
+				if (++edit_index < 10)
+					return;	// next char
+
+				// exit, save encryption key
+			}
+		}
+	#endif
+
 	if (UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME)
 	{
 		if (edit_index < 0)
 		{	// enter channel name edit mode
 			if (!RADIO_CheckValidChannel(gSubMenuSelection, false, 0))
 				return;
-
+		
 			SETTINGS_FetchChannelName(edit, gSubMenuSelection);
-
+			
 			// pad the channel name out with '_'
 			edit_index = strlen(edit);
 			while (edit_index < 10)
@@ -1505,6 +1545,9 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
 		if (UI_MENU_GetCurrentMenuId() == MENU_RESET  ||
 			UI_MENU_GetCurrentMenuId() == MENU_MEM_CH ||
 			UI_MENU_GetCurrentMenuId() == MENU_DEL_CH ||
+			#ifdef ENABLE_ENCRYPTION
+				UI_MENU_GetCurrentMenuId() == MENU_ENC_KEY ||
+			#endif
 			UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME)
 		{
 			switch (gAskForConfirmation)
@@ -1613,10 +1656,19 @@ static void MENU_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 	uint8_t Channel;
 	bool    bCheckScanList;
 
-	if (UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME && gIsInSubMenu && edit_index >= 0)
+	if (gIsInSubMenu &&
+		edit_index >= 0 &&
+		(
+			UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME
+			#ifdef ENABLE_ENCRYPTION
+				|| UI_MENU_GetCurrentMenuId() == MENU_ENC_KEY
+			#endif
+		)
+	)
 	{	// change the character
 		if (bKeyPressed && edit_index < 10 && Direction != 0)
 		{
+			// TODO: Allow special chars when setting encryption key
 			const char   unwanted[] = "$%&!\"':;?^`|{}";
 			char         c          = edit[edit_index] + Direction;
 			unsigned int i          = 0;
@@ -1747,8 +1799,16 @@ void MENU_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 			MENU_Key_STAR(bKeyPressed, bKeyHeld);
 			break;
 		case KEY_F:
-			if (UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME && edit_index >= 0)
-			{	// currently editing the channel name
+			if (edit_index >= 0 &&
+				(
+					UI_MENU_GetCurrentMenuId() == MENU_MEM_NAME
+					#ifdef ENABLE_ENCRYPTION
+						|| UI_MENU_GetCurrentMenuId() == MENU_ENC_KEY
+					#endif
+				)
+			)
+			{	// adds space,
+			    // currently editing the channel name or enc_key
 				if (!bKeyHeld && bKeyPressed)
 				{
 					gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;

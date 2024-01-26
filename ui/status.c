@@ -182,9 +182,6 @@ void UI_DisplayStatus()
 		
 		unsigned int x2 = LCD_WIDTH - sizeof(BITMAP_BatteryLevel1) - 3;
 
-		if (gChargingWithTypeC)
-			x2 -= sizeof(BITMAP_USB_C);  // the radio is on charge
-
 		switch (gSetting_battery_text)
 		{
 			default:
@@ -215,12 +212,7 @@ void UI_DisplayStatus()
 	}
 		
 	// move to right side of the screen
-	x = LCD_WIDTH - sizeof(BITMAP_BatteryLevel1) - sizeof(BITMAP_USB_C);
-	
-	// USB-C charge indicator
-	if (gChargingWithTypeC)
-		memmove(line + x, BITMAP_USB_C, sizeof(BITMAP_USB_C));
-	x += sizeof(BITMAP_USB_C);
+	x = LCD_WIDTH - sizeof(BITMAP_BatteryLevel1);
 
 	// BATTERY LEVEL indicator
 	UI_DrawBattery(line + x, gBatteryDisplayLevel, gLowBatteryBlink);

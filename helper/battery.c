@@ -26,11 +26,9 @@
 
 uint16_t          gBatteryCalibration[6];
 uint16_t          gBatteryCurrentVoltage;
-uint16_t          gBatteryCurrent;
 uint16_t          gBatteryVoltages[4];
 uint16_t          gBatteryVoltageAverage;
 uint8_t           gBatteryDisplayLevel;
-bool              gChargingWithTypeC;
 bool              gLowBatteryBlink;
 bool              gLowBattery;
 bool              gLowBatteryConfirmed;
@@ -123,28 +121,6 @@ void BATTERY_GetReadings(const bool bDisplayBatteryLevel)
 	if ((gScreenToDisplay == DISPLAY_MENU) && UI_MENU_GetCurrentMenuId() == MENU_VOL)
 		gUpdateDisplay = true;
 
-	if (gBatteryCurrent < 501)
-	{
-		if (gChargingWithTypeC)
-		{
-			gUpdateStatus  = true;
-			gUpdateDisplay = true;
-		}
-
-		gChargingWithTypeC = false;
-	}
-	else
-	{
-		if (!gChargingWithTypeC)
-		{
-			gUpdateStatus  = true;
-			gUpdateDisplay = true;
-			BACKLIGHT_TurnOn();
-		}
-
-		gChargingWithTypeC = true;
-	}
-
 	if (PreviousBatteryLevel != gBatteryDisplayLevel)
 	{
 		if(gBatteryDisplayLevel > 2)
@@ -181,42 +157,41 @@ void BATTERY_TimeSlice500ms(void)
 
 			if (lowBatteryCountdown < lowBatteryPeriod)
 			{
-				if (lowBatteryCountdown == lowBatteryPeriod-1 && !gChargingWithTypeC && !gLowBatteryConfirmed)
+				if (lowBatteryCountdown == lowBatteryPeriod-1 && !gLowBatteryConfirmed)
 					AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP);
 			}
 			else
 			{
 				lowBatteryCountdown = 0;
 
-				if (!gChargingWithTypeC)
-				{	// not on charge
-					if(!gLowBatteryConfirmed) {
-						AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP);
+
+				if(!gLowBatteryConfirmed) {
+					AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP);
 #ifdef ENABLE_VOICE
-						AUDIO_SetVoiceID(0, VOICE_ID_LOW_VOLTAGE);
-#endif
-					}
-					if (gBatteryDisplayLevel == 0)
-					{
-#ifdef ENABLE_VOICE
-						AUDIO_PlaySingleVoice(true);
-#endif
-
-						gReducedService = true;
-
-						//if (gCurrentFunction != FUNCTION_POWER_SAVE)
-							FUNCTION_Select(FUNCTION_POWER_SAVE);
-
-						ST7565_HardwareReset();
-
-						if (gEeprom.BACKLIGHT_TIME < (ARRAY_SIZE(gSubMenu_BACKLIGHT) - 1))
-							BACKLIGHT_TurnOff();  // turn the backlight off
-					}
-#ifdef ENABLE_VOICE
-					else
-						AUDIO_PlaySingleVoice(false);
+					AUDIO_SetVoiceID(0, VOICE_ID_LOW_VOLTAGE);
 #endif
 				}
+				if (gBatteryDisplayLevel == 0)
+				{
+#ifdef ENABLE_VOICE
+					AUDIO_PlaySingleVoice(true);
+#endif
+
+					gReducedService = true;
+
+					//if (gCurrentFunction != FUNCTION_POWER_SAVE)
+						FUNCTION_Select(FUNCTION_POWER_SAVE);
+
+					ST7565_HardwareReset();
+
+					if (gEeprom.BACKLIGHT_TIME < (ARRAY_SIZE(gSubMenu_BACKLIGHT) - 1))
+						BACKLIGHT_TurnOff();  // turn the backlight off
+				}
+#ifdef ENABLE_VOICE
+				else
+					AUDIO_PlaySingleVoice(false);
+#endif
+				
 			}
 		}
 	}

@@ -15,23 +15,20 @@
 #include "driver/system.h"
 #include "app/messenger.h"
 #include "ui/ui.h"
+#ifdef ENABLE_ENCRYPTION
+	#include "helper/crypto.h"
+#endif
 
 #if defined(ENABLE_UART) && defined(ENABLE_UART_DEBUG)
     #include "driver/uart.h"
 #endif
-
-typedef enum MsgStatus {
-    READY,
-    SENDING,
-    RECEIVING,
-} MsgStatus;
 
 const uint8_t MSG_BUTTON_STATE_HELD = 1 << 1;
 
 const uint8_t MSG_BUTTON_EVENT_SHORT =  0;
 const uint8_t MSG_BUTTON_EVENT_LONG =  MSG_BUTTON_STATE_HELD;
 
-const uint8_t MAX_MSG_LENGTH = TX_MSG_LENGTH - 1;
+const uint8_t MAX_MSG_LENGTH = PAYLOAD_LENGTH - 1;
 
 const uint16_t TONE2_FREQ = 0x3065; // 0x2854
 
@@ -44,16 +41,16 @@ unsigned char numberOfLettersAssignedToKey[9] = { 4, 3, 3, 3, 3, 3, 4, 3, 4 };
 char T9TableNum[9][4] = { {'1', '\0', '\0', '\0'}, {'2', '\0', '\0', '\0'}, {'3', '\0', '\0', '\0'}, {'4', '\0', '\0', '\0'}, {'5', '\0', '\0', '\0'}, {'6', '\0', '\0', '\0'}, {'7', '\0', '\0', '\0'}, {'8', '\0', '\0', '\0'}, {'9', '\0', '\0', '\0'} };
 unsigned char numberOfNumsAssignedToKey[9] = { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
-char cMessage[TX_MSG_LENGTH];
-char lastcMessage[TX_MSG_LENGTH];
-char rxMessage[4][MAX_RX_MSG_LENGTH + 2];
+char cMessage[PAYLOAD_LENGTH];
+char lastcMessage[PAYLOAD_LENGTH];
+char rxMessage[4][PAYLOAD_LENGTH + 2];
 unsigned char cIndex = 0;
 unsigned char prevKey = 0, prevLetter = 0;
 KeyboardType keyboardType = UPPERCASE;
 
 MsgStatus msgStatus = READY;
 
-uint8_t msgFSKBuffer[MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH];
+union DataPacket dataPacket;
 
 uint16_t gErrorsDuringMSG;
 
@@ -77,6 +74,11 @@ void MSG_FSKSendData() {
 
 	// set the FM deviation level
 	const uint16_t dev_val = BK4819_ReadRegister(BK4819_REG_40);
+
+	// mute the mic
+	const uint16_t reg30 = BK4819_ReadRegister(BK4819_REG_30);
+	BK4819_WriteRegister(BK4819_REG_30, reg30 & ~(1u << 2));
+
 	//UART_printf("\n BANDWIDTH : 0x%.4X", dev_val);
 	{
 		uint16_t deviation = 850;
@@ -227,7 +229,7 @@ void MSG_FSKSendData() {
 				(0u <<  0);    // 0 ~ 7   ???
 
 	// Set packet length (not including pre-amble and sync bytes that we can't seem to disable)
-	BK4819_WriteRegister(BK4819_REG_5D, ((MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH) << 8));
+	BK4819_WriteRegister(BK4819_REG_5D, ((sizeof(dataPacket.serializedArray)) << 8));
 
 	// REG_5A
 	//
@@ -267,11 +269,13 @@ void MSG_FSKSendData() {
 	SYSTEM_DelayMs(100);
 
 	{	// load the entire packet data into the TX FIFO buffer
-		const uint16_t len_buff = (MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH);
-		for (size_t i = 0, j = 0; i < len_buff; i += 2, j++) {
-        	BK4819_WriteRegister(BK4819_REG_5F, (msgFSKBuffer[i + 1] << 8) | msgFSKBuffer[i]);
+		for (size_t i = 0, j = 0; i < sizeof(dataPacket.serializedArray); i += 2, j++) {
+        	BK4819_WriteRegister(BK4819_REG_5F, (dataPacket.serializedArray[i + 1] << 8) | dataPacket.serializedArray[i]);
     	}
 	}
+
+	// clear dataPacket
+	memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));;
 
 	// enable FSK TX
 	BK4819_WriteRegister(BK4819_REG_59, (1u << 11) | fsk_reg59);
@@ -301,6 +305,9 @@ void MSG_FSKSendData() {
 
 	// restore FM deviation level
 	BK4819_WriteRegister(BK4819_REG_40, dev_val);
+
+	//restore mic mute
+	BK4819_WriteRegister(BK4819_REG_30, reg30);
 
 	// restore TX/RX filtering
 	BK4819_WriteRegister(BK4819_REG_2B, filt_val);
@@ -508,7 +515,7 @@ void MSG_EnableRX(const bool enable) {
 
 		{	// packet size .. sync + 14 bytes - size of a single packet
 
-			uint16_t size = (MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH);
+			uint16_t size = sizeof(dataPacket.serializedArray);
 			// size -= (fsk_reg59 & (1u << 3)) ? 4 : 2;
 			size = (((size + 1) / 2) * 2) + 2;             // round up to even, else FSK RX doesn't work
 			BK4819_WriteRegister(BK4819_REG_5D, (size << 8));
@@ -529,7 +536,7 @@ void MSG_EnableRX(const bool enable) {
 
 // -----------------------------------------------------
 
-void moveUP(char (*rxMessages)[MAX_RX_MSG_LENGTH + 2]) {
+void moveUP(char (*rxMessages)[PAYLOAD_LENGTH + 2]) {
     // Shift existing lines up
     strcpy(rxMessages[0], rxMessages[1]);
 	strcpy(rxMessages[1], rxMessages[2]);
@@ -539,34 +546,42 @@ void moveUP(char (*rxMessages)[MAX_RX_MSG_LENGTH + 2]) {
 	memset(rxMessages[3], 0, sizeof(rxMessages[3]));
 }
 
-void MSG_Send(const char txMessage[TX_MSG_LENGTH], bool bServiceMessage) {
+void MSG_SendPacket(union DataPacket packet) {
 
 	if ( msgStatus != READY ) return;
 
-	if ( strlen(txMessage) > 0 && (TX_freq_check(gCurrentVfo->pTX->Frequency) == 0) ) {
+	if ( strlen(packet.data.payload) > 0 && (TX_freq_check(gCurrentVfo->pTX->Frequency) == 0) ) {
 
 		msgStatus = SENDING;
 
 		RADIO_SetVfoState(VFO_STATE_NORMAL);
+		BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, false);
 		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, true);
 
-		memset(msgFSKBuffer, 0, sizeof(msgFSKBuffer));
+		memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));
 
-		// ? ToDo
-		// first 20 byte sync, msg type and ID
-		msgFSKBuffer[0] = 'M';
-		msgFSKBuffer[1] = 'S';
+		// later refactor to not use global state but pass dataPacket type everywhere
+		dataPacket = packet;
+		#ifdef ENABLE_ENCRYPTION
+			if(packet.data.header == ENCRYPTED_MESSAGE_PACKET){
+				char nonce[NONCE_LENGTH];
 
-		// next 20 for msg
-		memcpy(msgFSKBuffer + 2, txMessage, TX_MSG_LENGTH);
+				CRYPTO_Random(nonce, NONCE_LENGTH);
+				// this is wat happens when we have global state
+				memcpy(packet.data.nonce, nonce, NONCE_LENGTH);
 
-		// CRC ? ToDo
-
-		msgFSKBuffer[MAX_RX_MSG_LENGTH - 1] = '\0';
-		msgFSKBuffer[MAX_RX_MSG_LENGTH + 0] = 'I';
-		msgFSKBuffer[MAX_RX_MSG_LENGTH + 1] = 'D';
-		msgFSKBuffer[MAX_RX_MSG_LENGTH + 2] = '0';
-		msgFSKBuffer[(MSG_HEADER_LENGTH + MAX_RX_MSG_LENGTH) - 1] = '#';
+				CRYPTO_Crypt(
+					packet.data.payload,
+					PAYLOAD_LENGTH,
+					dataPacket.data.payload,
+					&packet.data.nonce,
+					gEncryptionKey,
+					256
+				);
+			
+				memcpy(dataPacket.data.nonce, nonce, sizeof(dataPacket.data.nonce));
+			}
+		#endif
 
 		BK4819_DisableDTMF();
 
@@ -583,7 +598,6 @@ void MSG_Send(const char txMessage[TX_MSG_LENGTH], bool bServiceMessage) {
 
 		SYSTEM_DelayMs(100);
 
-
         APP_EndTransmission();
 		// this must be run after end of TX, otherwise radio will still TX transmit without even RED LED on
 		FUNCTION_Select(FUNCTION_FOREGROUND);
@@ -593,11 +607,11 @@ void MSG_Send(const char txMessage[TX_MSG_LENGTH], bool bServiceMessage) {
 		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, false);
 
 		MSG_EnableRX(true);
-		if (!bServiceMessage) {
+		if (packet.data.header != ACK_PACKET) {
 			moveUP(rxMessage);
-			sprintf(rxMessage[3], "> %s", txMessage);
+			sprintf(rxMessage[3], "> %s", packet.data.payload);
 			memset(lastcMessage, 0, sizeof(lastcMessage));
-			memcpy(lastcMessage, txMessage, TX_MSG_LENGTH);
+			memcpy(lastcMessage, packet.data.payload, PAYLOAD_LENGTH);
 			cIndex = 0;
 			prevKey = 0;
 			prevLetter = 0;
@@ -629,7 +643,7 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 
 	if (rx_sync) {
 		gFSKWriteIndex = 0;
-		memset(msgFSKBuffer, 0, sizeof(msgFSKBuffer));
+		memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));
 		msgStatus = RECEIVING;
 	}
 
@@ -638,10 +652,10 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 		const uint16_t count = BK4819_ReadRegister(BK4819_REG_5E) & (7u << 0);  // almost full threshold
 		for (uint16_t i = 0; i < count; i++) {
 			const uint16_t word = BK4819_ReadRegister(BK4819_REG_5F);
-			if (gFSKWriteIndex < sizeof(msgFSKBuffer))
-				msgFSKBuffer[gFSKWriteIndex++] = validate_char((word >> 0) & 0xff);
-			if (gFSKWriteIndex < sizeof(msgFSKBuffer))
-				msgFSKBuffer[gFSKWriteIndex++] = validate_char((word >> 8) & 0xff);
+			if (gFSKWriteIndex < sizeof(dataPacket.serializedArray))
+				dataPacket.serializedArray[gFSKWriteIndex++] = (word >> 0) & 0xff;
+			if (gFSKWriteIndex < sizeof(dataPacket.serializedArray))
+				dataPacket.serializedArray[gFSKWriteIndex++] = (word >> 8) & 0xff;
 		}
 
 		SYSTEM_DelayMs(10);
@@ -658,31 +672,40 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 
 		if (gFSKWriteIndex > 2) {
 
-			// If there's three 0x1b bytes, then it's a service message
-			if (msgFSKBuffer[2] == 0x1b && msgFSKBuffer[3] == 0x1b && msgFSKBuffer[4] == 0x1b) {
+			if (dataPacket.data.header == ACK_PACKET) {
 			#ifdef ENABLE_MESSENGER_DELIVERY_NOTIFICATION
-				// If the next 4 bytes are "RCVD", then it's a delivery notification
-				if (msgFSKBuffer[5] == 'R' && msgFSKBuffer[6] == 'C' && msgFSKBuffer[7] == 'V' && msgFSKBuffer[8] == 'D') {
-					#ifdef ENABLE_MESSENGER_UART
-                        UART_printf("SVC<RCPT\r\n");
-                    #endif
-					rxMessage[3][strlen(rxMessage[3])] = '+';
-					gUpdateStatus = true;
-					gUpdateDisplay = true;
-				}
+				#ifdef ENABLE_MESSENGER_UART
+					UART_printf("SVC<RCPT\r\n");
+				#endif
+				rxMessage[3][strlen(rxMessage[3])] = '+';
+				gUpdateStatus = true;
+				gUpdateDisplay = true;
 			#endif
 			} else {
 				moveUP(rxMessage);
-				if (msgFSKBuffer[0] != 'M' || msgFSKBuffer[1] != 'S') {
-					snprintf(rxMessage[3], TX_MSG_LENGTH + 2, "? unknown msg format!");
+				if (dataPacket.data.header >= INVALID_PACKET) {
+					snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "ERROR: INVALID PACKET.");
 				}
 				else
 				{
-					snprintf(rxMessage[3], TX_MSG_LENGTH + 2, "< %s", &msgFSKBuffer[2]);
+					#ifdef ENABLE_ENCRYPTION
+						if(dataPacket.data.header == ENCRYPTED_MESSAGE_PACKET)
+						{
+							CRYPTO_Crypt(dataPacket.data.payload,
+								PAYLOAD_LENGTH,
+								dataPacket.data.payload,
+								&dataPacket.data.nonce,
+								gEncryptionKey,
+								256);
+						}
+						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.data.payload);
+					#else
+						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.data.payload);
+					#endif
 				}
 
 			#ifdef ENABLE_MESSENGER_UART
-				UART_printf("SMS<%s\r\n", &msgFSKBuffer[2]);
+				UART_printf("SMS<%s\r\n", dencryptedTxMessage);
 			#endif
 
 				if ( gScreenToDisplay != DISPLAY_MSG ) {
@@ -701,8 +724,9 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 
 		gFSKWriteIndex = 0;
 		// Transmit a message to the sender that we have received the message (Unless it's a service message)
-		if (msgFSKBuffer[0] == 'M' && msgFSKBuffer[1] == 'S' && msgFSKBuffer[2] != 0x1b) {
-			MSG_Send("\x1b\x1b\x1bRCVD                       ", true);
+		if (dataPacket.data.header!=ACK_PACKET) {
+			dataPacket.data.header=ACK_PACKET;
+			MSG_SendPacket(dataPacket);
 		}
 	}
 }
@@ -780,7 +804,7 @@ void processBackspace() {
 
 void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 	uint8_t state = bKeyPressed + 2 * bKeyHeld;
-
+	
 	if (state == MSG_BUTTON_EVENT_SHORT) {
 
 		switch (Key)
@@ -810,14 +834,21 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 				break;
 			case KEY_UP:
 				memset(cMessage, 0, sizeof(cMessage));
-				memcpy(cMessage, lastcMessage, TX_MSG_LENGTH);
+				memcpy(cMessage, lastcMessage, PAYLOAD_LENGTH);
 				cIndex = strlen(cMessage);
 				break;
 			/*case KEY_DOWN:
 				break;*/
 			case KEY_MENU:
 				// Send message
-				MSG_Send(cMessage, false);
+				memset(dataPacket.serializedArray,0,sizeof(dataPacket.serializedArray));
+				#ifdef ENABLE_ENCRYPTION
+					dataPacket.data.header=ENCRYPTED_MESSAGE_PACKET;
+				#else
+					dataPacket.data.header=MESSAGE_PACKET;
+				#endif
+				memcpy(dataPacket.data.payload, cMessage, sizeof(dataPacket.data.payload));
+				MSG_SendPacket(dataPacket);
 				break;
 			case KEY_EXIT:
 				gRequestDisplayScreen = DISPLAY_MAIN;

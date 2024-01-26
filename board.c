@@ -491,12 +491,11 @@ void BOARD_ADC_Init(void)
 	ADC_SoftReset();
 }
 
-void BOARD_ADC_GetBatteryInfo(uint16_t *pVoltage, uint16_t *pCurrent)
+void BOARD_ADC_GetBatteryInfo(uint16_t *pVoltage)
 {
 	ADC_Start();
 	while (!ADC_CheckEndOfConversion(ADC_CH9)) {}
 	*pVoltage = ADC_GetValue(ADC_CH4);
-	*pCurrent = ADC_GetValue(ADC_CH9);
 }
 
 void BOARD_Init(void)
@@ -506,9 +505,6 @@ void BOARD_Init(void)
 	BACKLIGHT_InitHardware();
 	BOARD_ADC_Init();
 	ST7565_Init(true);
-	#ifdef ENABLE_FMRADIO
-		BK1080_Init(0, false);
-	#endif
 	CRC_Init();
 }
 
@@ -730,18 +726,10 @@ void BOARD_EEPROM_Init(void)
 			att->band = 0xf;
 		}	
 	}
-
-	// 0F30..0F3F
-	EEPROM_ReadBuffer(0x0F30, gCustomAesKey, sizeof(gCustomAesKey));
-	bHasCustomAesKey = false;
-	for (i = 0; i < ARRAY_SIZE(gCustomAesKey); i++)
-	{
-		if (gCustomAesKey[i] != 0xFFFFFFFFu)
-		{
-			bHasCustomAesKey = true;
-			return;
-		}
-	}
+	#ifdef ENABLE_ENCRYPTION
+		// 0F30..0F3F - load encryption key
+		EEPROM_ReadBuffer(0x0F30, gEeprom.ENC_KEY, sizeof(gEeprom.ENC_KEY));
+	#endif
 
 	#ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
 		BOARD_gMR_LoadChannels();
@@ -855,7 +843,7 @@ void BOARD_FactoryReset(bool bIsAll)
 	{
 		if (
 			!(i >= 0x0EE0 && i < 0x0F18) &&         // ANI ID + DTMF codes
-			!(i >= 0x0F30 && i < 0x0F50) &&         // AES KEY + F LOCK + Scramble Enable
+			!(i >= 0x0F30 && i < 0x0F50) &&         // ENCRYPTION KEY + F LOCK + Scramble Enable
 			!(i >= 0x1C00 && i < 0x1E00) &&         // DTMF contacts
 			!(i >= 0x0EB0 && i < 0x0ED0) &&         // Welcome strings
 			!(i >= 0x0EA0 && i < 0x0EA8) &&         // Voice Prompt
