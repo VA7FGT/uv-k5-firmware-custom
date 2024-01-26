@@ -154,12 +154,7 @@ typedef struct {
 	uint8_t               field8_0xb;
 
 	#ifdef ENABLE_FMRADIO
-		uint16_t          FM_SelectedFrequency;
-		uint8_t           FM_SelectedChannel;
-		bool              FM_IsMrMode;
 		uint16_t          FM_FrequencyPlaying;
-		uint16_t          FM_LowerLimit;
-		uint16_t          FM_UpperLimit;
 	#endif
 
 	uint8_t               SQUELCH_LEVEL;

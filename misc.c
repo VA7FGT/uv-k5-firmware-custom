@@ -171,9 +171,6 @@ bool              gFlagResetVfos;
 bool              gRequestSaveVFO;
 uint8_t           gRequestSaveChannel;
 bool              gRequestSaveSettings;
-#ifdef ENABLE_FMRADIO
-	bool          gRequestSaveFM;
-#endif
 bool              gFlagPrepareTX;
 
 bool              gFlagAcceptSetting;
@@ -182,9 +179,6 @@ bool              gFlagRefreshSetting;
 bool              gFlagSaveVfo;
 bool              gFlagSaveSettings;
 bool              gFlagSaveChannel;
-#ifdef ENABLE_FMRADIO
-	bool          gFlagSaveFM;
-#endif
 bool              g_CDCSS_Lost;
 uint8_t           gCDCSSCodeType;
 bool              g_CTCSS_Lost;

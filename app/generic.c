@@ -61,13 +61,9 @@ void GENERIC_Key_F(bool bKeyPressed, bool bKeyHeld)
 		}
 		else // released
 		{
-			#ifdef ENABLE_FMRADIO
-				if ((gFmRadioMode || gScreenToDisplay != DISPLAY_MAIN) && gScreenToDisplay != DISPLAY_FM)
-					return;
-			#else
-				if (gScreenToDisplay != DISPLAY_MAIN)
-					return;
-			#endif
+
+			if (gScreenToDisplay != DISPLAY_MAIN)
+				return;
 
 			gWasFKeyPressed = !gWasFKeyPressed; // toggle F function
 
@@ -89,14 +85,6 @@ void GENERIC_Key_F(bool bKeyPressed, bool bKeyHeld)
 			gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
 			return;
 		}
-
-		#ifdef ENABLE_FMRADIO
-			if (gFM_ScanState == FM_SCAN_OFF) // not scanning
-			{
-				gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
-				return;
-			}
-		#endif
 
 		gBeepToPlay     = BEEP_440HZ_500MS;
 

@@ -505,9 +505,6 @@ void BOARD_Init(void)
 	BACKLIGHT_InitHardware();
 	BOARD_ADC_Init();
 	ST7565_Init(true);
-	#ifdef ENABLE_FMRADIO
-		BK1080_Init(0, false);
-	#endif
 	CRC_Init();
 }
 
