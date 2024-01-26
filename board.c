@@ -726,9 +726,10 @@ void BOARD_EEPROM_Init(void)
 			att->band = 0xf;
 		}	
 	}
-
-	// 0F30..0F3F - load encryption key
-	EEPROM_ReadBuffer(0x0F30, gEeprom.ENC_KEY, sizeof(gEeprom.ENC_KEY));
+	#ifdef ENABLE_ENCRYPTION
+		// 0F30..0F3F - load encryption key
+		EEPROM_ReadBuffer(0x0F30, gEeprom.ENC_KEY, sizeof(gEeprom.ENC_KEY));
+	#endif
 
 	#ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
 		BOARD_gMR_LoadChannels();

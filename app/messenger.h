@@ -34,27 +34,21 @@ typedef enum MsgStatus {
 } MsgStatus;
 
 typedef enum PacketType {
-    MESSAGE_PACKET,
+    MESSAGE_PACKET = 100u,
     ENCRYPTED_MESSAGE_PACKET,
-	ACK_PACKET,
-	INVALID_PACKET
+    ACK_PACKET,
+    INVALID_PACKET
 } PacketType;
 
 // Data Packet definition                            // 2024 kamilsss655
 union DataPacket
 { 
   struct{
-	uint8_t header;
-    uint8_t ciphertext[PAYLOAD_LENGTH];
+    uint8_t header;
+    uint8_t payload[PAYLOAD_LENGTH];
     unsigned char nonce[NONCE_LENGTH];
     // uint8_t signature[SIGNATURE_LENGTH];
-  } encrypted;
-  
-  struct{
-    uint8_t header;
-    char payload[PAYLOAD_LENGTH];
-    // uint8_t signature[SIGNATURE_LENGTH];
-  } unencrypted;
+  } data;
   // header + payload + nonce = must be an even number
   uint8_t serializedArray[1+PAYLOAD_LENGTH+NONCE_LENGTH];
 };

@@ -542,7 +542,7 @@ void MSG_SendPacket(union DataPacket packet) {
 
 	if ( msgStatus != READY ) return;
 
-	if ( strlen(packet.unencrypted.payload) > 0 && (TX_freq_check(gCurrentVfo->pTX->Frequency) == 0) ) {
+	if ( strlen(packet.data.payload) > 0 && (TX_freq_check(gCurrentVfo->pTX->Frequency) == 0) ) {
 
 		msgStatus = SENDING;
 
@@ -554,23 +554,23 @@ void MSG_SendPacket(union DataPacket packet) {
 		// later refactor to not use global state but pass dataPacket type everywhere
 		dataPacket = packet;
 		#ifdef ENABLE_ENCRYPTION
-			if(packet.unencrypted.header == ENCRYPTED_MESSAGE_PACKET){
+			if(packet.data.header == ENCRYPTED_MESSAGE_PACKET){
 				char nonce[NONCE_LENGTH];
 
 				CRYPTO_Random(nonce, NONCE_LENGTH);
 				// this is wat happens when we have global state
-				memcpy(packet.encrypted.nonce, nonce, NONCE_LENGTH);
+				memcpy(packet.data.nonce, nonce, NONCE_LENGTH);
 
 				CRYPTO_Crypt(
-					packet.encrypted.ciphertext,
+					packet.data.payload,
 					PAYLOAD_LENGTH,
-					dataPacket.encrypted.ciphertext,
-					&packet.encrypted.nonce,
+					dataPacket.data.payload,
+					&packet.data.nonce,
 					gEncryptionKey,
 					256
 				);
 			
-				memcpy(dataPacket.encrypted.nonce, nonce, sizeof(dataPacket.encrypted.nonce));
+				memcpy(dataPacket.data.nonce, nonce, sizeof(dataPacket.data.nonce));
 			}
 		#endif
 
@@ -598,11 +598,11 @@ void MSG_SendPacket(union DataPacket packet) {
 		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, false);
 
 		MSG_EnableRX(true);
-		if (packet.unencrypted.header != ACK_PACKET) {
+		if (packet.data.header != ACK_PACKET) {
 			moveUP(rxMessage);
-			sprintf(rxMessage[3], "> %s", packet.encrypted.ciphertext);
+			sprintf(rxMessage[3], "> %s", packet.data.payload);
 			memset(lastcMessage, 0, sizeof(lastcMessage));
-			memcpy(lastcMessage, packet.encrypted.ciphertext, PAYLOAD_LENGTH);
+			memcpy(lastcMessage, packet.data.payload, PAYLOAD_LENGTH);
 			cIndex = 0;
 			prevKey = 0;
 			prevLetter = 0;
@@ -663,8 +663,7 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 
 		if (gFSKWriteIndex > 2) {
 
-			// If there's three 0x1b bytes, then it's a service message
-			if (dataPacket.unencrypted.header == ACK_PACKET) {
+			if (dataPacket.data.header == ACK_PACKET) {
 			#ifdef ENABLE_MESSENGER_DELIVERY_NOTIFICATION
 				#ifdef ENABLE_MESSENGER_UART
 					UART_printf("SVC<RCPT\r\n");
@@ -675,26 +674,24 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 			#endif
 			} else {
 				moveUP(rxMessage);
-				if (dataPacket.unencrypted.header >= INVALID_PACKET) {
+				if (dataPacket.data.header >= INVALID_PACKET) {
 					snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "ERROR: INVALID PACKET.");
 				}
 				else
 				{
 					#ifdef ENABLE_ENCRYPTION
-						char dencryptedTxMessage[PAYLOAD_LENGTH];
-						// memset(dencryptedTxMessage,0,sizeof(dencryptedTxMessage));
-
-						if(dataPacket.unencrypted.header == ENCRYPTED_MESSAGE_PACKET)
-							CRYPTO_Crypt(dataPacket.encrypted.ciphertext,
+						if(dataPacket.data.header == ENCRYPTED_MESSAGE_PACKET)
+						{
+							CRYPTO_Crypt(dataPacket.data.payload,
 								PAYLOAD_LENGTH,
-								dencryptedTxMessage,
-								&dataPacket.encrypted.nonce,
+								dataPacket.data.payload,
+								&dataPacket.data.nonce,
 								gEncryptionKey,
 								256);
-
-						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dencryptedTxMessage);
+						}
+						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.data.payload);
 					#else
-						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.unencrypted.payload);
+						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.data.payload);
 					#endif
 				}
 
@@ -718,10 +715,9 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 
 		gFSKWriteIndex = 0;
 		// Transmit a message to the sender that we have received the message (Unless it's a service message)
-		if (dataPacket.unencrypted.header!=ACK_PACKET) {
-			dataPacket.unencrypted.header=ACK_PACKET;
+		if (dataPacket.data.header!=ACK_PACKET) {
+			dataPacket.data.header=ACK_PACKET;
 			MSG_SendPacket(dataPacket);
-			// MSG_Send("\x1b\x1b\x1bRCVD                       ", true);
 		}
 	}
 }
@@ -837,8 +833,12 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 			case KEY_MENU:
 				// Send message
 				memset(dataPacket.serializedArray,0,sizeof(dataPacket.serializedArray));
-				dataPacket.unencrypted.header=ENCRYPTED_MESSAGE_PACKET;
-				memcpy(dataPacket.unencrypted.payload, cMessage, sizeof(dataPacket.unencrypted.payload));
+				#ifdef ENABLE_ENCRYPTION
+					dataPacket.data.header=ENCRYPTED_MESSAGE_PACKET;
+				#else
+					dataPacket.data.header=MESSAGE_PACKET;
+				#endif
+				memcpy(dataPacket.data.payload, cMessage, sizeof(dataPacket.data.payload));
 				MSG_SendPacket(dataPacket);
 				break;
 			case KEY_EXIT:
