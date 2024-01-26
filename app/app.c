@@ -915,17 +915,6 @@ void APP_Update(void)
 		}
 	}
 
-#ifdef ENABLE_FMRADIO
-	if (gScheduleFM                          &&
-		gFM_ScanState    != FM_SCAN_OFF      &&
-		gCurrentFunction != FUNCTION_MONITOR &&
-		gCurrentFunction != FUNCTION_RECEIVE &&
-		gCurrentFunction != FUNCTION_TRANSMIT)
-	{	// switch to FM radio mode
-		FM_Start();
-		gScheduleFM = false;
-	}
-#endif
 
 #ifdef ENABLE_VOX
 	if (gEeprom.VOX_SWITCH)
@@ -1457,7 +1446,7 @@ void APP_TimeSlice500ms(void)
 	}
 
 	#ifdef ENABLE_FMRADIO
-		if ((gFM_ScanState == FM_SCAN_OFF || gAskToSave) && !gCssBackgroundScan)
+		if (gAskToSave && !gCssBackgroundScan)
 	#else
 		if (!gCssBackgroundScan)
 	#endif
@@ -1889,50 +1878,45 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 				}
 #endif
 		}
-		else if (Key != KEY_SIDE1 && Key != KEY_SIDE2) {
-			switch (gScreenToDisplay) {
-				case DISPLAY_MAIN:
+		switch (gScreenToDisplay) {
+			case DISPLAY_MAIN:
+				if ((Key == KEY_SIDE1 || Key == KEY_SIDE2) && !SCANNER_IsScanning())
+					{
+						ACTION_Handle(Key, bKeyPressed, bKeyHeld);
+					}
+				else
 					MAIN_ProcessKeys(Key, bKeyPressed, bKeyHeld);
-					break;
+
+				break;
 #ifdef ENABLE_FMRADIO
-				case DISPLAY_FM:
-					FM_ProcessKeys(Key, bKeyPressed, bKeyHeld);
-					break;
+			case DISPLAY_FM:
+				FM_ProcessKeys(Key, bKeyPressed, bKeyHeld);
+				break;
 #endif
-				case DISPLAY_MENU:
-					MENU_ProcessKeys(Key, bKeyPressed, bKeyHeld);
+			case DISPLAY_MENU:
+				MENU_ProcessKeys(Key, bKeyPressed, bKeyHeld);
+				break;
+			
+			#ifdef ENABLE_MESSENGER
+				case DISPLAY_MSG:
+					MSG_ProcessKeys(Key, bKeyPressed, bKeyHeld);
 					break;
-				
-				#ifdef ENABLE_MESSENGER
-					case DISPLAY_MSG:
-						MSG_ProcessKeys(Key, bKeyPressed, bKeyHeld);
-						break;
-				#endif
+			#endif
 
-				case DISPLAY_SCANNER:
-					SCANNER_ProcessKeys(Key, bKeyPressed, bKeyHeld);
-					break;
+			case DISPLAY_SCANNER:
+				SCANNER_ProcessKeys(Key, bKeyPressed, bKeyHeld);
+				break;
 
 #ifdef ENABLE_AIRCOPY
-				case DISPLAY_AIRCOPY:
-					AIRCOPY_ProcessKeys(Key, bKeyPressed, bKeyHeld);
-					break;
+			case DISPLAY_AIRCOPY:
+				AIRCOPY_ProcessKeys(Key, bKeyPressed, bKeyHeld);
+				break;
 #endif
-				case DISPLAY_INVALID:
-				default:
-					break;
-			}
+			case DISPLAY_INVALID:
+			default:
+				break;
 		}
-		else
-#ifdef ENABLE_AIRCOPY
-		if (!SCANNER_IsScanning() && gScreenToDisplay != DISPLAY_AIRCOPY)
-#else
-		if (!SCANNER_IsScanning())
-#endif
-		{
-			ACTION_Handle(Key, bKeyPressed, bKeyHeld);
-		}
-		else if (!bKeyHeld && bKeyPressed)
+		if (!bKeyHeld && bKeyPressed)
 			gBeepToPlay = BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL;
 	}
 
