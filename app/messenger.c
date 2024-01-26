@@ -74,6 +74,11 @@ void MSG_FSKSendData() {
 
 	// set the FM deviation level
 	const uint16_t dev_val = BK4819_ReadRegister(BK4819_REG_40);
+
+	// mute the mic
+	const uint16_t reg30 = BK4819_ReadRegister(BK4819_REG_30);
+	BK4819_WriteRegister(BK4819_REG_30, reg30 & ~(1u << 2));
+
 	//UART_printf("\n BANDWIDTH : 0x%.4X", dev_val);
 	{
 		uint16_t deviation = 850;
@@ -300,6 +305,9 @@ void MSG_FSKSendData() {
 
 	// restore FM deviation level
 	BK4819_WriteRegister(BK4819_REG_40, dev_val);
+
+	//restore mic mute
+	BK4819_WriteRegister(BK4819_REG_30, reg30);
 
 	// restore TX/RX filtering
 	BK4819_WriteRegister(BK4819_REG_2B, filt_val);
@@ -547,6 +555,7 @@ void MSG_SendPacket(union DataPacket packet) {
 		msgStatus = SENDING;
 
 		RADIO_SetVfoState(VFO_STATE_NORMAL);
+		BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, false);
 		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, true);
 
 		memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));
