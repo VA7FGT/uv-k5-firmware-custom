@@ -43,6 +43,10 @@ Video showing AM reception in VFO mode:
 
 [![Video showing AM reception in VFO mode](https://img.youtube.com/vi/GOZYdKd8wng/0.jpg)](https://www.youtube.com/shorts/GOZYdKd8wng)
 
+Video showing SSB reception with a CB antenna mounted on the roof of a car:
+
+https://github.com/kamilsss655/uv-k5-firmware-custom/assets/8842065/d0e931ba-90ca-4644-b48e-4aace1d1842c
+
 ## Main features:
 * many of OneOfEleven mods:
    * AM fix, huge improvement in reception quality
