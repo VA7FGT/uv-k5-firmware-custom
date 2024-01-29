@@ -46,8 +46,8 @@ bool isBlacklistApplied;
   #define ATTENUATE_STEP  10
   bool    isNormalizationApplied;
   bool    isAttenuationApplied;
-  uint8_t  gainOffset[128];
-  uint8_t  attenuationOffset[128];
+  uint8_t  gainOffset[129];
+  uint8_t  attenuationOffset[129];
   uint8_t scanChannel[MR_CHANNEL_LAST+3];
   uint8_t scanChannelsCount;
   void ToggleScanList();
@@ -92,7 +92,7 @@ KeyboardState kbd = {KEY_INVALID, KEY_INVALID, 0};
 static uint16_t blacklistFreqs[BLACKLIST_SIZE];
 static uint8_t blacklistFreqsIdx;
 static bool IsBlacklisted(uint16_t idx);
-static uint8_t ScanRangeidx();
+static uint8_t CurrentScanIndex();
 #endif
 
 const char *bwOptions[] = {"  25k", "12.5k", "6.25k"};
@@ -373,10 +373,8 @@ uint16_t GetRssi() {
       rssi+=UHF_NOISE_FLOOR;
     }
 
-    if (appMode==CHANNEL_MODE) {
-      rssi+=gainOffset[scanInfo.i];
-      rssi-=attenuationOffset[scanInfo.i];
-    }
+    rssi+=gainOffset[CurrentScanIndex()];
+    rssi-=attenuationOffset[CurrentScanIndex()];
 
   #endif
   return rssi;
@@ -442,7 +440,8 @@ static void InitScan() {
     scanInfo.measurementsCount++;
 }
 
-static void ResetBlacklist() {
+// resets modifiers like blacklist, attenuation, normalization
+static void ResetModifiers() {
   for (int i = 0; i < 128; ++i) {
     if (rssiHistory[i] == RSSI_MAX_VALUE)
       rssiHistory[i] = 0;
@@ -454,10 +453,10 @@ static void ResetBlacklist() {
   if(appMode==CHANNEL_MODE){
       LoadValidMemoryChannels();
       AutoAdjustResolution();
-      ToggleNormalizeRssi(false);
-      memset(attenuationOffset, 0, sizeof(attenuationOffset));
-      isAttenuationApplied = false;
   }
+  ToggleNormalizeRssi(false);
+  memset(attenuationOffset, 0, sizeof(attenuationOffset));
+  isAttenuationApplied = false;
   isBlacklistApplied = false;
   RelaunchScan();
 }
@@ -481,7 +480,7 @@ static void UpdateScanInfo() {
   }
   // add attenuation offset to prevent noise floor lowering when attenuated rx is over
   // essentially we measure non-attenuated lowest rssi
-  if (scanInfo.rssi+attenuationOffset[scanInfo.i] < scanInfo.rssiMin) {
+  if (scanInfo.rssi+attenuationOffset[CurrentScanIndex()] < scanInfo.rssiMin) {
     scanInfo.rssiMin = scanInfo.rssi;
     settings.dbMin = Rssi2DBm(scanInfo.rssiMin);
     redrawStatus = true;
@@ -513,15 +512,15 @@ static void UpdatePeakInfo() {
 static void Measure() 
 { 
   uint16_t rssi = scanInfo.rssi = GetRssi();
-#ifdef ENABLE_SCAN_RANGES  
-  if(scanInfo.measurementsCount > 128) {
-    uint8_t idx = ScanRangeidx();
-    if(rssiHistory[idx] < rssi || isListening) 
-      rssiHistory[idx] = rssi;
-    rssiHistory[(idx+1)%128] = 0;
-    return;
-  }
-#endif
+  #ifdef ENABLE_SCAN_RANGES  
+    if(scanInfo.measurementsCount > 128) {
+      uint8_t idx = CurrentScanIndex();
+      if(rssiHistory[idx] < rssi || isListening) 
+        rssiHistory[idx] = rssi;
+      rssiHistory[(idx+1)%128] = 0;
+      return;
+    }
+  #endif
   rssiHistory[scanInfo.i] = rssi;
 }
 
@@ -573,7 +572,7 @@ static void UpdateScanStep(bool inc) {
     return;
   }
   settings.frequencyChangeStep = GetBW() >> 1;
-  ResetBlacklist();
+  ResetModifiers();
   redrawScreen = true;
 }
 
@@ -585,7 +584,7 @@ static void UpdateCurrentFreq(bool inc) {
   } else {
     return;
   }
-  ResetBlacklist();
+  ResetModifiers();
   redrawScreen = true;
 }
 
@@ -601,16 +600,16 @@ static void UpdateCurrentFreqStill(bool inc) {
   redrawScreen = true;
 }
 
-static void UpdateFreqChangeStep(bool inc) {
-  uint16_t diff = GetScanStep() * 4;
-  if (inc && settings.frequencyChangeStep < 200000) {
-    settings.frequencyChangeStep += diff;
-  } else if (!inc && settings.frequencyChangeStep > 10000) {
-    settings.frequencyChangeStep -= diff;
-  }
-  SYSTEM_DelayMs(100);
-  redrawScreen = true;
-}
+// static void UpdateFreqChangeStep(bool inc) {
+//   uint16_t diff = GetScanStep() * 4;
+//   if (inc && settings.frequencyChangeStep < 200000) {
+//     settings.frequencyChangeStep += diff;
+//   } else if (!inc && settings.frequencyChangeStep > 10000) {
+//     settings.frequencyChangeStep -= diff;
+//   }
+//   SYSTEM_DelayMs(100);
+//   redrawScreen = true;
+// }
 
 static void ToggleModulation() {
   if (settings.modulationType < MODULATION_UKNOWN - 1) {
@@ -644,7 +643,7 @@ static void ToggleStepsCount() {
     settings.stepsCount--;
   }
   settings.frequencyChangeStep = GetBW() >> 1;
-  ResetBlacklist();
+  ResetModifiers();
   redrawScreen = true;
 }
 
@@ -714,7 +713,7 @@ static void UpdateFreqInput(KEY_Code_t key) {
 static void Blacklist() {
 #ifdef ENABLE_SCAN_RANGES
   blacklistFreqs[blacklistFreqsIdx++ % ARRAY_SIZE(blacklistFreqs)] = peak.i;
-  rssiHistory[ScanRangeidx()] = RSSI_MAX_VALUE;
+  rssiHistory[CurrentScanIndex()] = RSSI_MAX_VALUE;
 #endif
   rssiHistory[peak.i] = RSSI_MAX_VALUE;
   isBlacklistApplied = true;
@@ -724,7 +723,7 @@ static void Blacklist() {
 }
 
 #ifdef ENABLE_SCAN_RANGES
-static uint8_t ScanRangeidx()
+static uint8_t CurrentScanIndex()
 {
   if(scanInfo.measurementsCount > 128) {
     uint8_t i = (uint32_t)ARRAY_SIZE(rssiHistory) * 1000 / scanInfo.measurementsCount * scanInfo.i / 1000;
@@ -732,7 +731,7 @@ static uint8_t ScanRangeidx()
   }
   else
   {
-    return 0;
+    return scanInfo.i;
   }
   
 }
@@ -869,43 +868,31 @@ static void DrawNums() {
 
   }
 
-  if (IsCenterMode()) {
-    sprintf(String, "%u.%05u \x7F%u.%02uk", currentFreq / 100000,
-            currentFreq % 100000, settings.frequencyChangeStep / 100,
-            settings.frequencyChangeStep % 100);
-    GUI_DisplaySmallest(String, 36, 49, false, true);
-  } else {
-    if (appMode==CHANNEL_MODE) 
-    {
-      sprintf(String, "M:%d", scanChannel[0]+1);
-      GUI_DisplaySmallest(String, 0, 49, false, true);
+  if (appMode==CHANNEL_MODE) 
+  {
+    sprintf(String, "M:%d", scanChannel[0]+1);
+    GUI_DisplaySmallest(String, 0, 49, false, true);
 
-      if(isAttenuationApplied){
-        sprintf(String, "ATT");
-        GUI_DisplaySmallest(String, 48, 49, false, true);
-      }
+    sprintf(String, "M:%d", scanChannel[GetStepsCount()-1]+1);
+    GUI_DisplaySmallest(String, 108, 49, false, true);
+  }
+  else
+  {
+    sprintf(String, "%u.%05u", GetFStart() / 100000, GetFStart() % 100000);
+    GUI_DisplaySmallest(String, 0, 49, false, true);
 
-      if(isBlacklistApplied){
-        sprintf(String, "BL");
-        GUI_DisplaySmallest(String, 63, 49, false, true);
-      }
+    sprintf(String, "%u.%05u", GetFEnd() / 100000, GetFEnd() % 100000);
+    GUI_DisplaySmallest(String, 93, 49, false, true);
+  }
 
-      sprintf(String, "M:%d", scanChannel[GetStepsCount()-1]+1);
-      GUI_DisplaySmallest(String, 108, 49, false, true);
-    }
-    else
-    {
-      sprintf(String, "%u.%05u", GetFStart() / 100000, GetFStart() % 100000);
-      GUI_DisplaySmallest(String, 0, 49, false, true);
+  if(isAttenuationApplied){
+    sprintf(String, "ATT");
+    GUI_DisplaySmallest(String, 50, 49, false, true);
+  }
 
-      sprintf(String, "\x7F%u.%02uk", settings.frequencyChangeStep / 100,
-              settings.frequencyChangeStep % 100);
-      GUI_DisplaySmallest(String, 48, 49, false, true);
-
-      sprintf(String, "%u.%05u", GetFEnd() / 100000, GetFEnd() % 100000);
-      GUI_DisplaySmallest(String, 93, 49, false, true);
-    }
-
+  if(isBlacklistApplied){
+    sprintf(String, "BL");
+    GUI_DisplaySmallest(String, 65, 49, false, true);
   }
 }
 
@@ -931,18 +918,11 @@ static void DrawTicks() {
 
     gFrameBuffer[5][i] |= barValue;
   }
+  memset(gFrameBuffer[5] + 1, 0x80, 3);
+  memset(gFrameBuffer[5] + 124, 0x80, 3);
 
-  // center
-  if (IsCenterMode()) {
-    memset(gFrameBuffer[5] + 62, 0x80, 5);
-    gFrameBuffer[5][64] = 0xff;
-  } else {
-    memset(gFrameBuffer[5] + 1, 0x80, 3);
-    memset(gFrameBuffer[5] + 124, 0x80, 3);
-
-    gFrameBuffer[5][0] = 0xff;
-    gFrameBuffer[5][127] = 0xff;
-  }
+  gFrameBuffer[5][0] = 0xff;
+  gFrameBuffer[5][127] = 0xff;
 }
 
 static void DrawArrow(uint8_t x) {
@@ -975,43 +955,33 @@ static void OnKeyDown(uint8_t key) {
     }
     break;
   case KEY_2:
-		if(appMode==CHANNEL_MODE){
-			ToggleNormalizeRssi(!isNormalizationApplied);
-		}
-		else {
-			UpdateFreqChangeStep(true);
-		}
+    ToggleNormalizeRssi(!isNormalizationApplied);
     break;
   case KEY_8:
-    if(appMode==CHANNEL_MODE){
-      ToggleBacklight();
-    }
-    else{
-      UpdateFreqChangeStep(false);
-    }
+    ToggleBacklight();
     break;
   case KEY_UP:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart && appMode!=CHANNEL_MODE)
+    if(appMode!=CHANNEL_MODE)
     {
 #endif
       UpdateCurrentFreq(true);
     }
-    else if (appMode==CHANNEL_MODE)
+    else
     {
-      ResetBlacklist();
+      ResetModifiers();
     }
     break;
   case KEY_DOWN:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart && appMode!= CHANNEL_MODE)
+    if(appMode!= CHANNEL_MODE)
     {
 #endif
       UpdateCurrentFreq(false);
     }
-    else if (appMode==CHANNEL_MODE)
+    else
     {
-      ResetBlacklist();
+      ResetModifiers();
     }
     break;
   case KEY_SIDE1:
@@ -1046,13 +1016,10 @@ static void OnKeyDown(uint8_t key) {
     }
     break;
   case KEY_SIDE2:
-    if(appMode==CHANNEL_MODE) {
+    // attenuate is disabled with scan ranges due to way scan ranges work
+    if (!gScanRangeStart){
       Attenuate(ATTENUATE_STEP);
     }
-    else {
-      ToggleBacklight();
-    }
-
     break;
   case KEY_PTT:
     #ifdef ENABLE_SPECTRUM_COPY_VFO
@@ -1109,7 +1076,7 @@ static void OnKeyDownFreqInput(uint8_t key) {
     SetState(previousState);
     currentFreq = tempFreq;
     if (currentState == SPECTRUM) {
-      ResetBlacklist();
+      ResetModifiers();
     } else {
       SetF(currentFreq);
     }
@@ -1589,7 +1556,7 @@ void APP_RunSpectrum() {
     }
 
     LoadValidMemoryChannels();
-    ResetBlacklist();
+    ResetModifiers();
     AutoAdjustResolution();
   }
 
