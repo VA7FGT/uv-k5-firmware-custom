@@ -887,12 +887,12 @@ static void DrawNums() {
 
   if(isAttenuationApplied){
     sprintf(String, "ATT");
-    GUI_DisplaySmallest(String, 50, 49, false, true);
+    GUI_DisplaySmallest(String, 52, 49, false, true);
   }
 
   if(isBlacklistApplied){
     sprintf(String, "BL");
-    GUI_DisplaySmallest(String, 65, 49, false, true);
+    GUI_DisplaySmallest(String, 67, 49, false, true);
   }
 }
 
