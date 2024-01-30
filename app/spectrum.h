@@ -95,7 +95,8 @@ typedef enum State {
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
 typedef enum Mode {
   FREQUENCY_MODE,
-  CHANNEL_MODE
+  CHANNEL_MODE,
+  SCAN_RANGE_MODE
 } Mode;
 #endif
 

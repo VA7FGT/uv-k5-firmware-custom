@@ -285,7 +285,7 @@ uint16_t GetStepsCount()
   }
 #endif
 #ifdef ENABLE_SCAN_RANGES
-  if(gScanRangeStart) {
+  if(appMode==SCAN_RANGE_MODE) {
     return (gScanRangeStop - gScanRangeStart) / GetScanStep();
   }
 #endif
@@ -995,7 +995,7 @@ static void OnKeyDown(uint8_t key) {
     break;
   case KEY_5:
 #ifdef ENABLE_SCAN_RANGES
-    if(!gScanRangeStart && appMode!= CHANNEL_MODE)
+    if(appMode==FREQUENCY_MODE)
 #endif  
       FreqInput();
     break;
@@ -1010,14 +1010,14 @@ static void OnKeyDown(uint8_t key) {
     {
       ToggleScanList();
     }
-    else if (!gScanRangeStart)
+    else if (appMode!=SCAN_RANGE_MODE)
     {
       ToggleStepsCount();
     }
     break;
   case KEY_SIDE2:
     // attenuate is disabled with scan ranges due to way scan ranges work
-    if (!gScanRangeStart){
+    if (appMode!=SCAN_RANGE_MODE){
       Attenuate(ATTENUATE_STEP);
     }
     break;
@@ -1458,6 +1458,10 @@ static void Tick() {
 
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
 void APP_RunSpectrum(Mode mode) {
+  // reset modifiers if we launched in a different then previous mode
+  if(appMode!=mode){
+    ResetModifiers();
+  }
   appMode = mode;
 #elif
 void APP_RunSpectrum() {
@@ -1470,7 +1474,7 @@ void APP_RunSpectrum() {
     }
   #endif
   #ifdef ENABLE_SCAN_RANGES
-    if(gScanRangeStart) {
+    if(mode==SCAN_RANGE_MODE) {
       currentFreq = initialFreq = gScanRangeStart;
       for(uint8_t i = 0; i < ARRAY_SIZE(scanStepValues); i++) {
         if(scanStepValues[i] >= gTxVfo->StepFrequency) {
@@ -1595,16 +1599,13 @@ void APP_RunSpectrum() {
 
   void Attenuate(uint8_t amount)
   {
-    // we don't want to attenuate random scan measurments, only active rx measurment
-    if(!IsPeakOverLevel())
-      return;
-    // we don't want to lower the whole scan minimum rssi, otherwise the screen re-renders to show new lowest signal
-    if((GetRssi()-amount) <= scanInfo.rssiMin)
-      return;
     // idea: consider amount to be 10% of rssiMax-rssiMin
-    if(attenuationOffset[scanInfo.i] < MAX_ATTENUATION){
-      attenuationOffset[scanInfo.i]+=amount;
+    if(attenuationOffset[peak.i] < MAX_ATTENUATION){
+      attenuationOffset[peak.i] += amount;
       isAttenuationApplied = true;
+
+      ResetPeak();
+      ResetScanStats();
     }
     
   }
