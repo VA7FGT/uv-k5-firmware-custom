@@ -600,16 +600,9 @@ static void UpdateCurrentFreqStill(bool inc) {
   redrawScreen = true;
 }
 
-// static void UpdateFreqChangeStep(bool inc) {
-//   uint16_t diff = GetScanStep() * 4;
-//   if (inc && settings.frequencyChangeStep < 200000) {
-//     settings.frequencyChangeStep += diff;
-//   } else if (!inc && settings.frequencyChangeStep > 10000) {
-//     settings.frequencyChangeStep -= diff;
-//   }
-//   SYSTEM_DelayMs(100);
-//   redrawScreen = true;
-// }
+static void AutoAdjustFreqChangeStep() {
+  settings.frequencyChangeStep = GetBW() >> 1;
+}
 
 static void ToggleModulation() {
   if (settings.modulationType < MODULATION_UKNOWN - 1) {
@@ -642,7 +635,7 @@ static void ToggleStepsCount() {
   } else {
     settings.stepsCount--;
   }
-  settings.frequencyChangeStep = GetBW() >> 1;
+  AutoAdjustFreqChangeStep();
   ResetModifiers();
   redrawScreen = true;
 }
@@ -1487,6 +1480,8 @@ void APP_RunSpectrum() {
   currentFreq = initialFreq = gTxVfo->pRX->Frequency;
 
   BackupRegisters();
+
+  AutoAdjustFreqChangeStep();
 
   ResetInterrupts();
 
