@@ -1064,13 +1064,15 @@ void RADIO_PrepareCssTX(void)
 	RADIO_SetupRegisters(true);
 }
 
-void RADIO_SendEndOfTransmission(void)
+void RADIO_SendEndOfTransmission(bool isMessengerPacket)
 {
-	if (gEeprom.ROGER == ROGER_MODE_ROGER)
-		BK4819_PlayRoger();
-	else
-	if (gEeprom.ROGER == ROGER_MODE_MDC)
-		BK4819_PlayRogerMDC();
+	if (!isMessengerPacket) {
+		if (gEeprom.ROGER == ROGER_MODE_ROGER)
+			BK4819_PlayRoger();
+		else
+		if (gEeprom.ROGER == ROGER_MODE_MDC)
+			BK4819_PlayRogerMDC();
+	}
 
 	if (gCurrentVfo->DTMF_PTT_ID_TX_MODE == PTT_ID_APOLLO)
 		BK4819_PlaySingleTone(2475, 250, 28, gEeprom.DTMF_SIDE_TONE);
