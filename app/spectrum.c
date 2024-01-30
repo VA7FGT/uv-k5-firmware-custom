@@ -962,7 +962,7 @@ static void OnKeyDown(uint8_t key) {
     break;
   case KEY_UP:
 #ifdef ENABLE_SCAN_RANGES
-    if(appMode!=CHANNEL_MODE)
+    if(appMode==FREQUENCY_MODE)
     {
 #endif
       UpdateCurrentFreq(true);
@@ -974,7 +974,7 @@ static void OnKeyDown(uint8_t key) {
     break;
   case KEY_DOWN:
 #ifdef ENABLE_SCAN_RANGES
-    if(appMode!= CHANNEL_MODE)
+    if(appMode==FREQUENCY_MODE)
     {
 #endif
       UpdateCurrentFreq(false);
