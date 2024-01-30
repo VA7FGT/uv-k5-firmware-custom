@@ -84,9 +84,11 @@ void MSG_FSKSendData() {
 		uint16_t deviation = 850;
 		switch (gEeprom.VfoInfo[gEeprom.TX_VFO].CHANNEL_BANDWIDTH)
 		{
-			case BK4819_FILTER_BW_WIDE:     deviation = 1050; break;
-			case BK4819_FILTER_BW_NARROW:   deviation =  850; break;
-			case BK4819_FILTER_BW_NARROWER: deviation =  750; break;
+			BK4819_FILTER_BW_WIDE:            deviation = 1050; break;
+			BK4819_FILTER_BW_NARROW:          deviation =  525; break;
+			BK4819_FILTER_BW_NARROWAVIATION:  deviation =  350; break;
+			BK4819_FILTER_BW_NARROWER:        deviation =  250; break;
+			BK4819_FILTER_BW_NARROWEST:		  deviation =  210; break;
 		}
 		//BK4819_WriteRegister(0x40, (3u << 12) | (deviation & 0xfff));
 		BK4819_WriteRegister(BK4819_REG_40, (dev_val & 0xf000) | (deviation & 0xfff));
