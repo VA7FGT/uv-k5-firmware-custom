@@ -598,7 +598,7 @@ void MSG_SendPacket(union DataPacket packet) {
 
 		SYSTEM_DelayMs(100);
 
-		APP_EndTransmission(true);
+		APP_EndTransmission(false);
 		// this must be run after end of TX, otherwise radio will still TX transmit without even RED LED on
 		FUNCTION_Select(FUNCTION_FOREGROUND);
 

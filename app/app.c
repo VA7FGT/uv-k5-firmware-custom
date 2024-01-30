@@ -727,9 +727,9 @@ static void CheckRadioInterrupts(void)
 	}
 }
 
-void APP_EndTransmission(bool isMessengerPacket)
+void APP_EndTransmission(bool playRoger)
 {	// back to RX mode
-	RADIO_SendEndOfTransmission(isMessengerPacket);
+	RADIO_SendEndOfTransmission(playRoger);
 	// send the CTCSS/DCS tail tone - allows the receivers to mute the usual FM squelch tail/crash
 	RADIO_EnableCxCSS();
 	RADIO_SetupRegisters(false);
@@ -785,7 +785,7 @@ void APP_EndTransmission(bool isMessengerPacket)
 				}
 				else
 				{
-					APP_EndTransmission(false);
+					APP_EndTransmission(true);
 	
 					if (gEeprom.REPEATER_TAIL_TONE_ELIMINATION == 0)
 					{
@@ -836,7 +836,7 @@ void APP_Update(void)
 		gTxTimeoutReached = false;
 
 		gFlagEndTransmission = true;
-		APP_EndTransmission(false);
+		APP_EndTransmission(true);
 
 		AUDIO_PlayBeep(BEEP_880HZ_60MS_TRIPLE_BEEP);
 
@@ -1599,7 +1599,7 @@ void APP_TimeSlice500ms(void)
 
 		if (gEeprom.ALARM_MODE == ALARM_MODE_TONE)
 		{
-			RADIO_SendEndOfTransmission(false);
+			RADIO_SendEndOfTransmission(true);
 			RADIO_EnableCxCSS();
 		}
 

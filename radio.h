@@ -169,7 +169,7 @@ void     RADIO_SetVfoState(VfoState_t State);
 void     RADIO_PrepareTX(void);
 void     RADIO_EnableCxCSS(void);
 void     RADIO_PrepareCssTX(void);
-void     RADIO_SendEndOfTransmission(bool isMessengerPacket);
+void     RADIO_SendEndOfTransmission(bool playRoger);
 #endif
 
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
