@@ -1064,9 +1064,9 @@ void RADIO_PrepareCssTX(void)
 	RADIO_SetupRegisters(true);
 }
 
-void RADIO_SendEndOfTransmission(bool isMessengerPacket)
+void RADIO_SendEndOfTransmission(bool playRoger)
 {
-	if (!isMessengerPacket) {
+	if (playRoger) {
 		if (gEeprom.ROGER == ROGER_MODE_ROGER)
 			BK4819_PlayRoger();
 		else
