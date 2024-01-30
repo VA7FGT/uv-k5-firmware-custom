@@ -1016,10 +1016,7 @@ static void OnKeyDown(uint8_t key) {
     }
     break;
   case KEY_SIDE2:
-    // attenuate is disabled with scan ranges due to way scan ranges work
-    if (appMode!=SCAN_RANGE_MODE){
-      Attenuate(ATTENUATE_STEP);
-    }
+    Attenuate(ATTENUATE_STEP);
     break;
   case KEY_PTT:
     #ifdef ENABLE_SPECTRUM_COPY_VFO
@@ -1599,6 +1596,11 @@ void APP_RunSpectrum() {
 
   void Attenuate(uint8_t amount)
   {
+    // attenuate doesn't work with more than 128 samples,
+    // since we select max rssi in such mode ignoring attenuation
+     if(scanInfo.measurementsCount > 128)
+      return;
+
     // idea: consider amount to be 10% of rssiMax-rssiMin
     if(attenuationOffset[peak.i] < MAX_ATTENUATION){
       attenuationOffset[peak.i] += amount;
