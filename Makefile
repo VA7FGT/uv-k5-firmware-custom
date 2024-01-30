@@ -21,9 +21,6 @@ ENABLE_TX1750                 := 0
 ENABLE_PWRON_PASSWORD         := 1
 ENABLE_DTMF_CALLING           := 0
 
-#---- DEBUG ----
-ENABLE_ULTRA_LOW_POWER_TX          := 0
-
 # ---- CUSTOM MODS ----
 ENABLE_BIG_FREQ                         := 1
 ENABLE_SMALL_BOLD                       := 1
@@ -363,9 +360,6 @@ ifeq ($(ENABLE_SPECTRUM_SHOW_CHANNEL_NAME),1)
 endif
 ifeq ($(ENABLE_DTMF_CALLING),1)
 	CFLAGS  += -DENABLE_DTMF_CALLING
-endif
-ifeq ($(ENABLE_ULTRA_LOW_POWER_TX),1)
-	CFLAGS  += -DENABLE_ULTRA_LOW_POWER_TX
 endif
 ifeq ($(ENABLE_SPECTRUM_CHANNEL_SCAN),1)
 	CFLAGS  += -DENABLE_SPECTRUM_CHANNEL_SCAN
