@@ -81,14 +81,15 @@ void MSG_FSKSendData() {
 
 	//UART_printf("\n BANDWIDTH : 0x%.4X", dev_val);
 	{
-		uint16_t deviation = 850;
+		uint16_t deviation;
 		switch (gEeprom.VfoInfo[gEeprom.TX_VFO].CHANNEL_BANDWIDTH)
 		{
 			case BK4819_FILTER_BW_WIDE:            deviation =  1350; break; // 20k // measurements by kamilsss655
 			case BK4819_FILTER_BW_NARROW:          deviation =  1200; break; // 10k
-			case BK4819_FILTER_BW_NARROWAVIATION:  deviation =  850; break;  // 5k
-			case BK4819_FILTER_BW_NARROWER:        deviation =  850; break;  // 5k
-			case BK4819_FILTER_BW_NARROWEST:	   deviation =  850; break;  // 5k
+			// case BK4819_FILTER_BW_NARROWAVIATION:  deviation =  850; break;  // 5k
+			// case BK4819_FILTER_BW_NARROWER:        deviation =  850; break;  // 5k
+			// case BK4819_FILTER_BW_NARROWEST:	      deviation =  850; break;  // 5k
+			default:                               deviation =  850;  break;  // 5k
 		}
 		//BK4819_WriteRegister(0x40, (3u << 12) | (deviation & 0xfff));
 		BK4819_WriteRegister(BK4819_REG_40, (dev_val & 0xf000) | (deviation & 0xfff));
