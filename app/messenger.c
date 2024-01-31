@@ -624,6 +624,9 @@ uint8_t validate_char( uint8_t rchar ) {
 
 void MSG_StorePacket(const uint16_t interrupt_bits) {
 
+	// prevent listening to fsk data and squelch (kamilsss655)
+	AUDIO_AudioPathOff();
+
 	//const uint16_t rx_sync_flags   = BK4819_ReadRegister(BK4819_REG_0B);
 
 	const bool rx_sync             = (interrupt_bits & BK4819_REG_02_FSK_RX_SYNC) ? true : false;
@@ -654,6 +657,8 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 	}
 
 	if (rx_finished) {
+		// turn off green LED
+		BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, 0);
 
 		const uint16_t fsk_reg59 = BK4819_ReadRegister(BK4819_REG_59) & ~((1u << 15) | (1u << 14) | (1u << 12) | (1u << 11));
 
