@@ -719,8 +719,10 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 		}
 
 		gFSKWriteIndex = 0;
-		// Transmit a message to the sender that we have received the message (Unless it's a service message)
-		if (dataPacket.data.header!=ACK_PACKET) {
+		// Transmit a message to the sender that we have received the message
+		if (dataPacket.data.header == MESSAGE_PACKET || 
+			dataPacket.data.header == ENCRYPTED_MESSAGE_PACKET) 
+		{
 			// wait so the correspondent radio can properly receive it
 			SYSTEM_DelayMs(700);
 			MSG_SendAck();
