@@ -87,7 +87,6 @@ const t_menu_item MenuList[] =
 	{"Voice",  VOICE_ID_VOICE_PROMPT,                  MENU_VOICE         },
 #endif
 	{"Roger",  VOICE_ID_INVALID,                       MENU_ROGER         },
-	{"RP STE", VOICE_ID_INVALID,                       MENU_RP_STE        },
 	{"SqTone", VOICE_ID_INVALID,                       MENU_SQL_TONE      }, // squelch tail tone used for RX/TX
 	{"1 Call", VOICE_ID_INVALID,                       MENU_1_CALL        },
 #ifdef ENABLE_ALARM
@@ -783,13 +782,6 @@ void UI_DisplayMenu(void)
 
 			case MENU_MDF:
 				strcpy(String, gSubMenu_MDF[gSubMenuSelection]);
-				break;
-
-			case MENU_RP_STE:
-				if (gSubMenuSelection == 0)
-					strcpy(String, "OFF");
-				else
-					sprintf(String, "%d*100ms", gSubMenuSelection);
 				break;
 
 			#ifdef ENABLE_ALARM

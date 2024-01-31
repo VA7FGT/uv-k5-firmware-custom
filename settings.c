@@ -121,7 +121,7 @@ void SETTINGS_SaveSettings(void)
 		State[0] = false;
 	#endif
 	State[1] = gEeprom.ROGER;
-	State[2] = gEeprom.REPEATER_TAIL_TONE_ELIMINATION;
+	// State[2] = empty slot
 	State[3] = gEeprom.TX_VFO;
 	State[4] = gEeprom.BATTERY_TYPE;
 	State[5] = gEeprom.SQL_TONE;

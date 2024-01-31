@@ -1033,7 +1033,6 @@ void RADIO_PrepareTX(void)
 	gTxTimeoutReached    = false;
 
 	gFlagEndTransmission = false;
-	gRTTECountdown       = 0;
 
 #ifdef ENABLE_DTMF_CALLING
 	gDTMF_ReplyState     = DTMF_REPLY_NONE;
