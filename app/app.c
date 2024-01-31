@@ -65,6 +65,9 @@
 #ifdef ENABLE_MESSENGER
 	#include "app/messenger.h"
 #endif
+#ifdef ENABLE_ENCRYPTION
+	#include "helper/crypto.h"
+#endif
 
 #ifdef ENABLE_MESSENGER_NOTIFICATION
 	bool gPlayMSGRing = false;
@@ -1309,6 +1312,13 @@ void APP_TimeSlice500ms(void)
 			} else if (hasNewMessage == 2) {
 				hasNewMessage = 1;
 			}
+		}	
+	#endif
+
+	#ifdef ENABLE_ENCRYPTION
+		if(gRecalculateEncKey){
+			CRYPTO_Generate256BitKey(gEeprom.ENC_KEY, gEncryptionKey, sizeof(gEeprom.ENC_KEY));
+			gRecalculateEncKey = false;
 		}
 	#endif
 

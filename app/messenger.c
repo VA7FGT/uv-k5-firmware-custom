@@ -682,6 +682,9 @@ void MSG_Init() {
 	prevKey = 0;
     prevLetter = 0;
 	cIndex = 0;
+	#ifdef ENABLE_ENCRYPTION
+		gRecalculateEncKey = true;
+	#endif
 }
 
 void MSG_SendAck() {

@@ -13,10 +13,10 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  */
-
+#include <stdbool.h>
 #include <stdint.h>
-
-extern uint8_t gEncryptionKey[32];
+extern bool          gRecalculateEncKey;
+extern uint8_t       gEncryptionKey[32];
 static const uint8_t encryptionSalt[4][8];
 static const uint8_t displaySalt[32];
 

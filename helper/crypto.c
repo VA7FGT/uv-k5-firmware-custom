@@ -19,6 +19,8 @@
 #include "driver/bk4819.h"
 #include "driver/systick.h"
 
+bool     gRecalculateEncKey;
+
 u_int8_t gEncryptionKey[32];
 
 // salt used for hashing encryption key from eeprom used for sending packets
