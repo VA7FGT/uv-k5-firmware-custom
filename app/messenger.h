@@ -60,6 +60,7 @@ void MSG_Init();
 void MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 void MSG_SendPacket(union DataPacket packet);
 void MSG_FSKSendData();
+void MSG_ClearPacketBuffer();
 
 #endif
 

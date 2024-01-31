@@ -273,8 +273,7 @@ void MSG_FSKSendData() {
     	}
 	}
 
-	// clear dataPacket
-	memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));;
+	MSG_ClearPacketBuffer();
 
 	// enable FSK TX
 	BK4819_WriteRegister(BK4819_REG_59, (1u << 11) | fsk_reg59);
@@ -554,7 +553,7 @@ void MSG_SendPacket(union DataPacket packet) {
 		BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, false);
 		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, true);
 
-		memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));
+		MSG_ClearPacketBuffer();
 
 		// later refactor to not use global state but pass dataPacket type everywhere
 		dataPacket = packet;
@@ -640,7 +639,7 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 
 	if (rx_sync) {
 		gFSKWriteIndex = 0;
-		memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));
+		MSG_ClearPacketBuffer();
 		msgStatus = RECEIVING;
 	}
 
@@ -838,7 +837,7 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 				break;*/
 			case KEY_MENU:
 				// Send message
-				memset(dataPacket.serializedArray,0,sizeof(dataPacket.serializedArray));
+				MSG_ClearPacketBuffer();
 				#ifdef ENABLE_ENCRYPTION
 					dataPacket.data.header=ENCRYPTED_MESSAGE_PACKET;
 				#else
@@ -869,6 +868,11 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 		}
 	}
 
+}
+
+void MSG_ClearPacketBuffer()
+{
+	memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));
 }
 
 
