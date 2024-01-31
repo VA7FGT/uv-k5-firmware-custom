@@ -241,7 +241,6 @@ extern volatile uint16_t     gTailNoteEliminationCountdown_10ms;
 extern bool                  gEnableSpeaker;
 extern uint8_t               gKeyInputCountdown;
 extern uint8_t               gKeyLockCountdown;
-extern uint8_t               gRTTECountdown;
 extern bool                  bIsInLockScreen;
 extern uint8_t               gUpdateStatus;
 extern uint8_t               gFoundCTCSS;

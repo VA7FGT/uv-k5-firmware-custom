@@ -108,11 +108,7 @@ void GENERIC_Key_PTT(bool bKeyPressed)
 			else
 			{
 				APP_EndTransmission(true);
-
-				if (gEeprom.REPEATER_TAIL_TONE_ELIMINATION == 0)
-					FUNCTION_Select(FUNCTION_FOREGROUND);
-				else
-					gRTTECountdown = gEeprom.REPEATER_TAIL_TONE_ELIMINATION * 10;
+				FUNCTION_Select(FUNCTION_FOREGROUND);
 			}
 
 			gFlagEndTransmission = false;
@@ -165,7 +161,7 @@ void GENERIC_Key_PTT(bool bKeyPressed)
 		goto start_tx;	// listening to the FM radio .. start TX'ing
 #endif
 
-	if (gCurrentFunction == FUNCTION_TRANSMIT && gRTTECountdown == 0)
+	if (gCurrentFunction == FUNCTION_TRANSMIT)
 	{	// already transmitting
 		gInputBoxIndex = 0;
 		return;

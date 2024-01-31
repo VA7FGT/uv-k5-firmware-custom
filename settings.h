@@ -191,7 +191,6 @@ typedef struct {
 	#endif
 	POWER_OnDisplayMode_t POWER_ON_DISPLAY_MODE;
 	ROGER_Mode_t          ROGER;
-	uint8_t               REPEATER_TAIL_TONE_ELIMINATION;
 	uint8_t               KEY_1_SHORT_PRESS_ACTION;
 	uint8_t               KEY_1_LONG_PRESS_ACTION;
 	uint8_t               KEY_2_SHORT_PRESS_ACTION;

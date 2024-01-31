@@ -1481,8 +1481,6 @@ void APP_RunSpectrum() {
 
   BackupRegisters();
 
-  AutoAdjustFreqChangeStep();
-
   ResetInterrupts();
 
   // turn of GREEN LED if spectrum was started during active RX
@@ -1503,6 +1501,8 @@ void APP_RunSpectrum() {
     RADIO_SetModulation(settings.modulationType = MODULATION_FM);
     BK4819_SetFilterBandwidth(settings.listenBw = BK4819_FILTER_BW_WIDE, false);
   #endif
+
+  AutoAdjustFreqChangeStep();
 
   RelaunchScan();
 

@@ -65,6 +65,9 @@
 #ifdef ENABLE_MESSENGER
 	#include "app/messenger.h"
 #endif
+#ifdef ENABLE_ENCRYPTION
+	#include "helper/crypto.h"
+#endif
 
 #ifdef ENABLE_MESSENGER_NOTIFICATION
 	bool gPlayMSGRing = false;
@@ -786,14 +789,7 @@ void APP_EndTransmission(bool playRoger)
 				else
 				{
 					APP_EndTransmission(true);
-	
-					if (gEeprom.REPEATER_TAIL_TONE_ELIMINATION == 0)
-					{
-						//if (gCurrentFunction != FUNCTION_FOREGROUND)
-							FUNCTION_Select(FUNCTION_FOREGROUND);
-					}
-					else
-						gRTTECountdown = gEeprom.REPEATER_TAIL_TONE_ELIMINATION * 10;
+					FUNCTION_Select(FUNCTION_FOREGROUND);
 				}
 	
 				gUpdateStatus        = true;
@@ -1239,19 +1235,6 @@ void APP_TimeSlice10ms(void)
 				}
 			}
 		#endif
-
-		// repeater tail tone elimination
-		if (gRTTECountdown > 0)
-		{
-			if (--gRTTECountdown == 0)
-			{
-				//if (gCurrentFunction != FUNCTION_FOREGROUND)
-					FUNCTION_Select(FUNCTION_FOREGROUND);
-
-				gUpdateStatus  = true;
-				gUpdateDisplay = true;
-			}
-		}
 	}
 
 #ifdef ENABLE_FMRADIO
@@ -1329,6 +1312,13 @@ void APP_TimeSlice500ms(void)
 			} else if (hasNewMessage == 2) {
 				hasNewMessage = 1;
 			}
+		}	
+	#endif
+
+	#ifdef ENABLE_ENCRYPTION
+		if(gRecalculateEncKey){
+			CRYPTO_Generate256BitKey(gEeprom.ENC_KEY, gEncryptionKey, sizeof(gEeprom.ENC_KEY));
+			gRecalculateEncKey = false;
 		}
 	#endif
 
@@ -1865,10 +1855,7 @@ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 				{
 					ALARM_Off();
 
-					if (gEeprom.REPEATER_TAIL_TONE_ELIMINATION == 0)
-						FUNCTION_Select(FUNCTION_FOREGROUND);
-					else
-						gRTTECountdown = gEeprom.REPEATER_TAIL_TONE_ELIMINATION * 10;
+					FUNCTION_Select(FUNCTION_FOREGROUND);
 
 					if (Key == KEY_PTT)
 						gPttWasPressed  = true;

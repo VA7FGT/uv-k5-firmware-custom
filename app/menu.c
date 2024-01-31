@@ -273,11 +273,6 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			case MENU_VOX:
 			case MENU_VOX_DELAY:
 		#endif
-		case MENU_RP_STE:
-			*pMin = 0;
-			*pMax = 10;
-			break;
-
 		case MENU_MEM_CH:
 		case MENU_1_CALL:
 		case MENU_DEL_CH:
@@ -629,10 +624,6 @@ void MENU_AcceptSetting(void)
 			gVfoConfigureMode = VFO_CONFIGURE;
 			gFlagResetVfos    = true;
 			return;
-
-		case MENU_RP_STE:
-			gEeprom.REPEATER_TAIL_TONE_ELIMINATION = gSubMenuSelection;
-			break;
 
 		case MENU_MIC:
 			gEeprom.MIC_SENSITIVITY = gSubMenuSelection;
@@ -1017,10 +1008,6 @@ void MENU_ShowCurrentSetting(void)
 
 		case MENU_S_ADD2:
 			gSubMenuSelection = gTxVfo->SCANLIST2_PARTICIPATION;
-			break;
-
-		case MENU_RP_STE:
-			gSubMenuSelection = gEeprom.REPEATER_TAIL_TONE_ELIMINATION;
 			break;
 
 		case MENU_MIC:
