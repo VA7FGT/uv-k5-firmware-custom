@@ -61,6 +61,7 @@ void MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 void MSG_SendPacket();
 void MSG_FSKSendData();
 void MSG_ClearPacketBuffer();
+void MSG_SendAck();
 
 #endif
 

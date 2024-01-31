@@ -721,15 +721,9 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 		gFSKWriteIndex = 0;
 		// Transmit a message to the sender that we have received the message (Unless it's a service message)
 		if (dataPacket.data.header!=ACK_PACKET) {
-			// in the future we might reply with received payload and then the sending radio
-			// could compare it and determine if the messegage was read correctly (kamilsss655)
-			MSG_ClearPacketBuffer();
-			dataPacket.data.header=ACK_PACKET;
-			// sending only empty header seems to not work, so set few bytes of payload to increase reliability (kamilsss655)
-			memset(dataPacket.data.payload, 255, 5);
 			// wait so the correspondent radio can properly receive it
 			SYSTEM_DelayMs(700);
-			MSG_SendPacket();
+			MSG_SendAck();
 		}
 	}
 }
@@ -743,6 +737,16 @@ void MSG_Init() {
 	prevKey = 0;
     prevLetter = 0;
 	cIndex = 0;
+}
+
+void MSG_SendAck() {
+	// in the future we might reply with received payload and then the sending radio
+	// could compare it and determine if the messegage was read correctly (kamilsss655)
+	MSG_ClearPacketBuffer();
+	dataPacket.data.header = ACK_PACKET;
+	// sending only empty header seems to not work, so set few bytes of payload to increase reliability (kamilsss655)
+	memset(dataPacket.data.payload, 255, 5);
+	MSG_SendPacket();
 }
 
 // ---------------------------------------------------------------------------------
