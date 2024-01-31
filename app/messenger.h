@@ -62,6 +62,7 @@ void MSG_SendPacket();
 void MSG_FSKSendData();
 void MSG_ClearPacketBuffer();
 void MSG_SendAck();
+void MSG_HandleReceive();
 
 #endif
 

@@ -667,66 +667,9 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 		msgStatus = READY;
 
 		if (gFSKWriteIndex > 2) {
-
-			if (dataPacket.data.header == ACK_PACKET) {
-			#ifdef ENABLE_MESSENGER_DELIVERY_NOTIFICATION
-				#ifdef ENABLE_MESSENGER_UART
-					UART_printf("SVC<RCPT\r\n");
-				#endif
-				rxMessage[3][strlen(rxMessage[3])] = '+';
-				gUpdateStatus = true;
-				gUpdateDisplay = true;
-			#endif
-			} else {
-				moveUP(rxMessage);
-				if (dataPacket.data.header >= INVALID_PACKET) {
-					snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "ERROR: INVALID PACKET.");
-				}
-				else
-				{
-					#ifdef ENABLE_ENCRYPTION
-						if(dataPacket.data.header == ENCRYPTED_MESSAGE_PACKET)
-						{
-							CRYPTO_Crypt(dataPacket.data.payload,
-								PAYLOAD_LENGTH,
-								dataPacket.data.payload,
-								&dataPacket.data.nonce,
-								gEncryptionKey,
-								256);
-						}
-						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.data.payload);
-					#else
-						snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.data.payload);
-					#endif
-				}
-
-			#ifdef ENABLE_MESSENGER_UART
-				UART_printf("SMS<%s\r\n", dencryptedTxMessage);
-			#endif
-
-				if ( gScreenToDisplay != DISPLAY_MSG ) {
-					hasNewMessage = 1;
-					gUpdateStatus = true;
-					gUpdateDisplay = true;
-			#ifdef ENABLE_MESSENGER_NOTIFICATION
-					gPlayMSGRing = true;
-			#endif
-				}
-				else {
-					gUpdateDisplay = true;
-				}
-			}
+			MSG_HandleReceive();
 		}
-
 		gFSKWriteIndex = 0;
-		// Transmit a message to the sender that we have received the message
-		if (dataPacket.data.header == MESSAGE_PACKET || 
-			dataPacket.data.header == ENCRYPTED_MESSAGE_PACKET) 
-		{
-			// wait so the correspondent radio can properly receive it
-			SYSTEM_DelayMs(700);
-			MSG_SendAck();
-		}
 	}
 }
 
@@ -749,6 +692,66 @@ void MSG_SendAck() {
 	// sending only empty header seems to not work, so set few bytes of payload to increase reliability (kamilsss655)
 	memset(dataPacket.data.payload, 255, 5);
 	MSG_SendPacket();
+}
+
+void MSG_HandleReceive(){
+	if (dataPacket.data.header == ACK_PACKET) {
+	#ifdef ENABLE_MESSENGER_DELIVERY_NOTIFICATION
+		#ifdef ENABLE_MESSENGER_UART
+			UART_printf("SVC<RCPT\r\n");
+		#endif
+		rxMessage[3][strlen(rxMessage[3])] = '+';
+		gUpdateStatus = true;
+		gUpdateDisplay = true;
+	#endif
+	} else {
+		moveUP(rxMessage);
+		if (dataPacket.data.header >= INVALID_PACKET) {
+			snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "ERROR: INVALID PACKET.");
+		}
+		else
+		{
+			#ifdef ENABLE_ENCRYPTION
+				if(dataPacket.data.header == ENCRYPTED_MESSAGE_PACKET)
+				{
+					CRYPTO_Crypt(dataPacket.data.payload,
+						PAYLOAD_LENGTH,
+						dataPacket.data.payload,
+						&dataPacket.data.nonce,
+						gEncryptionKey,
+						256);
+				}
+				snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.data.payload);
+			#else
+				snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.data.payload);
+			#endif
+		}
+
+	#ifdef ENABLE_MESSENGER_UART
+		UART_printf("SMS<%s\r\n", dencryptedTxMessage);
+	#endif
+
+		if ( gScreenToDisplay != DISPLAY_MSG ) {
+			hasNewMessage = 1;
+			gUpdateStatus = true;
+			gUpdateDisplay = true;
+	#ifdef ENABLE_MESSENGER_NOTIFICATION
+			gPlayMSGRing = true;
+	#endif
+		}
+		else {
+			gUpdateDisplay = true;
+		}
+	}
+
+	// Transmit a message to the sender that we have received the message
+	if (dataPacket.data.header == MESSAGE_PACKET || 
+		dataPacket.data.header == ENCRYPTED_MESSAGE_PACKET) 
+	{
+		// wait so the correspondent radio can properly receive it
+		SYSTEM_DelayMs(700);
+		MSG_SendAck();
+	}
 }
 
 // ---------------------------------------------------------------------------------
