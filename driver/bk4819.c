@@ -1058,11 +1058,22 @@ void BK4819_ExitBypass(void)
 	);
 }
 
-void BK4819_PrepareTransmit(void)
+void BK4819_PrepareTransmit(bool muteMic)
 {
 	BK4819_ExitBypass();
 	BK4819_ExitTxMute();
 	BK4819_TxOn_Beep();
+
+	if(muteMic)
+	{
+		BK4819_MuteMic();
+	}
+}
+
+void BK4819_MuteMic(void)
+{
+	const uint16_t reg30 = BK4819_ReadRegister(BK4819_REG_30);
+	BK4819_WriteRegister(BK4819_REG_30, reg30 & ~(1u << 2));
 }
 
 void BK4819_TxOn_Beep(void)

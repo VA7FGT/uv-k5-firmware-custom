@@ -75,10 +75,6 @@ void MSG_FSKSendData() {
 	// set the FM deviation level
 	const uint16_t dev_val = BK4819_ReadRegister(BK4819_REG_40);
 
-	// mute the mic
-	const uint16_t reg30 = BK4819_ReadRegister(BK4819_REG_30);
-	BK4819_WriteRegister(BK4819_REG_30, reg30 & ~(1u << 2));
-
 	//UART_printf("\n BANDWIDTH : 0x%.4X", dev_val);
 	{
 		uint16_t deviation;
@@ -308,9 +304,6 @@ void MSG_FSKSendData() {
 
 	// restore FM deviation level
 	BK4819_WriteRegister(BK4819_REG_40, dev_val);
-
-	//restore mic mute
-	BK4819_WriteRegister(BK4819_REG_30, reg30);
 
 	// restore TX/RX filtering
 	BK4819_WriteRegister(BK4819_REG_2B, filt_val);
@@ -588,24 +581,25 @@ void MSG_SendPacket(union DataPacket packet) {
 
 		BK4819_DisableDTMF();
 
-		RADIO_SetTxParameters();
-		FUNCTION_Select(FUNCTION_TRANSMIT);
-		SYSTEM_DelayMs(500);
-		// BK4819_PlayRogerNormal(98);
-        // BK4819_PlayRogerMDC();
-		SYSTEM_DelayMs(100);
+		// mute the mic during TX
+		gMuteMic = true;
 
-		BK4819_ExitTxMute();
+		FUNCTION_Select(FUNCTION_TRANSMIT);
+
+		SYSTEM_DelayMs(50);
 		
 		MSG_FSKSendData();
 
-		SYSTEM_DelayMs(100);
+		SYSTEM_DelayMs(50);
 
 		APP_EndTransmission(false);
 		// this must be run after end of TX, otherwise radio will still TX transmit without even RED LED on
 		FUNCTION_Select(FUNCTION_FOREGROUND);
 
 		RADIO_SetVfoState(VFO_STATE_NORMAL);
+
+		// disable mic mute after TX
+		gMuteMic = false;
 
 		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, false);
 

@@ -120,7 +120,8 @@ void     BK4819_TurnsOffTones_TurnsOnRX(void);
 void     BK4819_ResetFSK(void);
 void     BK4819_Idle(void);
 void     BK4819_ExitBypass(void);
-void     BK4819_PrepareTransmit(void);
+void     BK4819_PrepareTransmit(bool muteMic);
+void     BK4819_MuteMic(void);
 void     BK4819_TxOn_Beep(void);
 void     BK4819_ExitSubAu(void);
 

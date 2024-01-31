@@ -152,6 +152,9 @@ extern DCS_CodeType_t gCurrentCodeType;
 
 extern VfoState_t     VfoState[2];
 
+// determines whether mic should be muted during TX (i.e during FSK modem TX)
+extern bool           gMuteMic;
+
 bool     RADIO_CheckValidChannel(uint16_t ChNum, bool bCheckScanList, uint8_t RadioNum);
 uint8_t  RADIO_FindNextChannel(uint8_t ChNum, int8_t Direction, bool bCheckScanList, uint8_t RadioNum);
 void     RADIO_InitInfo(VFO_Info_t *pInfo, const uint8_t ChannelSave, const uint32_t Frequency);
