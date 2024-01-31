@@ -58,7 +58,7 @@ void MSG_EnableRX(const bool enable);
 void MSG_StorePacket(const uint16_t interrupt_bits);
 void MSG_Init();
 void MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
-void MSG_SendPacket(union DataPacket packet);
+void MSG_SendPacket();
 void MSG_FSKSendData();
 void MSG_ClearPacketBuffer();
 

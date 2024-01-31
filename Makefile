@@ -225,7 +225,7 @@ endif
 CFLAGS =
 ifeq ($(ENABLE_CLANG),0)
 	# Highest optimization settings (possible breaking changes):
-	CFLAGS += -Oz -mcpu=cortex-m0 -fno-delete-null-pointer-checks -std=c11 -MMD
+	CFLAGS += -Oz -Wall -Werror -mcpu=cortex-m0 -fno-delete-null-pointer-checks -std=c11 -MMD
 	# Standard settings:
 	#CFLAGS += -Os -Wall -Werror -mcpu=cortex-m0 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=c11 -MMD
 	#CFLAGS += -Os -Wall -Werror -mcpu=cortex-m0 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=c99 -MMD

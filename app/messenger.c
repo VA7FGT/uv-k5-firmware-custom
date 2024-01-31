@@ -273,8 +273,6 @@ void MSG_FSKSendData() {
     	}
 	}
 
-	MSG_ClearPacketBuffer();
-
 	// enable FSK TX
 	BK4819_WriteRegister(BK4819_REG_59, (1u << 11) | fsk_reg59);
 
@@ -541,11 +539,11 @@ void moveUP(char (*rxMessages)[PAYLOAD_LENGTH + 2]) {
 	memset(rxMessages[3], 0, sizeof(rxMessages[3]));
 }
 
-void MSG_SendPacket(union DataPacket packet) {
+void MSG_SendPacket() {
 
 	if ( msgStatus != READY ) return;
 
-	if ( strlen(packet.data.payload) > 0 && (TX_freq_check(gCurrentVfo->pTX->Frequency) == 0) ) {
+	if ( strlen((char *)dataPacket.data.payload) > 0 && (TX_freq_check(gCurrentVfo->pTX->Frequency) == 0) ) {
 
 		msgStatus = SENDING;
 
@@ -553,28 +551,31 @@ void MSG_SendPacket(union DataPacket packet) {
 		BK4819_ToggleGpioOut(BK4819_GPIO6_PIN2_GREEN, false);
 		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, true);
 
-		MSG_ClearPacketBuffer();
+		// display sent message (before encryption)
+		if (dataPacket.data.header != ACK_PACKET) {
+			moveUP(rxMessage);
+			sprintf(rxMessage[3], "> %s", dataPacket.data.payload);
+			memset(lastcMessage, 0, sizeof(lastcMessage));
+			memcpy(lastcMessage, dataPacket.data.payload, PAYLOAD_LENGTH);
+			cIndex = 0;
+			prevKey = 0;
+			prevLetter = 0;
+			memset(cMessage, 0, sizeof(cMessage));
+		}
 
-		// later refactor to not use global state but pass dataPacket type everywhere
-		dataPacket = packet;
 		#ifdef ENABLE_ENCRYPTION
-			if(packet.data.header == ENCRYPTED_MESSAGE_PACKET){
-				char nonce[NONCE_LENGTH];
+			if(dataPacket.data.header == ENCRYPTED_MESSAGE_PACKET){
 
-				CRYPTO_Random(nonce, NONCE_LENGTH);
-				// this is wat happens when we have global state
-				memcpy(packet.data.nonce, nonce, NONCE_LENGTH);
+				CRYPTO_Random(dataPacket.data.nonce, NONCE_LENGTH);
 
 				CRYPTO_Crypt(
-					packet.data.payload,
+					dataPacket.data.payload,
 					PAYLOAD_LENGTH,
 					dataPacket.data.payload,
-					&packet.data.nonce,
+					&dataPacket.data.nonce,
 					gEncryptionKey,
 					256
 				);
-			
-				memcpy(dataPacket.data.nonce, nonce, sizeof(dataPacket.data.nonce));
 			}
 		#endif
 
@@ -603,16 +604,10 @@ void MSG_SendPacket(union DataPacket packet) {
 		BK4819_ToggleGpioOut(BK4819_GPIO5_PIN1_RED, false);
 
 		MSG_EnableRX(true);
-		if (packet.data.header != ACK_PACKET) {
-			moveUP(rxMessage);
-			sprintf(rxMessage[3], "> %s", packet.data.payload);
-			memset(lastcMessage, 0, sizeof(lastcMessage));
-			memcpy(lastcMessage, packet.data.payload, PAYLOAD_LENGTH);
-			cIndex = 0;
-			prevKey = 0;
-			prevLetter = 0;
-			memset(cMessage, 0, sizeof(cMessage));
-		}
+
+		// clear packet buffer
+		MSG_ClearPacketBuffer();
+		
 		msgStatus = READY;
 
 	} else {
@@ -721,8 +716,15 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 		gFSKWriteIndex = 0;
 		// Transmit a message to the sender that we have received the message (Unless it's a service message)
 		if (dataPacket.data.header!=ACK_PACKET) {
+			// in the future we might reply with received payload and then the sending radio
+			// could compare it and determine if the messegage was read correctly (kamilsss655)
+			MSG_ClearPacketBuffer();
 			dataPacket.data.header=ACK_PACKET;
-			MSG_SendPacket(dataPacket);
+			// sending only empty header seems to not work, so set few bytes of payload to increase reliability (kamilsss655)
+			memset(dataPacket.data.payload, 255, 5);
+			// wait so the correspondent radio can properly receive it
+			SYSTEM_DelayMs(700);
+			MSG_SendPacket();
 		}
 	}
 }
@@ -844,7 +846,7 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 					dataPacket.data.header=MESSAGE_PACKET;
 				#endif
 				memcpy(dataPacket.data.payload, cMessage, sizeof(dataPacket.data.payload));
-				MSG_SendPacket(dataPacket);
+				MSG_SendPacket();
 				break;
 			case KEY_EXIT:
 				gRequestDisplayScreen = DISPLAY_MAIN;
