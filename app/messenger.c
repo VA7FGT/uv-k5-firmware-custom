@@ -728,11 +728,10 @@ void MSG_HandleReceive(){
 			#else
 				snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.data.payload);
 			#endif
+			#ifdef ENABLE_MESSENGER_UART
+				UART_printf("SMS<%s\r\n", dataPacket.data.payload);
+			#endif
 		}
-
-	#ifdef ENABLE_MESSENGER_UART
-		UART_printf("SMS<%s\r\n", rxMessage);
-	#endif
 
 		if ( gScreenToDisplay != DISPLAY_MSG ) {
 			hasNewMessage = 1;
