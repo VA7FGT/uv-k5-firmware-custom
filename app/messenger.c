@@ -624,9 +624,6 @@ uint8_t validate_char( uint8_t rchar ) {
 
 void MSG_StorePacket(const uint16_t interrupt_bits) {
 
-	// prevent listening to fsk data and squelch (kamilsss655)
-	AUDIO_AudioPathOff();
-
 	//const uint16_t rx_sync_flags   = BK4819_ReadRegister(BK4819_REG_0B);
 
 	const bool rx_sync             = (interrupt_bits & BK4819_REG_02_FSK_RX_SYNC) ? true : false;
@@ -636,6 +633,9 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 	//UART_printf("\nMSG : S%i, F%i, E%i | %i", rx_sync, rx_fifo_almost_full, rx_finished, interrupt_bits);
 
 	if (rx_sync) {
+		// prevent listening to fsk data and squelch (kamilsss655)
+		AUDIO_AudioPathOff();
+
 		gFSKWriteIndex = 0;
 		MSG_ClearPacketBuffer();
 		msgStatus = RECEIVING;
