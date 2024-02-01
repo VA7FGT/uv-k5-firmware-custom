@@ -39,6 +39,13 @@
 	#include "sram-overlay.h"
 #endif
 #include "version.h"
+#ifdef ENABLE_MESSENGER
+#ifdef ENABLE_MESSENGER_UART
+#include "app/messenger.h"
+#include "external/printf/printf.h"
+#endif
+#endif
+
 
 #define DMA_INDEX(x, y) (((x) + (y)) % sizeof(UART_DMA_Buffer))
 
@@ -212,7 +219,7 @@ static void CMD_0514(const uint8_t *pBuffer)
 	#endif
 
 	gSerialConfigCountDown_500ms = 12; // 6 sec
-	
+
 	// turn the LCD backlight off
 	BACKLIGHT_TurnOff();
 
@@ -260,7 +267,7 @@ static void CMD_051D(const uint8_t *pBuffer)
 		return;
 
 	gSerialConfigCountDown_500ms = 12; // 6 sec
-	
+
 	bReloadEeprom = false;
 
 	#ifdef ENABLE_FMRADIO
@@ -369,6 +376,31 @@ bool UART_IsCommandAvailable(void)
 		if (gUART_WriteIndex == DmaLength)
 			return false;
 
+#ifdef ENABLE_MESSENGER
+#ifdef ENABLE_MESSENGER_UART
+
+    if (UART_DMA_Buffer[gUART_WriteIndex] == 'S' && UART_DMA_Buffer[gUART_WriteIndex + 1] == 'M' && UART_DMA_Buffer[gUART_WriteIndex + 2] == 'S' && UART_DMA_Buffer[gUART_WriteIndex + 3] == ':')
+    {
+
+      char txMessage[PAYLOAD_LENGTH + 4];
+      memset(txMessage, 0, sizeof(txMessage));
+      snprintf(txMessage, (PAYLOAD_LENGTH + 4), "%s", &UART_DMA_Buffer[gUART_WriteIndex + 4]);
+
+			for (int i = 0; txMessage[i] != '\0'; i++)
+			{
+				if (txMessage[i] == '\r' || txMessage[i] == '\n')
+					txMessage[i] = '\0';
+			}
+      if (strlen(txMessage) > 0)
+      {
+        MSG_Send(txMessage);
+        UART_printf("SMS>%s\r\n", txMessage);
+        gUpdateDisplay = true;
+      }
+    }
+
+#endif
+#endif
 		while (gUART_WriteIndex != DmaLength && UART_DMA_Buffer[gUART_WriteIndex] != 0xABU)
 			gUART_WriteIndex = DMA_INDEX(gUART_WriteIndex, 1);
 
@@ -442,7 +474,7 @@ bool UART_IsCommandAvailable(void)
 		for (i = 0; i < (Size + 2u); i++)
 			UART_Command.Buffer[i] ^= Obfuscation[i % 16];
 	}
-	
+
 	CRC = UART_Command.Buffer[Size] | (UART_Command.Buffer[Size + 1] << 8);
 
 	return (CRC_Calculate(UART_Command.Buffer, Size) != CRC) ? false : true;
@@ -455,33 +487,33 @@ void UART_HandleCommand(void)
 		case 0x0514:
 			CMD_0514(UART_Command.Buffer);
 			break;
-	
+
 		case 0x051B:
 			CMD_051B(UART_Command.Buffer);
 			break;
-	
+
 		case 0x051D:
 			CMD_051D(UART_Command.Buffer);
 			break;
-	
+
 		case 0x051F:	// Not implementing non-authentic command
 			break;
-	
+
 		case 0x0521:	// Not implementing non-authentic command
 			break;
-	
+
 		case 0x0527:
 			CMD_0527();
 			break;
-	
+
 		case 0x0529:
 			CMD_0529();
 			break;
-	
+
 		case 0x052F:
 			CMD_052F(UART_Command.Buffer);
 			break;
-	
+
 		case 0x05DD:
 			#if defined(ENABLE_OVERLAY)
 				overlay_FLASH_RebootToBootloader();
