@@ -378,8 +378,7 @@ bool UART_IsCommandAvailable(void)
 
 #ifdef ENABLE_MESSENGER
 #ifdef ENABLE_MESSENGER_UART
-
-    if (UART_DMA_Buffer[gUART_WriteIndex] == 'S' && UART_DMA_Buffer[gUART_WriteIndex + 1] == 'M' && UART_DMA_Buffer[gUART_WriteIndex + 2] == 'S' && UART_DMA_Buffer[gUART_WriteIndex + 3] == ':')
+    if (strncmp(((char*)UART_DMA_Buffer) + gUART_WriteIndex, "SMS:",4) == 0)
     {
 
       char txMessage[PAYLOAD_LENGTH + 4];
