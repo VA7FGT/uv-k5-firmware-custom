@@ -18,8 +18,7 @@
 #ifdef ENABLE_ENCRYPTION
 	#include "helper/crypto.h"
 #endif
-
-#if (defined(ENABLE_UART) && defined(ENABLE_UART_DEBUG)) || (defined(ENABLE_MESSENGER_UART))
+#ifdef ENABLE_MESSENGER_UART
     #include "driver/uart.h"
 #endif
 
