@@ -609,13 +609,13 @@ void MSG_ConfigureFSK(bool rx)
 	//
 	// <15:8> sync byte 0
 	// < 7:0> sync byte 1
-	BK4819_WriteRegister(BK4819_REG_5A, 0x5555);
+	BK4819_WriteRegister(BK4819_REG_5A, 0x3072);
 
 	// REG_5B .. bytes 2 & 3 sync pattern
 	//
 	// <15:8> sync byte 2
 	// < 7:0> sync byte 3
-	BK4819_WriteRegister(BK4819_REG_5B, 0x55AA);
+	BK4819_WriteRegister(BK4819_REG_5B, 0x576C);
 
 	// disable CRC
 	BK4819_WriteRegister(BK4819_REG_5C, 0x5625);
@@ -639,17 +639,17 @@ void MSG_ConfigureFSK(bool rx)
 
 	// configure main FSK params
 	BK4819_WriteRegister(BK4819_REG_59,
-				(0u  << 15) |   // 0/1     1 = clear TX FIFO
-				(0u  << 14) |   // 0/1     1 = clear RX FIFO
-				(0u  << 13) |   // 0/1     1 = scramble
-				(0u  << 12) |   // 0/1     1 = enable RX
-				(0u  << 11) |   // 0/1     1 = enable TX
-				(0u  << 10) |   // 0/1     1 = invert data when RX
-				(0u  <<  9) |   // 0/1     1 = invert data when TX
-				(0u  <<  8) |   // 0/1     ???
+				(0u        <<       15) |   // 0/1     1 = clear TX FIFO
+				(0u        <<       14) |   // 0/1     1 = clear RX FIFO
+				(0u        <<       13) |   // 0/1     1 = scramble
+				(0u        <<       12) |   // 0/1     1 = enable RX
+				(0u        <<       11) |   // 0/1     1 = enable TX
+				(0u        <<       10) |   // 0/1     1 = invert data when RX
+				(0u        <<        9) |   // 0/1     1 = invert data when TX
+				(0u        <<        8) |   // 0/1     ???
 				((rx ? 0u : 15u) <<  4) |   // 0 ~ 15  preamble length .. bit toggling
-				(1u  <<  3) |   // 0/1     sync length
-				(0u  <<  0)     // 0 ~ 7   ???
+				(1u        <<        3) |   // 0/1     sync length
+				(0u        <<        0)     // 0 ~ 7   ???
 				
 	);
 
