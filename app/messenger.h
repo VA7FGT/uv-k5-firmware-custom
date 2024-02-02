@@ -64,6 +64,7 @@ void MSG_ClearPacketBuffer();
 void MSG_SendAck();
 void MSG_HandleReceive();
 void MSG_Send(const char *cMessage);
+void MSG_ConfigureFSK(bool rx);
 
 #endif
 
