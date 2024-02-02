@@ -703,7 +703,7 @@ void MSG_HandleReceive(){
 		#ifdef ENABLE_MESSENGER_UART
 			UART_printf("SVC<RCPT\r\n");
 		#endif
-		rxMessage[3][strlen(rxMessage[3])] = '+';
+		rxMessage[3][0] = '+';
 		gUpdateStatus = true;
 		gUpdateDisplay = true;
 	#endif
