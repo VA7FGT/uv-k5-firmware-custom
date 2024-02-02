@@ -25,7 +25,8 @@ extern uint8_t UART_DMA_Buffer[256];
 void UART_Init(void);
 void UART_Send(const void *pBuffer, uint32_t Size);
 void UART_LogSend(const void *pBuffer, uint32_t Size);
-
-void UART_printf(const char *str, ...);
+#ifdef ENABLE_MESSENGER_UART
+    void UART_printf(const char *str, ...);
+#endif
 
 #endif
