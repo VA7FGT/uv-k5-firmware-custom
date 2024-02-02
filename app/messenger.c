@@ -266,9 +266,12 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 	//UART_printf("\nMSG : S%i, F%i, E%i | %i", rx_sync, rx_fifo_almost_full, rx_finished, interrupt_bits);
 
 	if (rx_sync) {
-		// prevent listening to fsk data and squelch (kamilsss655)
-		AUDIO_AudioPathOff();
-
+		#ifdef ENABLE_MESSENGER_FSK_MUTE
+			// prevent listening to fsk data and squelch (kamilsss655)
+			// CTCSS codes seem to false trigger the rx_sync
+			if(gCurrentCodeType == CODE_TYPE_OFF)
+				AUDIO_AudioPathOff();
+		#endif
 		gFSKWriteIndex = 0;
 		MSG_ClearPacketBuffer();
 		msgStatus = RECEIVING;
