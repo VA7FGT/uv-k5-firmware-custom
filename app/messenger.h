@@ -42,7 +42,7 @@ typedef enum PacketType {
 
 // Data Packet definition                            // 2024 kamilsss655
 union DataPacket
-{ 
+{
   struct{
     uint8_t header;
     uint8_t payload[PAYLOAD_LENGTH];
@@ -63,6 +63,7 @@ void MSG_FSKSendData();
 void MSG_ClearPacketBuffer();
 void MSG_SendAck();
 void MSG_HandleReceive();
+void MSG_Send(const char *cMessage);
 
 #endif
 
