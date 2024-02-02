@@ -39,11 +39,9 @@
 	#include "sram-overlay.h"
 #endif
 #include "version.h"
-#ifdef ENABLE_MESSENGER
-#ifdef ENABLE_MESSENGER_UART
-#include "app/messenger.h"
-#include "external/printf/printf.h"
-#endif
+#if defined(ENABLE_MESSENGER) && defined(ENABLE_MESSENGER_UART)
+	#include "app/messenger.h"
+	#include "external/printf/printf.h"
 #endif
 
 
@@ -376,8 +374,7 @@ bool UART_IsCommandAvailable(void)
 		if (gUART_WriteIndex == DmaLength)
 			return false;
 
-#ifdef ENABLE_MESSENGER
-#ifdef ENABLE_MESSENGER_UART
+#if defined(ENABLE_MESSENGER) && defined(ENABLE_MESSENGER_UART)
     if (strncmp(((char*)UART_DMA_Buffer) + gUART_WriteIndex, "SMS:",4) == 0)
     {
 
@@ -398,7 +395,6 @@ bool UART_IsCommandAvailable(void)
       }
     }
 
-#endif
 #endif
 		while (gUART_WriteIndex != DmaLength && UART_DMA_Buffer[gUART_WriteIndex] != 0xABU)
 			gUART_WriteIndex = DMA_INDEX(gUART_WriteIndex, 1);
