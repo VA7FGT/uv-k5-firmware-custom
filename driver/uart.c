@@ -19,6 +19,9 @@
 #include "bsp/dp32g030/syscon.h"
 #include "bsp/dp32g030/uart.h"
 #include "driver/uart.h"
+#ifdef ENABLE_MESSENGER_UART
+	#include "external/printf/printf.h"
+#endif
 
 static bool UART_IsLogEnabled;
 uint8_t UART_DMA_Buffer[256];
@@ -102,3 +105,18 @@ void UART_LogSend(const void *pBuffer, uint32_t Size)
 		UART_Send(pBuffer, Size);
 	}
 }
+
+#ifdef ENABLE_MESSENGER_UART
+	void UART_printf(const char *str, ...)
+	{
+		char text[256];
+		int  len;
+
+		va_list va;
+		va_start(va, str);
+		len = vsnprintf(text, sizeof(text), str, va);
+		va_end(va);
+
+		UART_Send(text, len);
+	}
+#endif

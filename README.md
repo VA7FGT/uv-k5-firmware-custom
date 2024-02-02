@@ -164,6 +164,9 @@ ENABLE_SPECTRUM_COPY_VFO           := 1       pressing MENU in spectrum mode wil
 ENABLE_SPECTRUM_SHOW_CHANNEL_NAME  := 1       shows channel number and channel name of the peak frequency in spectrum
 ENABLE_ADJUSTABLE_RX_GAIN_SETTINGS := 1       keeps the rx gain settings set in spectrum mode after exit (otherwise these are always overwritten to default value), this makes much more sense considering that we have a radio with user adjustable gain so why not use it to adjust to current radio conditions, maximum gain allows to greatly increase reception in scan memory channels mode (in this configuration default gain settings are only set at boot and when exiting AM modulation mode to set it to sane value after am fix)
 ENABLE_SPECTRUM_CHANNEL_SCAN       := 1       this enables spectrum channel scan mode (enter by going into memory mode and press F+5, this allows SUPER fast channel scanning (4.5x faster than regular scanning), regular scan of 200 memory channels takes roughly 18 seconds, spectrum memory scan takes roughly 4 seconds, if you have less channels stored i.e 50 - the spectrum memory scan will take only **1 second**
+ENABLE_MESSENGER                   := 1       enable messenger
+ENABLE_MESSENGER_NOTIFICATION      := 1       enable messenger delivery notification
+ENABLE_MESSENGER_UART              := 0       enable sending messages via serial with SMS:content command (unreliable)
 ENABLE_ENCRYPTION                  := 1       enable ChaCha20 256 bit encryption for messenger
 ```
 

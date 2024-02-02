@@ -18,8 +18,7 @@
 #ifdef ENABLE_ENCRYPTION
 	#include "helper/crypto.h"
 #endif
-
-#if defined(ENABLE_UART) && defined(ENABLE_UART_DEBUG)
+#ifdef ENABLE_MESSENGER_UART
     #include "driver/uart.h"
 #endif
 
@@ -587,7 +586,7 @@ void MSG_SendPacket() {
 		FUNCTION_Select(FUNCTION_TRANSMIT);
 
 		SYSTEM_DelayMs(50);
-		
+
 		MSG_FSKSendData();
 
 		SYSTEM_DelayMs(50);
@@ -607,7 +606,7 @@ void MSG_SendPacket() {
 
 		// clear packet buffer
 		MSG_ClearPacketBuffer();
-		
+
 		msgStatus = READY;
 
 	} else {
@@ -703,7 +702,7 @@ void MSG_HandleReceive(){
 		#ifdef ENABLE_MESSENGER_UART
 			UART_printf("SVC<RCPT\r\n");
 		#endif
-		rxMessage[3][strlen(rxMessage[3])] = '+';
+		rxMessage[3][0] = '+';
 		gUpdateStatus = true;
 		gUpdateDisplay = true;
 	#endif
@@ -728,11 +727,10 @@ void MSG_HandleReceive(){
 			#else
 				snprintf(rxMessage[3], PAYLOAD_LENGTH + 2, "< %s", dataPacket.data.payload);
 			#endif
+			#ifdef ENABLE_MESSENGER_UART
+				UART_printf("SMS<%s\r\n", dataPacket.data.payload);
+			#endif
 		}
-
-	#ifdef ENABLE_MESSENGER_UART
-		UART_printf("SMS<%s\r\n", dencryptedTxMessage);
-	#endif
 
 		if ( gScreenToDisplay != DISPLAY_MSG ) {
 			hasNewMessage = 1;
@@ -748,8 +746,8 @@ void MSG_HandleReceive(){
 	}
 
 	// Transmit a message to the sender that we have received the message
-	if (dataPacket.data.header == MESSAGE_PACKET || 
-		dataPacket.data.header == ENCRYPTED_MESSAGE_PACKET) 
+	if (dataPacket.data.header == MESSAGE_PACKET ||
+		dataPacket.data.header == ENCRYPTED_MESSAGE_PACKET)
 	{
 		// wait so the correspondent radio can properly receive it
 		SYSTEM_DelayMs(700);
@@ -819,7 +817,7 @@ void processBackspace() {
 
 void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 	uint8_t state = bKeyPressed + 2 * bKeyHeld;
-	
+
 	if (state == MSG_BUTTON_EVENT_SHORT) {
 
 		switch (Key)
@@ -856,14 +854,7 @@ void  MSG_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 				break;*/
 			case KEY_MENU:
 				// Send message
-				MSG_ClearPacketBuffer();
-				#ifdef ENABLE_ENCRYPTION
-					dataPacket.data.header=ENCRYPTED_MESSAGE_PACKET;
-				#else
-					dataPacket.data.header=MESSAGE_PACKET;
-				#endif
-				memcpy(dataPacket.data.payload, cMessage, sizeof(dataPacket.data.payload));
-				MSG_SendPacket();
+				MSG_Send(cMessage);
 				break;
 			case KEY_EXIT:
 				gRequestDisplayScreen = DISPLAY_MAIN;
@@ -894,5 +885,15 @@ void MSG_ClearPacketBuffer()
 	memset(dataPacket.serializedArray, 0, sizeof(dataPacket.serializedArray));
 }
 
+void MSG_Send(const char *cMessage){
+	MSG_ClearPacketBuffer();
+	#ifdef ENABLE_ENCRYPTION
+		dataPacket.data.header=ENCRYPTED_MESSAGE_PACKET;
+	#else
+		dataPacket.data.header=MESSAGE_PACKET;
+	#endif
+	memcpy(dataPacket.data.payload, cMessage, sizeof(dataPacket.data.payload));
+	MSG_SendPacket();
+}
 
 #endif
