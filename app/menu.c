@@ -245,9 +245,23 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 		case MENU_500TX:
 		case MENU_350EN:
 		case MENU_SCREN:
+#ifdef ENABLE_ENCRYPTION
+		case MENU_MSG_ENC:
+#endif
+#ifdef ENABLE_MESSENGER
+		case MENU_MSG_RX:
+		case MENU_MSG_ACK:
+#endif
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(gSubMenu_OFF_ON) - 1;
 			break;
+
+#ifdef ENABLE_MESSENGER
+		case MENU_MSG_MODULATION:
+			*pMin = 0;
+			*pMax = ARRAY_SIZE(gSubMenu_MSG_MODULATION) - 1;
+			break;
+#endif
 
 		case MENU_AM:
 			*pMin = 0;
@@ -483,9 +497,27 @@ void MENU_AcceptSetting(void)
 		#ifdef ENABLE_ENCRYPTION
 			case MENU_ENC_KEY:
 				memset(gEeprom.ENC_KEY, 0, sizeof(gEeprom.ENC_KEY));
-				memmove(gEeprom.ENC_KEY, edit, sizeof(edit));
+				memmove(gEeprom.ENC_KEY, edit, sizeof(gEeprom.ENC_KEY));
 				memset(edit, 0, sizeof(edit));
 				gUpdateStatus        = true;
+				break;
+
+			case MENU_MSG_ENC:
+				gEeprom.MESSENGER_CONFIG.data.encrypt = gSubMenuSelection;
+				break;
+		#endif
+
+		#ifdef ENABLE_MESSENGER
+			case MENU_MSG_RX:
+				gEeprom.MESSENGER_CONFIG.data.receive = gSubMenuSelection;
+				break;
+
+			case MENU_MSG_ACK:
+				gEeprom.MESSENGER_CONFIG.data.ack = gSubMenuSelection;
+				break;
+
+			case MENU_MSG_MODULATION:
+				gEeprom.MESSENGER_CONFIG.data.modulation = gSubMenuSelection;
 				break;
 		#endif
 
@@ -915,6 +947,26 @@ void MENU_ShowCurrentSetting(void)
 		case MENU_RX_OFFSET:
     		gSubMenuSelection = gEeprom.RX_OFFSET;
 			break;
+
+		#ifdef ENABLE_ENCRYPTION
+			case MENU_MSG_ENC:
+				gSubMenuSelection = gEeprom.MESSENGER_CONFIG.data.encrypt;
+				break;
+		#endif
+
+		#ifdef ENABLE_MESSENGER
+			case MENU_MSG_RX:
+				gSubMenuSelection = gEeprom.MESSENGER_CONFIG.data.receive;
+				break;
+
+			case MENU_MSG_ACK:
+				gSubMenuSelection = gEeprom.MESSENGER_CONFIG.data.ack;
+				break;
+
+			case MENU_MSG_MODULATION:
+				gSubMenuSelection = gEeprom.MESSENGER_CONFIG.data.modulation;
+				break;
+		#endif
 
 		#ifdef ENABLE_PWRON_PASSWORD
 			case MENU_PASSWORD:

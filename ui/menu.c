@@ -115,7 +115,13 @@ const t_menu_item MenuList[] =
 	{"Passwd", VOICE_ID_INVALID,                       MENU_PASSWORD      }, // power on password
 #endif
 #ifdef ENABLE_ENCRYPTION
-	{"EncKey", VOICE_ID_INVALID,                       MENU_ENC_KEY      }, // encryption key
+	{"EncKey", VOICE_ID_INVALID,                       MENU_ENC_KEY       }, // encryption key
+	{"MsgEnc", VOICE_ID_INVALID,                       MENU_MSG_ENC       }, // messenger encrypt outgoing messages
+#endif
+#ifdef ENABLE_MESSENGER
+	{"MsgRx",  VOICE_ID_INVALID,                       MENU_MSG_RX        }, // messenger rx
+	{"MsgAck", VOICE_ID_INVALID,                       MENU_MSG_ACK       }, // messenger respond ACK
+	{"MsgMod", VOICE_ID_INVALID,                       MENU_MSG_MODULATION}, // messenger modulation
 #endif
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
 	// hidden menu items from here on
@@ -176,6 +182,15 @@ const char gSubMenu_SAVE[][4] =
 	"75%",
 	"80%"
 };
+
+#ifdef ENABLE_MESSENGER
+	const char gSubMenu_MSG_MODULATION[][10] =
+	{
+		"FSK 450",
+		"FSK 700",
+		"AFSK 1.2K"
+	};
+#endif
 
 const char gSubMenu_RX_AGC[][6] =
 {
@@ -658,6 +673,13 @@ void UI_DisplayMenu(void)
 			#ifdef ENABLE_NOAA
 				case MENU_NOAA_S:
 			#endif
+			#ifdef ENABLE_ENCRYPTION
+				case MENU_MSG_ENC:
+			#endif
+			#ifdef ENABLE_MESSENGER
+				case MENU_MSG_RX:
+				case MENU_MSG_ACK:
+			#endif
 			case MENU_350TX:
 			case MENU_200TX:
 			case MENU_500TX:
@@ -665,7 +687,6 @@ void UI_DisplayMenu(void)
 			case MENU_SCREN:
 				strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
 				break;
-
 			case MENU_MEM_CH:
 			case MENU_1_CALL:
 			case MENU_DEL_CH:
@@ -753,6 +774,12 @@ void UI_DisplayMenu(void)
 					already_printed = true;
 					break;
 				}
+			#endif
+
+			#ifdef ENABLE_MESSENGER
+				case MENU_MSG_MODULATION:
+					strcpy(String, gSubMenu_MSG_MODULATION[gSubMenuSelection]);
+					break;
 			#endif
 
 			case MENU_SAVE:

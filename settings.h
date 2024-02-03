@@ -24,6 +24,9 @@
 #include <helper/battery.h>
 #include "radio.h"
 #include <driver/backlight.h>
+#ifdef ENABLE_MESSENGER
+	#include "app/messenger.h"
+#endif
 
 enum POWER_OnDisplayMode_t {
 	POWER_ON_DISPLAY_MODE_FULL_SCREEN = 0,
@@ -242,6 +245,9 @@ typedef struct {
 #endif
 #ifdef ENABLE_ENCRYPTION
 	char                  ENC_KEY[16];
+#endif
+#ifdef ENABLE_MESSENGER
+	MessengerConfig       MESSENGER_CONFIG;
 #endif
 	uint16_t              VOX1_THRESHOLD;
 	uint16_t              VOX0_THRESHOLD;

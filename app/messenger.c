@@ -29,7 +29,7 @@ const uint8_t MSG_BUTTON_EVENT_LONG =  MSG_BUTTON_STATE_HELD;
 
 const uint8_t MAX_MSG_LENGTH = PAYLOAD_LENGTH - 1;
 
-const uint16_t TONE2_FREQ = 0x3065; // 0x2854
+uint16_t TONE2_FREQ;
 
 #define NEXT_CHAR_DELAY 100 // 10ms tick
 
@@ -72,13 +72,14 @@ void MSG_FSKSendData() {
 		uint16_t deviation;
 		switch (gEeprom.VfoInfo[gEeprom.TX_VFO].CHANNEL_BANDWIDTH)
 		{
-			case BK4819_FILTER_BW_WIDE:            deviation =  1350; break; // 20k // measurements by kamilsss655
+			case BK4819_FILTER_BW_WIDE:            deviation =  1300; break; // 20k // measurements by kamilsss655
 			case BK4819_FILTER_BW_NARROW:          deviation =  1200; break; // 10k
 			// case BK4819_FILTER_BW_NARROWAVIATION:  deviation =  850; break;  // 5k
 			// case BK4819_FILTER_BW_NARROWER:        deviation =  850; break;  // 5k
 			// case BK4819_FILTER_BW_NARROWEST:	      deviation =  850; break;  // 5k
 			default:                               deviation =  850;  break;  // 5k
 		}
+
 		//BK4819_WriteRegister(0x40, (3u << 12) | (deviation & 0xfff));
 		BK4819_WriteRegister(BK4819_REG_40, (dev_val & 0xf000) | (deviation & 0xfff));
 	}
@@ -152,7 +153,9 @@ void MSG_EnableRX(const bool enable) {
 
 	if (enable) {
 		MSG_ConfigureFSK(true);
-		BK4819_FskEnableRx();
+
+		if(gEeprom.MESSENGER_CONFIG.data.receive)
+			BK4819_FskEnableRx();
 	} else {
 		BK4819_WriteRegister(BK4819_REG_70, 0);
 		BK4819_WriteRegister(BK4819_REG_58, 0);
@@ -266,9 +269,12 @@ void MSG_StorePacket(const uint16_t interrupt_bits) {
 	//UART_printf("\nMSG : S%i, F%i, E%i | %i", rx_sync, rx_fifo_almost_full, rx_finished, interrupt_bits);
 
 	if (rx_sync) {
-		// prevent listening to fsk data and squelch (kamilsss655)
-		AUDIO_AudioPathOff();
-
+		#ifdef ENABLE_MESSENGER_FSK_MUTE
+			// prevent listening to fsk data and squelch (kamilsss655)
+			// CTCSS codes seem to false trigger the rx_sync
+			if(gCurrentCodeType == CODE_TYPE_OFF)
+				AUDIO_AudioPathOff();
+		#endif
 		gFSKWriteIndex = 0;
 		MSG_ClearPacketBuffer();
 		msgStatus = RECEIVING;
@@ -382,7 +388,9 @@ void MSG_HandleReceive(){
 	{
 		// wait so the correspondent radio can properly receive it
 		SYSTEM_DelayMs(700);
-		MSG_SendAck();
+
+		if(gEeprom.MESSENGER_CONFIG.data.ack)
+			MSG_SendAck();
 	}
 }
 
@@ -519,7 +527,14 @@ void MSG_ClearPacketBuffer()
 void MSG_Send(const char *cMessage){
 	MSG_ClearPacketBuffer();
 	#ifdef ENABLE_ENCRYPTION
-		dataPacket.data.header=ENCRYPTED_MESSAGE_PACKET;
+		if(gEeprom.MESSENGER_CONFIG.data.encrypt)
+		{
+			dataPacket.data.header=ENCRYPTED_MESSAGE_PACKET;
+		}
+		else
+		{
+			dataPacket.data.header=MESSAGE_PACKET;
+		}
 	#else
 		dataPacket.data.header=MESSAGE_PACKET;
 	#endif
@@ -551,59 +566,122 @@ void MSG_ConfigureFSK(bool rx)
 		( 1u <<  7) |    // 1
 		(96u <<  0));    // 96
 
-	// Tone2 baudrate 1200
+	// Tone2 = FSK baudrate                       // kamilsss655 2024
+	switch(gEeprom.MESSENGER_CONFIG.data.modulation)
+	{
+		case MOD_AFSK_1200:
+			TONE2_FREQ = 12389u;
+			break;
+		case MOD_FSK_700:
+			TONE2_FREQ = 7227u;
+			break;
+		case MOD_FSK_450:
+			TONE2_FREQ = 4646u;
+			break;
+	}
+
 	BK4819_WriteRegister(BK4819_REG_72, TONE2_FREQ);
-
 	
-
-	BK4819_WriteRegister(BK4819_REG_58,
-		(1u << 13) |		// 1 FSK TX mode selection
-							//   0 = FSK 1.2K and FSK 2.4K TX .. no tones, direct FM
-							//   1 = FFSK 1200 / 1800 TX
-							//   2 = ???
-							//   3 = FFSK 1200 / 2400 TX
-							//   4 = ???
-							//   5 = NOAA SAME TX
-							//   6 = ???
-							//   7 = ???
-							//
-		(7u << 10) |		// 0 FSK RX mode selection
-							//   0 = FSK 1.2K, FSK 2.4K RX and NOAA SAME RX .. no tones, direct FM
-							//   1 = ???
-							//   2 = ???
-							//   3 = ???
-							//   4 = FFSK 1200 / 2400 RX
-							//   5 = ???
-							//   6 = ???
-							//   7 = FFSK 1200 / 1800 RX
-							//
-		(3u << 8) |			// 0 FSK RX gain
-							//   0 ~ 3
-							//
-		(0u << 6) |			// 0 ???
-							//   0 ~ 3
-							//
-		(0u << 4) |			// 0 FSK preamble type selection
-							//   0 = 0xAA or 0x55 due to the MSB of FSK sync byte 0
-							//   1 = ???
-							//   2 = 0x55
-							//   3 = 0xAA
-							//
-		(1u << 1) |			// 1 FSK RX bandwidth setting
-							//   0 = FSK 1.2K .. no tones, direct FM
-							//   1 = FFSK 1200 / 1800
-							//   2 = NOAA SAME RX
-							//   3 = ???
-							//   4 = FSK 2.4K and FFSK 1200 / 2400
-							//   5 = ???
-							//   6 = ???
-							//   7 = ???
-							//
-		(1u << 0));			// 1 FSK enable
-							//   0 = disable
-							//   1 = enable
-
-							
+	switch(gEeprom.MESSENGER_CONFIG.data.modulation)
+	{
+		case MOD_FSK_700:
+		case MOD_FSK_450:
+			BK4819_WriteRegister(BK4819_REG_58,
+				(0u << 13) |		// 1 FSK TX mode selection
+									//   0 = FSK 1.2K and FSK 2.4K TX .. no tones, direct FM
+									//   1 = FFSK 1200 / 1800 TX
+									//   2 = ???
+									//   3 = FFSK 1200 / 2400 TX
+									//   4 = ???
+									//   5 = NOAA SAME TX
+									//   6 = ???
+									//   7 = ???
+									//
+				(0u << 10) |		// 0 FSK RX mode selection
+									//   0 = FSK 1.2K, FSK 2.4K RX and NOAA SAME RX .. no tones, direct FM
+									//   1 = ???
+									//   2 = ???
+									//   3 = ???
+									//   4 = FFSK 1200 / 2400 RX
+									//   5 = ???
+									//   6 = ???
+									//   7 = FFSK 1200 / 1800 RX
+									//
+				(3u << 8) |			// 0 FSK RX gain
+									//   0 ~ 3
+									//
+				(0u << 6) |			// 0 ???
+									//   0 ~ 3
+									//
+				(0u << 4) |			// 0 FSK preamble type selection
+									//   0 = 0xAA or 0x55 due to the MSB of FSK sync byte 0
+									//   1 = ???
+									//   2 = 0x55
+									//   3 = 0xAA
+									//
+				(0u << 1) |			// 1 FSK RX bandwidth setting
+									//   0 = FSK 1.2K .. no tones, direct FM
+									//   1 = FFSK 1200 / 1800
+									//   2 = NOAA SAME RX
+									//   3 = ???
+									//   4 = FSK 2.4K and FFSK 1200 / 2400
+									//   5 = ???
+									//   6 = ???
+									//   7 = ???
+									//
+				(1u << 0));			// 1 FSK enable
+									//   0 = disable
+									//   1 = enable
+		break;
+		case MOD_AFSK_1200:
+			BK4819_WriteRegister(BK4819_REG_58,
+				(1u << 13) |		// 1 FSK TX mode selection
+									//   0 = FSK 1.2K and FSK 2.4K TX .. no tones, direct FM
+									//   1 = FFSK 1200 / 1800 TX
+									//   2 = ???
+									//   3 = FFSK 1200 / 2400 TX
+									//   4 = ???
+									//   5 = NOAA SAME TX
+									//   6 = ???
+									//   7 = ???
+									//
+				(7u << 10) |		// 0 FSK RX mode selection
+									//   0 = FSK 1.2K, FSK 2.4K RX and NOAA SAME RX .. no tones, direct FM
+									//   1 = ???
+									//   2 = ???
+									//   3 = ???
+									//   4 = FFSK 1200 / 2400 RX
+									//   5 = ???
+									//   6 = ???
+									//   7 = FFSK 1200 / 1800 RX
+									//
+				(3u << 8) |			// 0 FSK RX gain
+									//   0 ~ 3
+									//
+				(0u << 6) |			// 0 ???
+									//   0 ~ 3
+									//
+				(0u << 4) |			// 0 FSK preamble type selection
+									//   0 = 0xAA or 0x55 due to the MSB of FSK sync byte 0
+									//   1 = ???
+									//   2 = 0x55
+									//   3 = 0xAA
+									//
+				(1u << 1) |			// 1 FSK RX bandwidth setting
+									//   0 = FSK 1.2K .. no tones, direct FM
+									//   1 = FFSK 1200 / 1800
+									//   2 = NOAA SAME RX
+									//   3 = ???
+									//   4 = FSK 2.4K and FFSK 1200 / 2400
+									//   5 = ???
+									//   6 = ???
+									//   7 = ???
+									//
+				(1u << 0));			// 1 FSK enable
+									//   0 = disable
+									//   1 = enable
+		break;
+	}
 
 	// REG_5A .. bytes 0 & 1 sync pattern
 	//

@@ -746,8 +746,11 @@ void RADIO_SetupRegisters(bool switchToForeground)
 	// enable/disable BK4819 selected interrupts
 
 	#ifdef ENABLE_MESSENGER
-		MSG_EnableRX(true);
-		InterruptMask |= BK4819_REG_3F_FSK_RX_SYNC | BK4819_REG_3F_FSK_RX_FINISHED | BK4819_REG_3F_FSK_FIFO_ALMOST_FULL | BK4819_REG_3F_FSK_TX_FINISHED;
+		if(gEeprom.MESSENGER_CONFIG.data.receive)
+		{
+			MSG_EnableRX(true);
+			InterruptMask |= BK4819_REG_3F_FSK_RX_SYNC | BK4819_REG_3F_FSK_RX_FINISHED | BK4819_REG_3F_FSK_FIFO_ALMOST_FULL | BK4819_REG_3F_FSK_TX_FINISHED;
+		}
 	#endif	
 
 	BK4819_WriteRegister(BK4819_REG_3F, InterruptMask);

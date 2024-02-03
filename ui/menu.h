@@ -64,6 +64,12 @@ enum
 #endif
 #ifdef ENABLE_ENCRYPTION
 	MENU_ENC_KEY,
+	MENU_MSG_ENC,
+#endif
+#ifdef ENABLE_MESSENGER
+	MENU_MSG_RX,
+	MENU_MSG_ACK,
+	MENU_MSG_MODULATION,
 #endif
 	MENU_BEEP,
 #ifdef ENABLE_VOICE
@@ -158,6 +164,9 @@ extern const char        gSubMenu_BAT_TXT[3][8];
 extern const char 		 gSubMenu_BATTYP[2][9];
 extern const char        gSubMenu_SCRAMBLER[11][7];
 extern const char        gSubMenu_RX_AGC[3][6];
+#ifdef ENABLE_MESSENGER
+extern const char        gSubMenu_MSG_MODULATION[3][10];
+#endif
 
 typedef struct {char* name; uint8_t id;} t_sidefunction;
 extern const uint8_t 		 gSubMenu_SIDEFUNCTIONS_size;
