@@ -571,14 +571,14 @@ void MSG_ConfigureFSK(bool rx)
 		case MOD_BAUD_1200:
 			TONE2_FREQ = 0x3065;
 			break;
-		case MOD_BAUD_300:
-			TONE2_FREQ = 0xC19;
+		case MOD_BAUD_700:
+			TONE2_FREQ = 7227;
 			break;
-		case MOD_BAUD_200:
-			TONE2_FREQ = 0x811;
+		case MOD_BAUD_550:
+			TONE2_FREQ = 5678;
 			break;
-		case MOD_BAUD_100:
-			TONE2_FREQ = 0x408;
+		case MOD_BAUD_450:
+			TONE2_FREQ = 4646;
 			break;
 	}
 
