@@ -40,6 +40,22 @@ typedef enum PacketType {
     INVALID_PACKET
 } PacketType;
 
+// Modem Modulation                             // 2024 kamilsss655
+typedef enum ModemModulation {
+    MOD_FSK,
+    MOD_AFSK,
+    MOD_NOAA_SAME
+} ModemModulation;
+
+// Modem Baud Rate                             // 2024 kamilsss655
+// lower baud provides better reliability in bad conditions
+typedef enum ModemBaudRate {
+    MOD_BAUD_1200,
+    MOD_BAUD_300,
+    MOD_BAUD_200,
+    MOD_BAUD_100
+} ModemBaudRate;
+
 // Data Packet definition                            // 2024 kamilsss655
 union DataPacket
 {
@@ -53,6 +69,19 @@ union DataPacket
   uint8_t serializedArray[1+PAYLOAD_LENGTH+NONCE_LENGTH];
 };
 
+// MessengerConfig                            // 2024 kamilsss655
+typedef union {
+  struct {
+    uint8_t
+      receive    :1, // determines whether fsk modem will listen for new messages
+      ack        :1, // determines whether the radio will automatically respond to messages with ACK
+      encrypt    :1, // determines whether outgoing messages will be encrypted
+      unused     :1,
+      modulation :2, // determines FSK modulation type
+      baud       :2; // determines FSK baud rate
+  } data;
+  uint8_t __val;
+} MessengerConfig;
 
 void MSG_EnableRX(const bool enable);
 void MSG_StorePacket(const uint16_t interrupt_bits);

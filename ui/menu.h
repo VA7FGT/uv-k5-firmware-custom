@@ -64,6 +64,11 @@ enum
 #endif
 #ifdef ENABLE_ENCRYPTION
 	MENU_ENC_KEY,
+	MENU_MSG_ENC,
+#endif
+#ifdef ENABLE_MESSENGER
+	MENU_MSG_RX,
+	MENU_MSG_ACK,
 #endif
 	MENU_BEEP,
 #ifdef ENABLE_VOICE

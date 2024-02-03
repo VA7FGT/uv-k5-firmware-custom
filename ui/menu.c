@@ -115,7 +115,12 @@ const t_menu_item MenuList[] =
 	{"Passwd", VOICE_ID_INVALID,                       MENU_PASSWORD      }, // power on password
 #endif
 #ifdef ENABLE_ENCRYPTION
-	{"EncKey", VOICE_ID_INVALID,                       MENU_ENC_KEY      }, // encryption key
+	{"EncKey", VOICE_ID_INVALID,                       MENU_ENC_KEY       }, // encryption key
+	{"MsgEnc", VOICE_ID_INVALID,                       MENU_MSG_ENC       }, // messenger encrypt outgoing messages
+#endif
+#ifdef ENABLE_MESSENGER
+	{"MsgRx",  VOICE_ID_INVALID,                       MENU_MSG_RX        }, // messenger rx
+	{"MsgAck", VOICE_ID_INVALID,                       MENU_MSG_ACK       }, // messenger respond ACK
 #endif
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
 	// hidden menu items from here on
@@ -753,6 +758,20 @@ void UI_DisplayMenu(void)
 					already_printed = true;
 					break;
 				}
+
+				case MENU_MSG_ENC:
+						strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
+						break;
+			#endif
+
+			#ifdef ENABLE_MESSENGER
+				case MENU_MSG_RX:
+						strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
+						break;
+
+				case MENU_MSG_ACK:
+						strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
+						break;
 			#endif
 
 			case MENU_SAVE:

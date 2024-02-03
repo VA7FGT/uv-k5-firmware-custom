@@ -593,6 +593,9 @@ void BOARD_EEPROM_Init(void)
 	#ifdef ENABLE_PWRON_PASSWORD
 		gEeprom.PASSWORD_WRONG_ATTEMPTS = (Data[2] > PASSWORD_MAX_RETRIES) ? PASSWORD_MAX_RETRIES : Data[2];
 	#endif
+	#ifdef ENABLE_MESSENGER
+		gEeprom.MESSENGER_CONFIG.__val = Data[3];
+	#endif
 
 	// 0EA8..0EAF
 	EEPROM_ReadBuffer(0x0EA8, Data, 8);

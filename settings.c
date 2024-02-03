@@ -112,6 +112,9 @@ void SETTINGS_SaveSettings(void)
 	#endif
 	State[1] = gEeprom.RX_AGC;
 	State[2] = gEeprom.PASSWORD_WRONG_ATTEMPTS;
+	#ifdef ENABLE_MESSENGER
+		State[3] = gEeprom.MESSENGER_CONFIG.__val;
+	#endif
 	EEPROM_WriteBuffer(0x0EA0, State, true);
 	
 	memset(State, 0xFF, sizeof(State));
