@@ -565,29 +565,26 @@ void MSG_ConfigureFSK(bool rx)
 		( 1u <<  7) |    // 1
 		(96u <<  0));    // 96
 
-	// Tone2 = FSK baudrate 
-	switch(gEeprom.MESSENGER_CONFIG.data.baud)
+	// Tone2 = FSK baudrate                       // kamilsss655 2024
+	switch(gEeprom.MESSENGER_CONFIG.data.modulation)
 	{
-		case MOD_BAUD_1200:
-			TONE2_FREQ = 0x3065;
+		case MOD_AFSK_1200:
+			TONE2_FREQ = 12389u;
 			break;
-		case MOD_BAUD_700:
-			TONE2_FREQ = 7227;
+		case MOD_FSK_700:
+			TONE2_FREQ = 7227u;
 			break;
-		case MOD_BAUD_550:
-			TONE2_FREQ = 5678;
-			break;
-		case MOD_BAUD_450:
-			TONE2_FREQ = 4646;
+		case MOD_FSK_450:
+			TONE2_FREQ = 4646u;
 			break;
 	}
 
 	BK4819_WriteRegister(BK4819_REG_72, TONE2_FREQ);
-
 	
 	switch(gEeprom.MESSENGER_CONFIG.data.modulation)
 	{
-		case MOD_FSK:
+		case MOD_FSK_700:
+		case MOD_FSK_450:
 			BK4819_WriteRegister(BK4819_REG_58,
 				(0u << 13) |		// 1 FSK TX mode selection
 									//   0 = FSK 1.2K and FSK 2.4K TX .. no tones, direct FM
@@ -635,57 +632,9 @@ void MSG_ConfigureFSK(bool rx)
 									//   0 = disable
 									//   1 = enable
 		break;
-		case MOD_AFSK:
+		case MOD_AFSK_1200:
 			BK4819_WriteRegister(BK4819_REG_58,
 				(1u << 13) |		// 1 FSK TX mode selection
-									//   0 = FSK 1.2K and FSK 2.4K TX .. no tones, direct FM
-									//   1 = FFSK 1200 / 1800 TX
-									//   2 = ???
-									//   3 = FFSK 1200 / 2400 TX
-									//   4 = ???
-									//   5 = NOAA SAME TX
-									//   6 = ???
-									//   7 = ???
-									//
-				(7u << 10) |		// 0 FSK RX mode selection
-									//   0 = FSK 1.2K, FSK 2.4K RX and NOAA SAME RX .. no tones, direct FM
-									//   1 = ???
-									//   2 = ???
-									//   3 = ???
-									//   4 = FFSK 1200 / 2400 RX
-									//   5 = ???
-									//   6 = ???
-									//   7 = FFSK 1200 / 1800 RX
-									//
-				(3u << 8) |			// 0 FSK RX gain
-									//   0 ~ 3
-									//
-				(0u << 6) |			// 0 ???
-									//   0 ~ 3
-									//
-				(0u << 4) |			// 0 FSK preamble type selection
-									//   0 = 0xAA or 0x55 due to the MSB of FSK sync byte 0
-									//   1 = ???
-									//   2 = 0x55
-									//   3 = 0xAA
-									//
-				(1u << 1) |			// 1 FSK RX bandwidth setting
-									//   0 = FSK 1.2K .. no tones, direct FM
-									//   1 = FFSK 1200 / 1800
-									//   2 = NOAA SAME RX
-									//   3 = ???
-									//   4 = FSK 2.4K and FFSK 1200 / 2400
-									//   5 = ???
-									//   6 = ???
-									//   7 = ???
-									//
-				(1u << 0));			// 1 FSK enable
-									//   0 = disable
-									//   1 = enable
-		break;
-		case MOD_NOAA_SAME:
-			BK4819_WriteRegister(BK4819_REG_58,
-				(5u << 13) |		// 1 FSK TX mode selection
 									//   0 = FSK 1.2K and FSK 2.4K TX .. no tones, direct FM
 									//   1 = FFSK 1200 / 1800 TX
 									//   2 = ???

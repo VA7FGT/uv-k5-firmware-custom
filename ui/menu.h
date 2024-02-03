@@ -69,7 +69,6 @@ enum
 #ifdef ENABLE_MESSENGER
 	MENU_MSG_RX,
 	MENU_MSG_ACK,
-	MENU_MSG_BAUD_RATE,
 	MENU_MSG_MODULATION,
 #endif
 	MENU_BEEP,
@@ -166,7 +165,6 @@ extern const char 		 gSubMenu_BATTYP[2][9];
 extern const char        gSubMenu_SCRAMBLER[11][7];
 extern const char        gSubMenu_RX_AGC[3][6];
 #ifdef ENABLE_MESSENGER
-extern const char        gSubMenu_MSG_BAUD_RATE[4][5];
 extern const char        gSubMenu_MSG_MODULATION[3][10];
 #endif
 

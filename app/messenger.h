@@ -42,19 +42,10 @@ typedef enum PacketType {
 
 // Modem Modulation                             // 2024 kamilsss655
 typedef enum ModemModulation {
-    MOD_FSK,
-    MOD_AFSK,
-    MOD_NOAA_SAME
+  MOD_FSK_450,   // for bad conditions
+  MOD_FSK_700,   // for medium conditions
+  MOD_AFSK_1200  // for good conditions
 } ModemModulation;
-
-// Modem Baud Rate                             // 2024 kamilsss655
-// lower baud provides better reliability in bad conditions
-typedef enum ModemBaudRate {
-    MOD_BAUD_450,
-    MOD_BAUD_550,
-    MOD_BAUD_700,
-    MOD_BAUD_1200
-} ModemBaudRate;
 
 // Data Packet definition                            // 2024 kamilsss655
 union DataPacket
@@ -78,7 +69,7 @@ typedef union {
       encrypt    :1, // determines whether outgoing messages will be encrypted
       unused     :1,
       modulation :2, // determines FSK modulation type
-      baud       :2; // determines FSK baud rate
+      unused2    :2;
   } data;
   uint8_t __val;
 } MessengerConfig;
