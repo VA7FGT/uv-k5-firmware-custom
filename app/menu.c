@@ -256,6 +256,18 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			*pMax = ARRAY_SIZE(gSubMenu_OFF_ON) - 1;
 			break;
 
+#ifdef ENABLE_MESSENGER
+		case MENU_MSG_BAUD_RATE:
+			*pMin = 0;
+			*pMax = ARRAY_SIZE(gSubMenu_MSG_BAUD_RATE) - 1;
+			break;
+
+		case MENU_MSG_MODULATION:
+			*pMin = 0;
+			*pMax = ARRAY_SIZE(gSubMenu_MSG_MODULATION) - 1;
+			break;
+#endif
+
 		case MENU_AM:
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(gModulationStr) - 1;
@@ -507,6 +519,14 @@ void MENU_AcceptSetting(void)
 
 			case MENU_MSG_ACK:
 				gEeprom.MESSENGER_CONFIG.data.ack = gSubMenuSelection;
+				break;
+
+			case MENU_MSG_BAUD_RATE:
+				gEeprom.MESSENGER_CONFIG.data.baud = gSubMenuSelection;
+				break;
+
+			case MENU_MSG_MODULATION:
+				gEeprom.MESSENGER_CONFIG.data.modulation = gSubMenuSelection;
 				break;
 		#endif
 
@@ -950,6 +970,14 @@ void MENU_ShowCurrentSetting(void)
 
 			case MENU_MSG_ACK:
 				gSubMenuSelection = gEeprom.MESSENGER_CONFIG.data.ack;
+				break;
+
+			case MENU_MSG_BAUD_RATE:
+				gSubMenuSelection = gEeprom.MESSENGER_CONFIG.data.baud;
+				break;
+
+			case MENU_MSG_MODULATION:
+				gSubMenuSelection = gEeprom.MESSENGER_CONFIG.data.modulation;
 				break;
 		#endif
 

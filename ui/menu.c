@@ -121,6 +121,8 @@ const t_menu_item MenuList[] =
 #ifdef ENABLE_MESSENGER
 	{"MsgRx",  VOICE_ID_INVALID,                       MENU_MSG_RX        }, // messenger rx
 	{"MsgAck", VOICE_ID_INVALID,                       MENU_MSG_ACK       }, // messenger respond ACK
+	{"MsgMod", VOICE_ID_INVALID,                       MENU_MSG_MODULATION}, // messenger modulation
+	{"MsBaud", VOICE_ID_INVALID,                       MENU_MSG_BAUD_RATE }, // messenger baud rate
 #endif
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
 	// hidden menu items from here on
@@ -181,6 +183,23 @@ const char gSubMenu_SAVE[][4] =
 	"75%",
 	"80%"
 };
+
+#ifdef ENABLE_MESSENGER
+	const char gSubMenu_MSG_BAUD_RATE[][5] =
+	{
+		"1200",
+		"300",
+		"200",
+		"100"
+	};
+
+	const char gSubMenu_MSG_MODULATION[][10] =
+	{
+		"FSK",
+		"AFSK",
+		"NOAA SAME"
+	};
+#endif
 
 const char gSubMenu_RX_AGC[][6] =
 {
@@ -764,6 +783,16 @@ void UI_DisplayMenu(void)
 					already_printed = true;
 					break;
 				}
+			#endif
+
+			#ifdef ENABLE_MESSENGER
+				case MENU_MSG_BAUD_RATE:
+					strcpy(String, gSubMenu_MSG_BAUD_RATE[gSubMenuSelection]);
+					break;
+
+				case MENU_MSG_MODULATION:
+					strcpy(String, gSubMenu_MSG_MODULATION[gSubMenuSelection]);
+					break;
 			#endif
 
 			case MENU_SAVE:
