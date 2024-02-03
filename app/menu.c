@@ -490,7 +490,7 @@ void MENU_AcceptSetting(void)
 		#ifdef ENABLE_ENCRYPTION
 			case MENU_ENC_KEY:
 				memset(gEeprom.ENC_KEY, 0, sizeof(gEeprom.ENC_KEY));
-				memmove(gEeprom.ENC_KEY, edit, sizeof(edit));
+				memmove(gEeprom.ENC_KEY, edit, sizeof(gEeprom.ENC_KEY));
 				memset(edit, 0, sizeof(edit));
 				gUpdateStatus        = true;
 				break;
