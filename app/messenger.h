@@ -50,10 +50,10 @@ typedef enum ModemModulation {
 // Modem Baud Rate                             // 2024 kamilsss655
 // lower baud provides better reliability in bad conditions
 typedef enum ModemBaudRate {
-    MOD_BAUD_1200,
-    MOD_BAUD_300,
+    MOD_BAUD_100,
     MOD_BAUD_200,
-    MOD_BAUD_100
+    MOD_BAUD_300,
+    MOD_BAUD_1200
 } ModemBaudRate;
 
 // Data Packet definition                            // 2024 kamilsss655

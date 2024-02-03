@@ -187,10 +187,10 @@ const char gSubMenu_SAVE[][4] =
 #ifdef ENABLE_MESSENGER
 	const char gSubMenu_MSG_BAUD_RATE[][5] =
 	{
-		"1200",
-		"300",
+		"100",
 		"200",
-		"100"
+		"300",
+		"1200"
 	};
 
 	const char gSubMenu_MSG_MODULATION[][10] =

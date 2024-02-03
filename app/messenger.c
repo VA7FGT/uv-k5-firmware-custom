@@ -29,7 +29,7 @@ const uint8_t MSG_BUTTON_EVENT_LONG =  MSG_BUTTON_STATE_HELD;
 
 const uint8_t MAX_MSG_LENGTH = PAYLOAD_LENGTH - 1;
 
-const uint16_t TONE2_FREQ = 0x3065; // 0x2854
+uint16_t TONE2_FREQ;
 
 #define NEXT_CHAR_DELAY 100 // 10ms tick
 
@@ -565,7 +565,23 @@ void MSG_ConfigureFSK(bool rx)
 		( 1u <<  7) |    // 1
 		(96u <<  0));    // 96
 
-	// Tone2 baudrate 1200
+	// Tone2 = FSK baudrate 
+	switch(gEeprom.MESSENGER_CONFIG.data.baud)
+	{
+		case MOD_BAUD_1200:
+			TONE2_FREQ = 0x3065;
+			break;
+		case MOD_BAUD_300:
+			TONE2_FREQ = 0xC19;
+			break;
+		case MOD_BAUD_200:
+			TONE2_FREQ = 0x811;
+			break;
+		case MOD_BAUD_100:
+			TONE2_FREQ = 0x408;
+			break;
+	}
+
 	BK4819_WriteRegister(BK4819_REG_72, TONE2_FREQ);
 
 	
