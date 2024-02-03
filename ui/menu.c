@@ -663,6 +663,13 @@ void UI_DisplayMenu(void)
 			#ifdef ENABLE_NOAA
 				case MENU_NOAA_S:
 			#endif
+			#ifdef ENABLE_ENCRYPTION
+				case MENU_MSG_ENC:
+			#endif
+			#ifdef ENABLE_MESSENGER
+				case MENU_MSG_RX:
+				case MENU_MSG_ACK:
+			#endif
 			case MENU_350TX:
 			case MENU_200TX:
 			case MENU_500TX:
@@ -670,7 +677,6 @@ void UI_DisplayMenu(void)
 			case MENU_SCREN:
 				strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
 				break;
-
 			case MENU_MEM_CH:
 			case MENU_1_CALL:
 			case MENU_DEL_CH:
@@ -758,20 +764,6 @@ void UI_DisplayMenu(void)
 					already_printed = true;
 					break;
 				}
-
-				case MENU_MSG_ENC:
-						strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
-						break;
-			#endif
-
-			#ifdef ENABLE_MESSENGER
-				case MENU_MSG_RX:
-						strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
-						break;
-
-				case MENU_MSG_ACK:
-						strcpy(String, gSubMenu_OFF_ON[gSubMenuSelection]);
-						break;
 			#endif
 
 			case MENU_SAVE:

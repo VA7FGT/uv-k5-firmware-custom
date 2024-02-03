@@ -152,7 +152,9 @@ void MSG_EnableRX(const bool enable) {
 
 	if (enable) {
 		MSG_ConfigureFSK(true);
-		BK4819_FskEnableRx();
+
+		if(gEeprom.MESSENGER_CONFIG.data.receive)
+			BK4819_FskEnableRx();
 	} else {
 		BK4819_WriteRegister(BK4819_REG_70, 0);
 		BK4819_WriteRegister(BK4819_REG_58, 0);
@@ -385,7 +387,9 @@ void MSG_HandleReceive(){
 	{
 		// wait so the correspondent radio can properly receive it
 		SYSTEM_DelayMs(700);
-		MSG_SendAck();
+
+		if(gEeprom.MESSENGER_CONFIG.data.ack)
+			MSG_SendAck();
 	}
 }
 
@@ -522,7 +526,14 @@ void MSG_ClearPacketBuffer()
 void MSG_Send(const char *cMessage){
 	MSG_ClearPacketBuffer();
 	#ifdef ENABLE_ENCRYPTION
-		dataPacket.data.header=ENCRYPTED_MESSAGE_PACKET;
+		if(gEeprom.MESSENGER_CONFIG.data.encrypt)
+		{
+			dataPacket.data.header=ENCRYPTED_MESSAGE_PACKET;
+		}
+		else
+		{
+			dataPacket.data.header=MESSAGE_PACKET;
+		}
 	#else
 		dataPacket.data.header=MESSAGE_PACKET;
 	#endif
