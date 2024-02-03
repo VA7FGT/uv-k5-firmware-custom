@@ -685,7 +685,7 @@ void MSG_ConfigureFSK(bool rx)
 		break;
 		case MOD_NOAA_SAME:
 			BK4819_WriteRegister(BK4819_REG_58,
-				(0b101 << 13) |		// 1 FSK TX mode selection
+				(5u << 13) |		// 1 FSK TX mode selection
 									//   0 = FSK 1.2K and FSK 2.4K TX .. no tones, direct FM
 									//   1 = FFSK 1200 / 1800 TX
 									//   2 = ???
@@ -695,7 +695,7 @@ void MSG_ConfigureFSK(bool rx)
 									//   6 = ???
 									//   7 = ???
 									//
-				(0u << 10) |		// 0 FSK RX mode selection
+				(7u << 10) |		// 0 FSK RX mode selection
 									//   0 = FSK 1.2K, FSK 2.4K RX and NOAA SAME RX .. no tones, direct FM
 									//   1 = ???
 									//   2 = ???
@@ -717,7 +717,7 @@ void MSG_ConfigureFSK(bool rx)
 									//   2 = 0x55
 									//   3 = 0xAA
 									//
-				(0b010 << 1) |			// 1 FSK RX bandwidth setting
+				(1u << 1) |			// 1 FSK RX bandwidth setting
 									//   0 = FSK 1.2K .. no tones, direct FM
 									//   1 = FFSK 1200 / 1800
 									//   2 = NOAA SAME RX
