@@ -1,5 +1,8 @@
-/* Copyright 2023 Dual Tachyon
+/* Original work Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
+ *
+ * Modified work Copyright 2024 kamilsss655
+ * https://github.com/kamilsss655
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

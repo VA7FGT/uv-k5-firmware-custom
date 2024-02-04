@@ -1,5 +1,8 @@
-/* Copyright 2023 Dual Tachyon
+/* Original work Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
+ *
+ * Modified work Copyright 2024 kamilsss655
+ * https://github.com/kamilsss655
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -912,6 +915,10 @@ void RADIO_SetVfoState(VfoState_t State)
 	}
 
 	gUpdateDisplay = true;
+}
+
+VfoState_t RADIO_GetVfoState() {
+	return VfoState[(gEeprom.CROSS_BAND_RX_TX == CROSS_BAND_OFF) ? gEeprom.RX_VFO : gEeprom.TX_VFO];
 }
 
 void RADIO_PrepareTX(void)
