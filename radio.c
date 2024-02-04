@@ -914,6 +914,10 @@ void RADIO_SetVfoState(VfoState_t State)
 	gUpdateDisplay = true;
 }
 
+VfoState_t RADIO_GetVfoState() {
+	return VfoState[(gEeprom.CROSS_BAND_RX_TX == CROSS_BAND_OFF) ? gEeprom.RX_VFO : gEeprom.TX_VFO];
+}
+
 void RADIO_PrepareTX(void)
 {
 	VfoState_t State = VFO_STATE_NORMAL;  // default to OK to TX

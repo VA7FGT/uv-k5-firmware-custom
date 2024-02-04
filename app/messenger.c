@@ -179,7 +179,14 @@ void MSG_SendPacket() {
 
 	if ( msgStatus != READY ) return;
 
-	if ( strlen((char *)dataPacket.data.payload) > 0 && (TX_freq_check(gCurrentVfo->pTX->Frequency) == 0) ) {
+	RADIO_PrepareTX();
+
+	if(RADIO_GetVfoState() != VFO_STATE_NORMAL){
+		gRequestDisplayScreen = DISPLAY_MAIN;
+		return;
+	} 
+
+	if ( strlen((char *)dataPacket.data.payload) > 0) {
 
 		msgStatus = SENDING;
 
@@ -219,8 +226,6 @@ void MSG_SendPacket() {
 
 		// mute the mic during TX
 		gMuteMic = true;
-
-		FUNCTION_Select(FUNCTION_TRANSMIT);
 
 		SYSTEM_DelayMs(50);
 

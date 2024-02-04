@@ -155,24 +155,25 @@ extern VfoState_t     VfoState[2];
 // determines whether mic should be muted during TX (i.e during FSK modem TX)
 extern bool           gMuteMic;
 
-bool     RADIO_CheckValidChannel(uint16_t ChNum, bool bCheckScanList, uint8_t RadioNum);
-uint8_t  RADIO_FindNextChannel(uint8_t ChNum, int8_t Direction, bool bCheckScanList, uint8_t RadioNum);
-void     RADIO_InitInfo(VFO_Info_t *pInfo, const uint8_t ChannelSave, const uint32_t Frequency);
-void     RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure);
-void     RADIO_ConfigureSquelchAndOutputPower(VFO_Info_t *pInfo);
-void     RADIO_ApplyTxOffset(VFO_Info_t *pInfo);
-void     RADIO_SelectVfos(void);
-void     RADIO_SetupRegisters(bool bSwitchToFunction0);
+bool       RADIO_CheckValidChannel(uint16_t ChNum, bool bCheckScanList, uint8_t   RadioNum);
+uint8_t    RADIO_FindNextChannel(uint8_t ChNum, int8_t Direction, bool bCheckScanList, uint8_t   RadioNum);
+void       RADIO_InitInfo(VFO_Info_t *pInfo, const uint8_t ChannelSave, const uint32_t Frequency);
+void       RADIO_ConfigureChannel(const unsigned int VFO, const unsigned int configure);
+void       RADIO_ConfigureSquelchAndOutputPower(VFO_Info_t *pInfo);
+void       RADIO_ApplyTxOffset(VFO_Info_t *pInfo);
+void       RADIO_SelectVfos(void);
+void       RADIO_SetupRegisters(bool bSwitchToFunction0);
 #ifdef ENABLE_NOAA
-	void RADIO_ConfigureNOAA(void);
+	void   RADIO_ConfigureNOAA(void);
 #endif
-void     RADIO_SetTxParameters(void);
-void     RADIO_SetModulation(ModulationMode_t modulation);
-void     RADIO_SetVfoState(VfoState_t State);
-void     RADIO_PrepareTX(void);
-void     RADIO_EnableCxCSS(void);
-void     RADIO_PrepareCssTX(void);
-void     RADIO_SendEndOfTransmission(bool playRoger);
+void       RADIO_SetTxParameters(void);
+void       RADIO_SetModulation(ModulationMode_t modulation);
+void       RADIO_SetVfoState(VfoState_t State);
+VfoState_t RADIO_GetVfoState();
+void       RADIO_PrepareTX(void);
+void       RADIO_EnableCxCSS(void);
+void       RADIO_PrepareCssTX(void);
+void       RADIO_SendEndOfTransmission(bool playRoger);
 #endif
 
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
