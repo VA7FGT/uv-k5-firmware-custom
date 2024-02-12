@@ -48,7 +48,7 @@ Video showing SSB reception with a CB antenna mounted on the roof of a car:
 
 https://github.com/kamilsss655/uv-k5-firmware-custom/assets/8842065/d0e931ba-90ca-4644-b48e-4aace1d1842c
 
-Video of the early beta NUNU Protocol enabling message hopping:
+Video of the NUNU Protocol enabling message hopping (available in v.21.0):
 
 https://github.com/kamilsss655/uv-k5-firmware-custom/assets/8842065/5392ce36-9308-4a54-a92c-a82474b4b0d5
 
