@@ -99,7 +99,7 @@ void SETTINGS_SaveSettings(void)
 	State[6] = gEeprom.AUTO_KEYPAD_LOCK;
 	State[7] = gEeprom.POWER_ON_DISPLAY_MODE;
 	EEPROM_WriteBuffer(0x0E90, State, true);
-	
+
 	// 0x0E98..0x0E9F
 	memset(State, 0xFF, sizeof(State));
 	EEPROM_ReadBuffer(0x0E98, State, 8);
@@ -114,12 +114,14 @@ void SETTINGS_SaveSettings(void)
 		State[0] = gEeprom.VOX_DELAY;
 	#endif
 	State[1] = gEeprom.RX_AGC;
-	State[2] = gEeprom.PASSWORD_WRONG_ATTEMPTS;
+	#ifdef ENABLE_PWRON_PASSWORD
+		State[2] = gEeprom.PASSWORD_WRONG_ATTEMPTS;
+	#endif
 	#ifdef ENABLE_MESSENGER
 		State[3] = gEeprom.MESSENGER_CONFIG.__val;
 	#endif
 	EEPROM_WriteBuffer(0x0EA0, State, true);
-	
+
 	memset(State, 0xFF, sizeof(State));
 	#if defined(ENABLE_ALARM) || defined(ENABLE_TX1750)
 		State[0] = gEeprom.ALARM_MODE;
@@ -139,7 +141,7 @@ void SETTINGS_SaveSettings(void)
 	State[2] = gEeprom.DTMF_GROUP_CALL_CODE;
 	State[3] = gEeprom.DTMF_DECODE_RESPONSE;
 	State[4] = gEeprom.DTMF_auto_reset_time;
-#endif	
+#endif
 	State[5] = gEeprom.DTMF_PRELOAD_TIME / 10U;
 	State[6] = gEeprom.DTMF_FIRST_CODE_PERSIST_TIME / 10U;
 	State[7] = gEeprom.DTMF_HASH_CODE_PERSIST_TIME / 10U;
@@ -177,7 +179,7 @@ void SETTINGS_SaveSettings(void)
 	if (!gSetting_live_DTMF_decoder) State[7] &= ~(1u << 1);
 	State[7] = (State[7] & ~(3u << 2)) | ((gSetting_battery_text & 3u) << 2);
 	State[7] = (State[7] & ~(3u << 6)) | ((gSetting_backlight_on_tx_rx & 3u) << 6);
-	 
+
 	EEPROM_WriteBuffer(0x0F40, State, true);
 
 	#ifdef ENABLE_FMRADIO
@@ -226,7 +228,7 @@ void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, 
 				| (pVFO->FrequencyReverse  << 0);
 			if(pVFO->CHANNEL_BANDWIDTH != BK4819_FILTER_BW_WIDE)
 				State[4] |= ((pVFO->CHANNEL_BANDWIDTH - 1) << 5);
-			State[5] = ((pVFO->DTMF_PTT_ID_TX_MODE & 7u) << 1) 
+			State[5] = ((pVFO->DTMF_PTT_ID_TX_MODE & 7u) << 1)
 #ifdef ENABLE_DTMF_CALLING
 				| ((pVFO->DTMF_DECODING_ENABLE & 1u) << 0)
 #endif
@@ -246,7 +248,7 @@ void SETTINGS_SaveChannel(uint8_t Channel, uint8_t VFO, const VFO_Info_t *pVFO, 
 				#else
 					if (Mode >= 3) {
 						SETTINGS_SaveChannelName(Channel, pVFO->Name);
-						
+
 						#ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
 							//update channel names stored in memory
 							BOARD_gMR_LoadChannels();
@@ -280,7 +282,7 @@ void SETTINGS_SaveChannelName(uint8_t channel, const char * name)
 
 #ifdef ENABLE_ENCRYPTION
 void SETTINGS_SaveEncryptionKey()
-{	
+{
 	EEPROM_WriteBuffer(0x0F30, gEeprom.ENC_KEY, true);
 	EEPROM_WriteBuffer(0x0F38, gEeprom.ENC_KEY + 8, true);
 	gRecalculateEncKey = true;
@@ -293,9 +295,9 @@ void SETTINGS_FetchChannelName(char *s, const int channel)
 
 	if (s == NULL)
 		return;
-	
+
 	memset(s, 0, 11);  // 's' had better be large enough !
-	
+
 	if (channel < 0)
 		return;
 
