@@ -36,6 +36,10 @@ Anyway, have fun.
 ---
 ## Videos:
 
+Video showing FM reception in spectrum channel mode:
+
+https://github.com/kamilsss655/uv-k5-firmware-custom/assets/8842065/a30c1031-a4c9-4021-8c44-c7532e354d27
+
 Video showing AM reception in spectrum channel mode:
 
 https://github.com/kamilsss655/uv-k5-firmware-custom/assets/8842065/638a9985-b808-4cbf-9b98-628df64dba46
