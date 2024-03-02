@@ -18,9 +18,10 @@ This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-
 * `VOXSen` fixed and improved VOX sensitivity setting from menu. Added `VoxDel` - VOX delay setting allowing to set value to `0` for no VOX delay which might be useful for packet radio enthusiasts (APRS etc.).
 * `SqTone` configurable squelch tail tones and 180* phase shift tail when in CTCSS mode
 
-> [!WARNING]  
-> Use this firmware at your own risk (entirely). There is absolutely no guarantee that it will work in any way shape or form on your radio(s), it may even brick your radio(s), in which case, you'd need to buy another radio.
-Anyway, have fun.
+> [!WARNING]
+> By using the firmware provided, users are responsible for ensuring compliance with all local laws and regulations governing the use of such technology. The author of the firmware shall not be held liable for any misuse or unlawful activities conducted by the user. It is the user's sole responsibility to use the firmware in a legal and responsible manner. By proceeding to use the firmware, users agree to abide by all applicable laws and regulations.
+The firmware provided does not come with any form of warranty, express or implied. Users understand that there is a risk that the firmware may potentially brick their radio device. The author of the firmware shall not be held responsible for any damage caused to the user's radio device as a result of using the firmware. By proceeding to use the firmware, users agree to do so at their own risk and understand that the author will not be liable for any adverse consequences that may arise. It is the user's responsibility to proceed with caution and understand the potential risks involved in using the firmware.
+
 
 ---
 
