@@ -4,8 +4,11 @@
 This repo is a fork of kamils modifications to egzumer, with a few new additions I'm working on.
 
 * `ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY` this if enabled will allow the channel spectrum mode to be constrained. Requires both VFOs to be in channel mode, one with the lowest channel and the other the highest channel. All channels between them will appear in the spectrum scan (and it will respect scanlist filtering). If enabled ```B``` will be visible in the spectrum with the number of channels (ie, N(87)-B). Enabled in the menu under ```ScnBnd```
-* TODO: Extend this filtering functionality to normal channel scanning
-* Also: The messenger/encryption feature has been disabled in the makefile. It can easily be re-enabled if desired.
+* Boundaries can also be applied to the normal channel scan. Like before set your top/bottom to the edge of what you want to search, and hold ```SCAN```. If bounding is enabled you'll see a ```:3``` in your status bar. To temporarily disable boundaries for a scan you can set each VFO to be the same, or simply change a VFO into Frequency mode. (If you don't have something mapped to ```M-Long```, Try setting it to ```VFO/MR```
+* The messenger/encryption feature has been disabled in the makefile. It can easily be re-enabled if desired.
+* TODO: Double check build options and make sure I didn't break anything if it's disabled
+
+This is alpha software, there will be bugs but nothing a power cycle can't fix. Download in releases
 
 The rest of the unmodified README follows 
 -- 
