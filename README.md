@@ -2,6 +2,10 @@
 
 <img src="images/radio_picture.jpg" width=300 align="right"/>
 
+This repo is a fork of kamils modifications to egzumer, with a few new additions I'm working on.
+* `ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY` this if enabled will allow the channel spectrum mode to be constrained. Requires both VFOs to be in channel mode, one with the lowest channel and the other the highest channel. All channels between them will appear in the spectrum scan (and it will respect scanlist filtering). If enabled ```B``` will be visible in the spectrum with the number of channels (ie, N(87)-B)
+* Also: The messenger/encryption feature has been disabled in the makefile. It can easily be re-enabled if desired.
+
 This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-firmware-custom) plus my changes:
 
 * `ENABLE_SPECTRUM_CHANNEL_SCAN` this enables spectrum channel scan mode (enter by going into memory mode and press F+5, this allows SUPER fast channel scanning (**4.5x faster than regular scanning**), regular scan of 200 memory channels takes roughly 18 seconds, **spectrum memory scan takes roughly 4 seconds**, if you have less channels stored i.e 50 - the spectrum memory scan will take only **1 second**
