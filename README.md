@@ -1,10 +1,11 @@
 # Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
 
 <img src="images/radio_picture.jpg" width=300 align="right"/>
-
 This repo is a fork of kamils modifications to egzumer, with a few new additions I'm working on.
-* `ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY` this if enabled will allow the channel spectrum mode to be constrained. Requires both VFOs to be in channel mode, one with the lowest channel and the other the highest channel. All channels between them will appear in the spectrum scan (and it will respect scanlist filtering). If enabled ```B``` will be visible in the spectrum with the number of channels (ie, N(87)-B)
+* `ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY` this if enabled will allow the channel spectrum mode to be constrained. Requires both VFOs to be in channel mode, one with the lowest channel and the other the highest channel. All channels between them will appear in the spectrum scan (and it will respect scanlist filtering). If enabled ```B``` will be visible in the spectrum with the number of channels (ie, N(87)-B). Enabled in the menu under ```ScnBnd```
+* TODO: Extend this filtering functionality to normal channel scanning
 * Also: The messenger/encryption feature has been disabled in the makefile. It can easily be re-enabled if desired.
+
 The rest of the unmodified README follows 
 -- 
 
