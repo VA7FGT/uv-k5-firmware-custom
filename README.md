@@ -1,7 +1,6 @@
-# Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
+# UV-K5, now with 400% more ```:3```
 
-<img src="images/radio_picture.jpg" width=300 align="right"/>
-This repo is a fork of kamils modifications to egzumer, with a few new additions I'm working on.
+This repo is a fork of kamils modifications to egzumer, with a few new additions I'm working on to improve scanning.
 
 * `ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY` this if enabled will allow the channel spectrum mode to be constrained. Requires both VFOs to be in channel mode, one with the lowest channel and the other the highest channel. All channels between them will appear in the spectrum scan (and it will respect scanlist filtering). If enabled ```B``` will be visible in the spectrum with the number of channels (ie, N(87)-B). Enabled in the menu under ```ScnBnd```
 * Boundaries can also be applied to the normal channel scan. Like before set your top/bottom to the edge of what you want to search, and hold ```SCAN```. If bounding is enabled you'll see a ```:3``` in your status bar. To temporarily disable boundaries for a scan you can set each VFO to be the same, or simply change a VFO into Frequency mode. (If you don't have something mapped to ```M-Long```, Try setting it to ```VFO/MR```
@@ -12,6 +11,9 @@ This is alpha software, there will be bugs but nothing a power cycle can't fix. 
 
 The rest of the unmodified README follows 
 -- 
+# Open re-implementation of the Quansheng UV-K5 v2.1.27 firmware
+
+<img src="images/radio_picture.jpg" width=300 align="right"/>
 
 This repository is a fork of [Egzumer firmare](https://github.com/egzumer/uv-k5-firmware-custom) plus my changes:
 
