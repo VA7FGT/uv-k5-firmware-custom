@@ -1134,6 +1134,12 @@ void APP_TimeSlice10ms(void)
 {
 	gFlashLightBlinkCounter++;
 
+#ifdef ENABLE_BOOT_BEEPS
+	if (boot_counter_10ms > 0 && (boot_counter_10ms % 25) == 0) {
+		AUDIO_PlayBeep(BEEP_880HZ_40MS_OPTIONAL);
+	}
+#endif
+
 	#ifdef ENABLE_MESSENGER
 		keyTickCounter++;
 	#endif

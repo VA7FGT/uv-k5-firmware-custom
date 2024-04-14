@@ -80,6 +80,9 @@ bool redrawScreen = false;
 bool newScanStart = true;
 bool preventKeypress = true;
 bool audioState = true;
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+bool isBounded = false;
+#endif
 
 State currentState = SPECTRUM, previousState = SPECTRUM;
 
@@ -349,6 +352,7 @@ static void DeInitSpectrum() {
   RestoreRegisters();
   gVfoConfigureMode = VFO_CONFIGURE;
   isInitialized = false;
+  isBounded = false;
 }
 
 uint8_t GetBWRegValueForScan() {
@@ -845,6 +849,9 @@ static void DrawNums() {
     }
     else {
       sprintf(String, "%ux", GetStepsCount());
+    }
+    if (isBounded) {
+      sprintf(String, "%s-B", String);
     }
     GUI_DisplaySmallest(String, 0, 1, false, true);
 
@@ -1459,6 +1466,13 @@ void APP_RunSpectrum() {
   #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
     if (appMode==CHANNEL_MODE)
     {
+      // Check if we have two channels set up + menu, if so set bounded mode
+      #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+      if (gEeprom.SPEC_CHAN_BOUND && IS_MR_CHANNEL(gEeprom.ScreenChannel[0]) && IS_MR_CHANNEL(gEeprom.ScreenChannel[1])) {
+        isBounded = true;
+      }
+      #endif
+
       LoadValidMemoryChannels();
       AutoAdjustResolution();
     }
@@ -1520,10 +1534,16 @@ void APP_RunSpectrum() {
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
   void LoadValidMemoryChannels()
   {
-    memset(scanChannel,0,sizeof(scanChannel));
-    scanChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
-    signed int channelIndex=-1;
-    for(int i=0; i < scanChannelsCount; i++)
+    memset(scanChannel,0,sizeof(scanChannel));  // Reset Scan info
+    scanChannelsCount = 0;
+    int allChannelsCount = RADIO_ValidMemoryChannelsCount(true, settings.scanList);
+    
+    // Sort out mixed up channels
+    uint8_t lowChannel  = gEeprom.ScreenChannel[0] < gEeprom.ScreenChannel[1] ? gEeprom.ScreenChannel[0] : gEeprom.ScreenChannel[1];
+    uint8_t highChannel = gEeprom.ScreenChannel[0] > gEeprom.ScreenChannel[1] ? gEeprom.ScreenChannel[0] : gEeprom.ScreenChannel[1];
+
+    signed int channelIndex =- 1;
+    for(int i=0; i < allChannelsCount; i++)
     {
       int nextChannel;
       nextChannel = RADIO_FindNextChannel((channelIndex)+1, 1, true, settings.scanList);
@@ -1534,8 +1554,15 @@ void APP_RunSpectrum() {
       }
       else
       {
+        // Move cursor forward
         channelIndex = nextChannel;
-        scanChannel[i]=channelIndex;
+
+        // Check if channel fits bounds
+        if (isBounded && ((nextChannel < lowChannel) || (nextChannel > highChannel)))
+          continue;
+
+        scanChannel[scanChannelsCount] = channelIndex;
+        scanChannelsCount++;
       }
     }
   }

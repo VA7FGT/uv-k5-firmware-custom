@@ -126,6 +126,9 @@ const t_menu_item MenuList[] =
 	{"MsgAck", VOICE_ID_INVALID,                       MENU_MSG_ACK       }, // messenger respond ACK
 	{"MsgMod", VOICE_ID_INVALID,                       MENU_MSG_MODULATION}, // messenger modulation
 #endif
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+	{"ScnBnd",  VOICE_ID_INVALID,                      MENU_SPEC_BOUND}, // Spectrum Channel Filter
+#endif
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
 	// hidden menu items from here on
 	// enabled if pressing both the PTT and upper side button at power-on
@@ -150,7 +153,10 @@ const int CHANNEL_ONLY_SETTINGS[] = {
 	MENU_S_ADD2,
 	MENU_DEL_CH,
 	MENU_MEM_NAME,
-	MENU_1_CALL
+	MENU_1_CALL,
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+	MENU_SPEC_BOUND
+#endif
 };
 
 const int VFO_ONLY_SETTINGS[] = {};
@@ -683,6 +689,9 @@ void UI_DisplayMenu(void)
 			#ifdef ENABLE_MESSENGER
 				case MENU_MSG_RX:
 				case MENU_MSG_ACK:
+			#endif
+			#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+				case MENU_SPEC_BOUND:
 			#endif
 			case MENU_350TX:
 			case MENU_200TX:

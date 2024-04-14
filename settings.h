@@ -270,6 +270,9 @@ typedef struct {
 	uint32_t              RX_OFFSET;
 	uint8_t				  RX_AGC;
 	uint16_t              SQL_TONE;
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+	bool				  SPEC_CHAN_BOUND;
+#endif
 } EEPROM_Config_t;
 
 extern EEPROM_Config_t gEeprom;

@@ -255,6 +255,9 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 		case MENU_MSG_RX:
 		case MENU_MSG_ACK:
 #endif
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+		case MENU_SPEC_BOUND:
+#endif
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(gSubMenu_OFF_ON) - 1;
 			break;
@@ -521,6 +524,12 @@ void MENU_AcceptSetting(void)
 
 			case MENU_MSG_MODULATION:
 				gEeprom.MESSENGER_CONFIG.data.modulation = gSubMenuSelection;
+				break;
+		#endif
+
+		#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+			case MENU_SPEC_BOUND:
+				gEeprom.SPEC_CHAN_BOUND = gSubMenuSelection;
 				break;
 		#endif
 
@@ -968,6 +977,11 @@ void MENU_ShowCurrentSetting(void)
 
 			case MENU_MSG_MODULATION:
 				gSubMenuSelection = gEeprom.MESSENGER_CONFIG.data.modulation;
+				break;
+		#endif
+		#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+			case MENU_SPEC_BOUND:
+				gSubMenuSelection = gEeprom.SPEC_CHAN_BOUND;
 				break;
 		#endif
 

@@ -44,12 +44,14 @@ ENABLE_SCAN_RANGES                      := 1
 ENABLE_SPECTRUM_COPY_VFO                := 1
 ENABLE_SPECTRUM_SHOW_CHANNEL_NAME       := 1
 ENABLE_SPECTRUM_CHANNEL_SCAN            := 1
-ENABLE_MESSENGER                        := 1
-ENABLE_MESSENGER_DELIVERY_NOTIFICATION  := 1
-ENABLE_MESSENGER_FSK_MUTE               := 1
-ENABLE_MESSENGER_NOTIFICATION           := 1
+ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY	:= 1
+ENABLE_BOOT_BEEPS						:= 1
+ENABLE_MESSENGER                        := 0  # Disable all messenger features for space
+ENABLE_MESSENGER_DELIVERY_NOTIFICATION  := 0
+ENABLE_MESSENGER_FSK_MUTE               := 0
+ENABLE_MESSENGER_NOTIFICATION           := 0
 ENABLE_MESSENGER_UART                   := 0
-ENABLE_ENCRYPTION                       := 1
+ENABLE_ENCRYPTION                       := 0
 
 #############################################################
 
@@ -382,6 +384,9 @@ ifeq ($(ENABLE_MESSENGER_UART),1)
 endif
 ifeq ($(ENABLE_ENCRYPTION),1)
 	CFLAGS  += -DENABLE_ENCRYPTION
+endif
+ifeq ($(ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY),1)
+	CFLAGS  += -DENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
 endif
 
 LDFLAGS =
