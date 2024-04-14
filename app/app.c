@@ -1136,7 +1136,8 @@ void APP_TimeSlice10ms(void)
 
 #ifdef ENABLE_BOOT_BEEPS
 	if (boot_counter_10ms > 0 && (boot_counter_10ms % 25) == 0) {
-		AUDIO_PlayBeep(BEEP_880HZ_40MS_OPTIONAL);
+		AUDIO_PlayBeep(BEEP_880HZ_500MS);
+		AUDIO_PlayBeep(BEEP_880HZ_500MS);
 	}
 #endif
 

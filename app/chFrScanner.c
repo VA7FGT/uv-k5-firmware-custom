@@ -27,17 +27,37 @@ uint32_t            initialFrqOrChan;
 uint8_t           	initialCROSS_BAND_RX_TX;
 uint32_t            lastFoundFrqOrChan;
 
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+bool				isScanBounded   = false;
+uint8_t 			lowChannel  	= -1; 
+uint8_t 			highChannel 	= -1; 
+#endif
+
 static void NextFreqChannel(void);
 static void NextMemChannel(void);
 
 void CHFRSCANNER_Start(const bool storeBackupSettings, const int8_t scan_direction)
 {
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+	// Check if in Channel Mode, Bounding is enabled, and Both VFOs are Channels and Both VFOs are Different
+	// Yes it is absolutely fucking disgusting and I'm sorry
+	if (IS_MR_CHANNEL(gNextMrChannel)
+		&& gEeprom.SPEC_CHAN_BOUND 
+		&& (IS_MR_CHANNEL(gEeprom.ScreenChannel[0]) && IS_MR_CHANNEL(gEeprom.ScreenChannel[1]))
+		&& (gEeprom.ScreenChannel[0] != gEeprom.ScreenChannel[1]))
+	{
+		isScanBounded = true;
+		lowChannel    = gEeprom.ScreenChannel[0] < gEeprom.ScreenChannel[1] ? gEeprom.ScreenChannel[0] : gEeprom.ScreenChannel[1];
+		highChannel   = gEeprom.ScreenChannel[0] > gEeprom.ScreenChannel[1] ? gEeprom.ScreenChannel[0] : gEeprom.ScreenChannel[1];
+	}
+#endif
+
 	if (storeBackupSettings) {
 		initialCROSS_BAND_RX_TX = gEeprom.CROSS_BAND_RX_TX;
 		gEeprom.CROSS_BAND_RX_TX = CROSS_BAND_OFF;
 		gScanKeepResult = false;
 	}
-	
+
 	RADIO_SelectVfos();
 
 	gNextMrChannel   = gRxVfo->CHANNEL_SAVE;
@@ -152,6 +172,13 @@ void CHFRSCANNER_Stop(void)
 
 	RADIO_SetupRegisters(true);
 	gUpdateDisplay = true;
+
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+	// Clean up for next run
+	isScanBounded = false;
+	lowChannel = -1;
+	highChannel = -1;
+#endif
 }
 
 static void NextFreqChannel(void)
@@ -177,6 +204,8 @@ static void NextFreqChannel(void)
 	gUpdateDisplay     = true;
 }
 
+
+		
 static void NextMemChannel(void)
 {
 	static unsigned int prev_mr_chan = 0;
@@ -242,10 +271,16 @@ static void NextMemChannel(void)
 	if (!enabled || chan == 0xff)
 	{
 		chan = RADIO_FindNextChannel(gNextMrChannel + gScanStateDir, gScanStateDir, (gEeprom.SCAN_LIST_DEFAULT < 2) ? true : false, gEeprom.SCAN_LIST_DEFAULT);
-		if (chan == 0xFF)
-		{	// no valid channel found
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+		// Save scanning through channels outside of range
+		if (chan > highChannel) {
+			chan = lowChannel;
+		}
+#else
+		if (chan == 0xFF) {	// no valid channel found
 			chan = MR_CHANNEL_FIRST;
 		}
+#endif
 		
 		gNextMrChannel = chan;
 	}
@@ -261,13 +296,19 @@ static void NextMemChannel(void)
 		gUpdateDisplay = true;
 	}
 
+	// Instead of skipping ahead, we just omit the pause
+	bool toSkip = isScanBounded && ((gNextMrChannel < lowChannel) || (gNextMrChannel > highChannel));
+	if (toSkip) {
+		gScanPauseDelayIn_10ms = 1;
+	} else {
 #ifdef ENABLE_FASTER_CHANNEL_SCAN
-	gScanPauseDelayIn_10ms = 9;  // 90ms .. <= ~60ms it misses signals (squelch response and/or PLL lock time) ?
+		gScanPauseDelayIn_10ms = 9;  // 90ms .. <= ~60ms it misses signals (squelch response and/or PLL lock time) ?
 #else
-	gScanPauseDelayIn_10ms = scan_pause_delay_in_3_10ms;
+		gScanPauseDelayIn_10ms = scan_pause_delay_in_3_10ms;
 #endif
+	}
 
 	if (enabled)
 		if (++currentScanList >= SCAN_NEXT_NUM)
 			currentScanList = SCAN_NEXT_CHAN_SCANLIST1;  // back round we go
-}
+}		

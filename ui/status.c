@@ -92,6 +92,12 @@ void UI_DisplayStatus()
 		}
 		x += sizeof(BITMAP_NEWMSG);
 	#endif
+	#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+		// Scanbound indicator
+		if (isScanBounded) memcpy(line + x, BITMAP_BOUNDED, sizeof(BITMAP_BOUNDED));
+		x1 = x + sizeof(BITMAP_BOUNDED);
+		x += sizeof(BITMAP_BOUNDED);
+	#endif
 
 #ifdef ENABLE_DTMF_CALLING
 	if (gSetting_KILLED)

@@ -49,4 +49,7 @@ extern const uint8_t BITMAP_compand[6];
 #ifdef ENABLE_MESSENGER
 	extern const uint8_t BITMAP_NEWMSG[8];
 #endif
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+	extern const uint8_t BITMAP_BOUNDED[8];
+#endif
 

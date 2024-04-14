@@ -336,3 +336,16 @@ const uint8_t BITMAP_NEWMSG[8] =
 	0b01111110,
 };
 #endif
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+const uint8_t BITMAP_BOUNDED[8] =
+{	// lil smiley icon
+	0b00110000,
+	0b01000110,
+	0b01000010,
+	0b00100000,
+	0b00100000,
+	0b01000110,
+	0b01000010,
+	0b00110000,
+};
+#endif

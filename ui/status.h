@@ -20,6 +20,10 @@
 #ifndef UI_STATUS_H
 #define UI_STATUS_H
 
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY
+extern bool isScanBounded;
+#endif
+
 void UI_DisplayStatus();
 
 #endif
