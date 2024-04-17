@@ -46,6 +46,9 @@ ENABLE_SPECTRUM_SHOW_CHANNEL_NAME       := 1
 ENABLE_SPECTRUM_CHANNEL_SCAN            := 1
 ENABLE_SPECTRUM_CHANNEL_SCAN_BOUNDARY	:= 1
 ENABLE_BOOT_BEEPS						:= 0
+ENABLE_WATERFALL						:= 1
+
+# Kamil Messenger
 ENABLE_MESSENGER                        := 0  # Disable all messenger features for space
 ENABLE_MESSENGER_DELIVERY_NOTIFICATION  := 0
 ENABLE_MESSENGER_FSK_MUTE               := 0
@@ -168,6 +171,9 @@ ifeq ($(ENABLE_ENCRYPTION),1)
 	OBJS += external/chacha/chacha.o
 	OBJS += helper/crypto.o
 endif
+ifeq ($(ENABLE_WATERFALL),1)
+	OBJS += app/waterfall.o 
+endif
 
 ifeq ($(OS), Windows_NT)
 	TOP := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -208,7 +214,7 @@ endif
 OBJCOPY = arm-none-eabi-objcopy
 SIZE = arm-none-eabi-size
 
-AUTHOR_STRING := NUNU
+AUTHOR_STRING := VA7FGT
 # the user might not have/want git installed
 # can set own version string here (max 7 chars)
 ifneq (, $(shell $(WHERE) git))
@@ -391,6 +397,9 @@ endif
 ifeq ($(ENABLE_BOOT_BEEPS),1)
 	CFLAGS  += -DENABLE_BOOT_BEEPS
 endif
+ifeq ($(ENABLE_WATERFALL),1)
+	CFLAGS  += -DENABLE_WATERFALL
+endif
 
 LDFLAGS =
 ifeq ($(ENABLE_CLANG),0)
@@ -445,7 +454,7 @@ ifndef MY_PYTHON
 else ifneq (,$(HAS_CRCMOD))
 	$(info )
 	$(info !!!!!!!! CRCMOD NOT INSTALLED, *.PACKED.BIN WON'T BE BUILT)
-	$(info !!!!!!!! run: pip install crcmod)
+$(info !!!!!!!! run: pip install crcmod)
 	$(info )
 else
 	-$(MY_PYTHON) fw-pack.py $<.bin $(AUTHOR_STRING) $(VERSION_STRING) $<.packed.bin

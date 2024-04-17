@@ -42,6 +42,9 @@ void ACTION_SwitchDemodul(void);
 #ifdef ENABLE_BLMIN_TMP_OFF
 void ACTION_BlminTmpOff(void);
 #endif
+#ifdef ENABLE_WATERFALL
+void ACTION_RunWaterfall(void);
+#endif
 
 void ACTION_Handle(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 

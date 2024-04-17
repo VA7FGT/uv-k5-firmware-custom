@@ -14,8 +14,43 @@
  *     limitations under the License.
  */
 
-#ifndef SPECTRUM_H
-#define SPECTRUM_H
+
+/*
+
+   )                     )      )  
+( /(   (        (     ( /(   ( /(  
+)\())  )\       )\    )\())  )\()) 
+((_)\((((_)(   (((_) |((_)\  ((_)\  
+_((_))\ _ )\  )\___ |_ ((_)__ ((_) 
+| || |(_)_\(_)((/ __|| |/ / \ \ / / 
+| __ | / _ \   | (__   ' <   \ V /  
+|_||_|/_/ (_\   \___| _|\_\   |_|   
+   (      )\ )                      
+   )\    (()/(                      
+((((_)(   /(_))                     
+ )\ _ )\ (_))                       
+ (_)_\(_)/ __|                      
+  / _ \  \__ \                      
+ (_/ \_\ |___/          )           
+ )\ )          (     ( /(           
+(()/(    (     )\    )\())          
+ /(_))   )\  (((_) |((_)\           
+(_))_|_ ((_) )\___ |_ ((_)          
+| |_ | | | |((/ __|| |/ /           
+| __|| |_| | | (__   ' <            
+|_|   \___/   \___| _|\_\           
+
+// Yeah most of this is duplicated from spectrum
+// Yeah the conflicting vars are prefixed with W
+// Yeah this whole thing was a half baked idea 
+
+// lol
+// Jane, VA7FGT
+
+*/
+
+#ifndef WATERFALL_H
+#define WATERFALL_H 
 
 #include "../bitmaps.h"
 #include "../board.h"
@@ -29,7 +64,6 @@
 #include "../driver/systick.h"
 #include "../external/printf/printf.h"
 #include "../font.h"
-#include "../frequencies.h"
 #include "../helper/battery.h"
 #include "../misc.h"
 #include "../radio.h"
@@ -39,20 +73,18 @@
 #include <stdint.h>
 #include <string.h>
 
-/*
-static const uint8_t DrawingEndY = 40;
+static const uint8_t WDrawingEndY = 40;
 
-static const uint8_t U8RssiMap[] = {
+static const uint8_t WU8RssiMap[] = {
     121, 115, 109, 103, 97, 91, 85, 79, 73, 63,
 };
 
-static const uint16_t scanStepValues[] = {
-    1,   10,  50,  100,
-
-    250, 500, 625, 833, 1000, 1250, 2500, 10000,
+static const uint16_t WscanStepValues[] = {
+    1, 10, 50, 100, 250, 500, 625, 833, 
+    1000, 1250, 1500, 2000, 2500, 5000, 10000,
 };
 
-static const uint16_t scanStepBWRegValues[] = {
+static const uint16_t WscanStepBWRegValues[] = {
     //     RX  RXw TX  BW
     // 0b0 000 000 001 01 1000
     // 1
@@ -81,59 +113,48 @@ static const uint16_t scanStepBWRegValues[] = {
     0b0011011000101000, // 25
 };
 
-// static const uint16_t listenBWRegValues[] = {
-//     0b0011011000101000, // 25
-//     0b0111111100001000, // 12.5
-//     0b0100100001011000, // 6.25
-// };
+static const uint16_t WlistenBWRegValues[] = {
+    0b0011011000101000, // 25
+    0b0111111100001000, // 12.5
+    0b0100100001011000, // 6.25
+};
 
-typedef enum State {
-  SPECTRUM,
-  FREQ_INPUT,
-  STILL,
-} State;
+typedef enum WState {
+  WSPECTRUM,
+  WFREQ_INPUT,
+  WSTILL,
+} WState;
 
-#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-typedef enum Mode {
-  FREQUENCY_MODE,
-  CHANNEL_MODE,
-  SCAN_RANGE_MODE
-} Mode;
-#endif
+typedef enum WStepsCount {
+  WSTEPS_128,
+  WSTEPS_64,
+  WSTEPS_32,
+  WSTEPS_16,
+} WStepsCount;
 
-typedef enum StepsCount {
-  STEPS_128,
-  STEPS_64,
-  STEPS_32,
-  STEPS_16,
-} StepsCount;
+typedef enum WScanStep {
+  WS_STEP_0_01kHz,
+  WS_STEP_0_1kHz,
+  WS_STEP_0_5kHz,
+  WS_STEP_1_0kHz,
 
-typedef enum ScanStep {
-  S_STEP_0_01kHz,
-  S_STEP_0_1kHz,
-  S_STEP_0_5kHz,
-  S_STEP_1_0kHz,
+  WS_STEP_2_5kHz,
+  WS_STEP_5_0kHz,
+  WS_STEP_6_25kHz,
+  WS_STEP_8_33kHz,
+  WS_STEP_10_0kHz,
+  WS_STEP_12_5kHz,
+  WS_STEP_15_0kHz,
+  WS_STEP_20_0kHz,
+  WS_STEP_25_0kHz,
+  WS_STEP_50_0kHz,
+  WS_STEP_100_0kHz,
+} WScanStep;
 
-  S_STEP_2_5kHz,
-  S_STEP_5_0kHz,
-  S_STEP_6_25kHz,
-  S_STEP_8_33kHz,
-  S_STEP_10_0kHz,
-  S_STEP_12_5kHz,
-  S_STEP_25_0kHz,
-  S_STEP_100_0kHz,
-} ScanStep;
-
-typedef enum ScanList {
-  S_SCAN_LIST_1,
-  S_SCAN_LIST_2,
-  S_SCAN_LIST_ALL
-} ScanList;
-
-typedef struct SpectrumSettings {
+typedef struct WSpectrumSettings {
   uint32_t frequencyChangeStep;  
-  StepsCount stepsCount;
-  ScanStep scanStepIndex;
+  WStepsCount stepsCount;
+  WScanStep scanStepIndex;
   uint16_t scanDelay;
   uint16_t rssiTriggerLevel;
   BK4819_FilterBandwidth_t bw;
@@ -142,49 +163,31 @@ typedef struct SpectrumSettings {
   int dbMax;  
   ModulationMode_t modulationType;
   bool backlightState;
-  int scanList;
-} SpectrumSettings;
+} WSpectrumSettings;
 
-typedef struct KeyboardState {
+typedef struct WKeyboardState {
   KEY_Code_t current;
   KEY_Code_t prev;
   uint8_t counter;
-} KeyboardState;
+} WKeyboardState;
 
-typedef struct ScanInfo {
+typedef struct WScanInfo {
   uint16_t rssi, rssiMin, rssiMax;
   uint16_t i, iPeak;
   uint32_t f, fPeak;
   uint16_t scanStep;
   uint16_t measurementsCount;
-} ScanInfo;
+} WScanInfo;
 
-typedef struct PeakInfo {
+typedef struct WPeakInfo {
   uint16_t t;
   uint16_t rssi;
   uint32_t f;
   uint16_t i;
-} PeakInfo;
+} WPeakInfo;
 
-*/
+void APP_RunWaterfall(void);
 
-typedef enum Mode {
-  TEST_THIS_ONLY,
-  SCAN_RANGE_MODE
-} Mode;
-
-#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
-void APP_RunSpectrum(Mode mode);
-#elif
-void APP_RunSpectrum(void);
-#endif
-
-/*
-#ifdef ENABLE_SPECTRUM_SHOW_CHANNEL_NAME
-  void LookupChannelInfo();
-#endif
-*/
-
-#endif /* ifndef SPECTRUM_H */
+#endif /* ifndef WATERFALL_H */
 
 // vim: ft=c

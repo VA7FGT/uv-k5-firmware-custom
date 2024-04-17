@@ -43,6 +43,10 @@
 #include "ui/ui.h"
 #include "spectrum.h"
 
+#ifdef ENABLE_WATERFALL
+#include "app/waterfall.h"
+#endif
+
 static void ACTION_FlashLight(void)
 {
 	switch (gFlashLightState)
@@ -248,6 +252,12 @@ void ACTION_Scan(bool bRestart)
 	}
 #endif
 
+void ACTION_RunWaterfall(void) {
+#ifdef ENABLE_WATERFALL
+	APP_RunWaterfall();
+#endif
+}
+
 void ACTION_RunSpectrum(void)
 {
 	#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
@@ -434,6 +444,11 @@ void ACTION_Handle(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 #ifdef ENABLE_BLMIN_TMP_OFF
 		case ACTION_OPT_BLMIN_TMP_OFF:
 			ACTION_BlminTmpOff();
+			break;
+#endif
+#ifdef ENABLE_WATERFALL
+		case ACTION_OPT_WATERFALL:
+			ACTION_RunWaterfall();
 			break;
 #endif
 	}

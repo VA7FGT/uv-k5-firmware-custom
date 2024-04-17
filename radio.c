@@ -1128,3 +1128,31 @@ uint8_t RADIO_ValidMemoryChannelsCount(bool bCheckScanList, uint8_t VFO)
 		return count;
 	}
 #endif
+
+void RADIO_SetupAGC(bool listeningAM, bool disable)
+{
+	static uint8_t lastSettings;
+	uint8_t newSettings = (listeningAM << 1) | (disable << 1);
+	if(lastSettings == newSettings)
+		return;
+	lastSettings = newSettings;
+
+
+	if(!listeningAM) { // if not actively listening AM we don't need any AM specific regulation
+		BK4819_SetAGC(!disable);
+		BK4819_InitAGC(gEeprom.RX_AGC, false);
+	}
+	else {
+#ifdef ENABLE_AM_FIX
+		if(gSetting_AM_fix) { // if AM fix active lock AGC so AM-fix can do it's job
+			BK4819_SetAGC(0);
+			AM_fix_enable(!disable);
+		}
+		else
+#endif
+		{
+			BK4819_SetAGC(!disable);
+			BK4819_InitAGC(gEeprom.RX_AGC, true);
+		}
+	}
+}

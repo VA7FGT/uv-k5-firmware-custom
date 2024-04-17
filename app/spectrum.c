@@ -27,6 +27,7 @@
 #endif
 #include "action.h"
 
+/*
 struct FrequencyBandInfo {
     uint32_t lower;
     uint32_t upper;
@@ -1452,7 +1453,6 @@ static void Tick() {
     redrawScreen = false;
   }
 }
-
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
 void APP_RunSpectrum(Mode mode) {
   // reset modifiers if we launched in a different then previous mode
@@ -1633,4 +1633,15 @@ void APP_RunSpectrum() {
     }
     
   }
+*/
+
+#ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
+void APP_RunSpectrum(Mode mode){
+  mode = TEST_THIS_ONLY;
+  mode++;
+}
+#elif
+void APP_RunSpectrum(void) {}
 #endif
+
+//UHHHHH WHOSE IS THIS?? #endif 

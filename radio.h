@@ -182,3 +182,5 @@ void       RADIO_SendEndOfTransmission(bool playRoger);
 #ifdef ENABLE_SPECTRUM_CHANNEL_SCAN
 	uint8_t RADIO_ValidMemoryChannelsCount(bool bCheckScanList, uint8_t VFO);
 #endif
+
+void RADIO_SetupAGC(bool listeningAM, bool disable);
